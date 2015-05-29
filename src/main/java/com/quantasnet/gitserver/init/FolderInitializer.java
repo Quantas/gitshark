@@ -11,7 +11,7 @@ public abstract class FolderInitializer implements Initializer {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	protected void initializeDirectory(final String dir, final String name) throws FileNotFoundException {
-		final File folder = new File(dir.replaceFirst("^~",System.getProperty("user.home")));
+		final File folder = new File(name);
 		
 		logger.info("Checking folder: {}", folder.getAbsolutePath());
 		

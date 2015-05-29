@@ -4,19 +4,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.quantasnet.gitserver.util.GitServerFolderUtil;
+import com.quantasnet.gitserver.git.repo.RepoFolderUtil;
 
 @Order(InitOrdering.SERVER_ROOT)
 @Component
 public class GitServerFolderInitalizer extends FolderInitializer {
 
 	@Autowired
-	private GitServerFolderUtil folderUtil;
+	private RepoFolderUtil folderUtil;
 	
 	@Override
 	public void init() throws Exception {
 		initializeDirectory(folderUtil.getRoot(), "Git Root");
-		initializeDirectory(folderUtil.getRepos(), "Git Repos");
+		initializeDirectory(folderUtil.getReposRoot(), "Git Repos");
+		initializeDirectory(folderUtil.getUserReposRoot(), "Git User Repos");
+		initializeDirectory(folderUtil.getProjectReposRoot(), "Git Project Repos");
 	}
 
 }
