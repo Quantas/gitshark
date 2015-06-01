@@ -14,12 +14,6 @@ public class RepoFolderUtil {
 	@Value("${git.dir.repos}")
 	private String repos;
 	
-	@Value("${git.dir.users}")
-	private String userRepos;
-	
-	@Value("${git.dir.projects}")
-	private String projectRepos;
-	
 	public String getRoot() {
 		return expand(gitRoot);
 	}
@@ -28,20 +22,8 @@ public class RepoFolderUtil {
 		return getRoot() + File.separatorChar + repos;
 	}
 	
-	public String getUserReposName() {
-		return userRepos;
-	}
-	
-	public String getUserReposRoot() {
-		return getReposRoot() + File.separatorChar + userRepos;
-	}
-	
-	public String getProjectReposName() {
-		return projectRepos;
-	}
-	
-	public String getProjectReposRoot() {
-		return getReposRoot() + File.separatorChar + projectRepos;
+	public File getRepoDir(final String owner) {
+		return new File(getReposRoot() + File.separatorChar + owner);
 	}
 	
 	private String expand(final String location) {

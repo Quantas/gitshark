@@ -17,8 +17,6 @@ public class GitServerFolderInitalizer extends FolderInitializer {
 	public void init() throws Exception {
 		initializeDirectory(folderUtil.getRoot(), "Git Root");
 		initializeDirectory(folderUtil.getReposRoot(), "Git Repos");
-		initializeDirectory(folderUtil.getUserReposRoot(), "Git User Repos");
-		initializeDirectory(folderUtil.getProjectReposRoot(), "Git Project Repos");
 	}
 
 }

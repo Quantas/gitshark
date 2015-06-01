@@ -5,6 +5,8 @@ import java.io.FileFilter;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,37 +17,40 @@ public class RepositoryService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RepositoryService.class);
 	
-	private static final FileFilter FOLDERS_ONLY_FILTER = new FileFilter() {
+	private static final FileFilter GIT_ONLY_FILTER = new FileFilter() {
 		@Override
 		public boolean accept(File pathname) {
-			return pathname.isDirectory();
+			return pathname.getAbsolutePath().endsWith(".git");
 		}
 	};
 	
 	@Autowired
 	private RepoFolderUtil folderUtil;
 	
-	public Set<GitRepository> getRepositories() {
+	public Set<GitRepository> getRepositories(final String owner) {
+		final File rootFolder = folderUtil.getRepoDir(owner);
 		final Set<GitRepository> repos = new HashSet<>();
-		
-		repos.addAll(getRepositories(RepoType.USER, new File(folderUtil.getUserReposRoot())));
-		repos.addAll(getRepositories(RepoType.PROJECT, new File(folderUtil.getProjectReposRoot())));
-		
-		return repos;
-	}
-	
-	private Set<GitRepository> getRepositories(final RepoType type, final File folder) {
-		final Set<GitRepository> repos = new HashSet<>();
-		LOG.debug("ROOT={}", folder);
-		if (folder.isDirectory()) {
+		LOG.info("ROOT={}", rootFolder);
+		if (rootFolder.isDirectory()) {
 			// get all the child folders
-			for (final File parent : folder.listFiles(FOLDERS_ONLY_FILTER)) {
-				LOG.debug("CHILD={}", parent);
-				for (final File repo : parent.listFiles(FOLDERS_ONLY_FILTER)) {
-					repos.add(new GitRepository(repo, type, parent.getName(), repo.getName()));
-				}
+			for (final File child : rootFolder.listFiles(GIT_ONLY_FILTER)) {
+				LOG.info("CHILD={}", child);
+				repos.add(new GitRepository(child, owner, child.getName()));
 			}
 		}
 		return repos;
+	}
+	
+	public GitRepository createRepo(final String name, final String owner) {
+		final File rootFolder = folderUtil.getRepoDir(owner);
+		final File newRepo = new File(rootFolder, name + ".git");
+		
+		try {
+			Git.init().setGitDir(newRepo).setBare(true).call();
+		} catch (IllegalStateException | GitAPIException e) {
+			throw new RuntimeException(e);
+		}
+		
+		return new GitRepository(newRepo, owner, name);
 	}
 }
