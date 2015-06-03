@@ -1,5 +1,7 @@
 package com.quantasnet.gitserver.git.repo;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
@@ -22,7 +24,7 @@ public class RepoUIController {
 	}
 	
 	@RequestMapping("/create/{repoName}")
-	public String createRepo(@AuthenticationPrincipal final User user, @PathVariable final String repoName) {
+	public String createRepo(@AuthenticationPrincipal final User user, @PathVariable final String repoName) throws IOException {
 		repoService.createRepo(repoName, user.getUsername());
 		return "redirect:/ui/repo/";
 	}

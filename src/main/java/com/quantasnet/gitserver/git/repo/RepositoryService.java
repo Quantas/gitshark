@@ -2,6 +2,7 @@ package com.quantasnet.gitserver.git.repo;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,12 +42,13 @@ public class RepositoryService {
 		return repos;
 	}
 	
-	public GitRepository createRepo(final String name, final String owner) {
+	public GitRepository createRepo(final String name, final String owner) throws IOException {
 		final File rootFolder = folderUtil.getRepoDir(owner);
 		final File newRepo = new File(rootFolder, name + ".git");
 		
 		try {
-			Git.init().setGitDir(newRepo).setBare(true).call();
+			Git.init().setGitDir(newRepo).setBare(false).call();
+			Git.open(newRepo).branchCreate().setName("master").call();
 		} catch (IllegalStateException | GitAPIException e) {
 			throw new RuntimeException(e);
 		}
