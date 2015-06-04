@@ -47,8 +47,8 @@ public class RepositoryService {
 		final File newRepo = new File(rootFolder, name + ".git");
 		
 		try {
-			Git.init().setGitDir(newRepo).setBare(false).call();
-			Git.open(newRepo).branchCreate().setName("master").call();
+			/*final Git git = */ Git.init().setGitDir(newRepo).setBare(false).call();
+			//final Repository repo = git.getRepository();
 		} catch (IllegalStateException | GitAPIException e) {
 			throw new RuntimeException(e);
 		}

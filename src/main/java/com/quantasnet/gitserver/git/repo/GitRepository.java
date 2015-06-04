@@ -2,6 +2,9 @@ package com.quantasnet.gitserver.git.repo;
 
 import java.io.File;
 
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.Repository;
+
 public class GitRepository {
 
 	private final File fullRepoDirectory;
@@ -14,6 +17,21 @@ public class GitRepository {
 		this.name = name;
 	}
 
+	public static void execute(final GitRepository repo, final RepositoryAction repoAction) throws Exception {
+		
+		Repository db = null;
+		
+		try {
+			db = Git.open(repo.getFullRepoDirectory()).getRepository();
+			repoAction.doAction(db);
+		} finally {
+			if (null != db) {
+				db.close();
+			}
+		}
+		
+	}
+	
 	public File getFullRepoDirectory() {
 		return fullRepoDirectory;
 	}
