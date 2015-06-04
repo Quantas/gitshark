@@ -1,7 +1,5 @@
 package com.quantasnet.gitserver.git.repo;
 
-import static org.eclipse.jgit.lib.RefDatabase.ALL;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -10,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.RefDatabase;
 import org.eclipse.jgit.transport.RefAdvertiser;
 import org.eclipse.jgit.util.IO;
 import org.slf4j.Logger;
@@ -54,7 +53,7 @@ public class RepoController {
 			adv.init(db);
 			adv.setDerefTags(true);
 
-			final Map<String, Ref> refs = db.getRefDatabase().getRefs(ALL);
+			final Map<String, Ref> refs = db.getRefDatabase().getRefs(RefDatabase.ALL);
 			refs.remove(Constants.HEAD);
 			adv.send(refs);
 		});
