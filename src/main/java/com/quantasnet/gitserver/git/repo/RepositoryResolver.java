@@ -35,8 +35,8 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 		
 		final Set<GitRepository> repos = repositoryService.getRepositories(userName);
 		
-		final String requestURI = webRequest.getNativeRequest(HttpServletRequest.class).getRequestURI();
-		// TODO double check this doesn't include contextPath
+		final String requestURI = webRequest.getNativeRequest(HttpServletRequest.class).getServletPath();
+		
 		final String repoName = requestURI.split("/")[3];
 		
 		for (final GitRepository repo : repos) {
