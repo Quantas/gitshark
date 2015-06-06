@@ -1,4 +1,4 @@
-package com.quantasnet.gitserver.git.repo;
+package com.quantasnet.gitserver.git.repo.ui;
 
 import java.io.IOException;
 
@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.quantasnet.gitserver.git.repo.RepositoryService;
 
 @RequestMapping("/ui/repo")
 @Controller
