@@ -1,6 +1,7 @@
 package com.quantasnet.gitserver.git.repo;
 
 import java.io.File;
+import java.util.regex.Matcher;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,8 @@ public class RepoFolderUtil {
 	}
 	
 	private String expand(final String location) {
-		return location.replaceFirst("^~",System.getProperty("user.home"));
+		return location
+				.replaceAll("/", Matcher.quoteReplacement(File.separator))
+				.replaceFirst("^~", Matcher.quoteReplacement(System.getProperty("user.home")));
 	}
 }
