@@ -1,7 +1,6 @@
 package com.quantasnet.gitserver.git.repo;
 
 import java.security.Principal;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,19 +32,16 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 			userName = principalObject.getName();
 		}
 		
-		final Set<GitRepository> repos = repositoryService.getRepositories(userName);
-		
 		final String requestURI = webRequest.getNativeRequest(HttpServletRequest.class).getServletPath();
+
+		String repoName;
 		
-		final String repoName = requestURI.split("/")[3];
-		
-		for (final GitRepository repo : repos) {
-			if (repo.getName().equals(repoName)) {
-				return repo;
-			}
+		if (requestURI.startsWith("/ui/")) {
+			repoName = requestURI.split("/")[4];
+		} else {
+			repoName = requestURI.split("/")[3];
 		}
 		
-		return null;
+		return repositoryService.getRepository(userName, repoName);
 	}
-
 }

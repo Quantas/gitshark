@@ -28,8 +28,17 @@ public class RepositoryService {
 	@Autowired
 	private RepoFolderUtil folderUtil;
 	
+	public GitRepository getRepository(final String owner, final String repoName) {
+		final File gitFolder = folderUtil.getRepoDir(owner, repoName);
+		if (gitFolder.exists() && gitFolder.isDirectory()) {
+			return new GitRepository(gitFolder, owner, gitFolder.getName());
+		}
+		
+		return null;
+	}
+	
 	public Set<GitRepository> getRepositories(final String owner) {
-		final File rootFolder = folderUtil.getRepoDir(owner);
+		final File rootFolder = folderUtil.getOwnerRootDir(owner);
 		final Set<GitRepository> repos = new HashSet<>();
 		LOG.info("ROOT={}", rootFolder);
 		if (rootFolder.isDirectory()) {
@@ -43,12 +52,11 @@ public class RepositoryService {
 	}
 	
 	public GitRepository createRepo(final String name, final String owner) throws IOException {
-		final File rootFolder = folderUtil.getRepoDir(owner);
+		final File rootFolder = folderUtil.getOwnerRootDir(owner);
 		final File newRepo = new File(rootFolder, name + ".git");
 		
 		try {
-			/*final Git git = */ Git.init().setGitDir(newRepo).setBare(false).call();
-			//final Repository repo = git.getRepository();
+			Git.init().setGitDir(newRepo).setBare(true).call();
 		} catch (IllegalStateException | GitAPIException e) {
 			throw new RuntimeException(e);
 		}

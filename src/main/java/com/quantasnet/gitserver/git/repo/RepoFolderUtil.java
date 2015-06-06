@@ -23,8 +23,12 @@ public class RepoFolderUtil {
 		return getRoot() + File.separatorChar + repos;
 	}
 	
-	public File getRepoDir(final String owner) {
+	public File getOwnerRootDir(final String owner) {
 		return new File(getReposRoot() + File.separatorChar + owner);
+	}
+	
+	public File getRepoDir(final String owner, final String repoName) {
+		return new File(getReposRoot() + File.separatorChar + owner, repoName);
 	}
 	
 	private String expand(final String location) {

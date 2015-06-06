@@ -1,6 +1,7 @@
 package com.quantasnet.gitserver.git.repo;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
@@ -16,9 +17,12 @@ public class GitRepository {
 		this.owner = owner;
 		this.name = name;
 	}
+	
+	public Repository getDB() throws IOException {
+		return Git.open(getFullRepoDirectory()).getRepository();
+	}
 
 	public static void execute(final GitRepository repo, final RepositoryAction repoAction) throws Exception {
-		
 		Repository db = null;
 		
 		try {
@@ -29,7 +33,14 @@ public class GitRepository {
 				db.close();
 			}
 		}
-		
+	}
+	
+	public static boolean hasCommits(Repository repository) {
+		if (repository != null && repository.getDirectory().exists()) {
+			return (new File(repository.getDirectory(), "objects").list().length > 2)
+					|| (new File(repository.getDirectory(), "objects/pack").list().length > 0);
+		}
+		return false;
 	}
 	
 	public File getFullRepoDirectory() {
@@ -49,5 +60,4 @@ public class GitRepository {
 		return "GitRepository [fullRepoDirectory=" + fullRepoDirectory
 				+ ", owner=" + owner + ", name=" + name + "]";
 	}
-	
 }

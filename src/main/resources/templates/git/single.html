@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/default"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 th:text="${repo.owner} + '/' + ${repo.name}">owner/name</h1>
+    <hr />
+    <div th:if="${commits}">
+    	This repo has things, show them
+    </div>
+    <div th:if="${!commits}">
+    	This repo is empty, you should a few commits...
+    </div>
+</div>
+</body>
+</html>
