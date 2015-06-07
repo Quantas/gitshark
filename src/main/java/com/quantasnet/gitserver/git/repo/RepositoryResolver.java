@@ -34,14 +34,24 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 		
 		final String requestURI = webRequest.getNativeRequest(HttpServletRequest.class).getServletPath();
 
+		String owner;
 		String repoName;
 		
 		if (requestURI.startsWith("/ui/")) {
-			repoName = requestURI.split("/")[4];
+			owner = requestURI.split("/")[3];
+			repoName = requestURI.split("/")[4] + ".git";
 		} else {
+			owner = requestURI.split("/")[2];
 			repoName = requestURI.split("/")[3];
 		}
 		
-		return repositoryService.getRepository(userName, repoName);
+		if (owner.equals(userName)) {
+			final GitRepository repo = repositoryService.getRepository(userName, repoName);
+			if (null != repo) {
+				return repo;
+			}
+		}
+		
+		throw new Exception("TODO");
 	}
 }

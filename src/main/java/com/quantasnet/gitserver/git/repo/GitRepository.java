@@ -54,6 +54,10 @@ public class GitRepository {
 	public String getName() {
 		return name;
 	}
+	
+	public String getDisplayName() {
+		return name.replaceAll("\\.git", "");
+	}
 
 	@Override
 	public String toString() {

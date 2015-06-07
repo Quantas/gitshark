@@ -17,7 +17,7 @@
         </thead>
         <tbody>
         <tr th:each="repo : ${repos}">
-            <td class="left"><a th:href="@{/ui/repo/} + ${repo.owner} + '/' + ${repo.name}" th:text="${repo.owner} + '/' + ${repo.name}">Name</a></td>
+            <td class="left"><a th:href="@{/ui/repo/} + ${repo.owner} + '/' + ${repo.displayName}" th:text="${repo.owner} + '/' + ${repo.displayName}">Name</a></td>
         </tr>
         </tbody>
     </table>

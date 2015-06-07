@@ -8,7 +8,7 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <h1 th:text="${repo.owner} + '/' + ${repo.name}">owner/name</h1>
+    <h1 th:text="${repo.owner} + '/' + ${repo.displayName}">owner/name</h1>
     <hr />
     <div th:if="${commits}">
     	This repo has things, show them
