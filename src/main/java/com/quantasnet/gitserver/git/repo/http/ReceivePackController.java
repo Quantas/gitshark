@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.jgit.vendor.SmartOutputStream;
 
-@RequestMapping("/repo/{repoOwner}/{repoName}")
+@RequestMapping("/repo/{repoOwner}/{repoName}.git")
 @Controller
 public class ReceivePackController {
 

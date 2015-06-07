@@ -34,16 +34,8 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 		
 		final String requestURI = webRequest.getNativeRequest(HttpServletRequest.class).getServletPath();
 
-		String owner;
-		String repoName;
-		
-		if (requestURI.startsWith("/ui/")) {
-			owner = requestURI.split("/")[3];
-			repoName = requestURI.split("/")[4] + ".git";
-		} else {
-			owner = requestURI.split("/")[2];
-			repoName = requestURI.split("/")[3];
-		}
+		final String owner = requestURI.split("/")[2];
+		final String repoName = endsWithGit(requestURI.split("/")[3]);
 		
 		if (owner.equals(userName)) {
 			final GitRepository repo = repositoryService.getRepository(userName, repoName);
@@ -53,5 +45,12 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 		}
 		
 		throw new Exception("TODO");
+	}
+	
+	private String endsWithGit(final String name) {
+		if (!name.endsWith(".git")) {
+			return name + ".git";
+		}
+		return name;
 	}
 }

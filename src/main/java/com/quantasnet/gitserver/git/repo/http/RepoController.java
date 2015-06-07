@@ -4,29 +4,24 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.RefDatabase;
 import org.eclipse.jgit.transport.RefAdvertiser;
 import org.eclipse.jgit.util.IO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
-@RequestMapping("/repo/{repoOwner}/{repoName}")
+@RequestMapping("/repo/{repoOwner}/{repoName}.git")
 @Controller
 public class RepoController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(RepoController.class);
-	
 	@RequestMapping(value = "/" + Constants.HEAD, method = RequestMethod.GET)
 	public ResponseEntity<byte[]> head(final GitRepository repo) throws IOException {
 		final byte[] head = IO.readFully(new File(repo.getFullRepoDirectory(), Constants.HEAD));
@@ -60,10 +55,8 @@ public class RepoController {
 		return new ResponseEntity<String>(output.toString(), HttpStatus.OK);
 	}
 	
-	@RequestMapping({ "", "/", "/**" })
-	public ResponseEntity<Object> repo(final GitRepository repo, final HttpServletRequest req) {
-		LOG.info("Path requested ={}, {}", req.getMethod(), req.getServletPath());
-		LOG.info("Parameters = {}", req.getParameterMap());
-		return new ResponseEntity<Object>("Fail", HttpStatus.OK);
+	@RequestMapping(value = "", method = RequestMethod.GET)
+	public String repo(@PathVariable final String repoOwner, @PathVariable final String repoName) {
+		return "redirect:/repo/" + repoOwner + '/' + repoName;
 	}
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.git.repo.RepositoryService;
 
-@RequestMapping("/ui/repo")
+@RequestMapping("/repo")
 @Controller
 public class RepoUIController {
 
