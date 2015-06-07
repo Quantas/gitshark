@@ -11,7 +11,6 @@ import static org.eclipse.jgit.http.server.ServletUtils.consumeRequestBody;
 import static org.eclipse.jgit.http.server.ServletUtils.getInputStream;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +21,6 @@ import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.transport.InternalHttpServerGlue;
 import org.eclipse.jgit.transport.PacketLineOut;
 import org.eclipse.jgit.transport.ReceivePack;
-import org.eclipse.jgit.transport.ServiceMayNotContinueException;
 import org.eclipse.jgit.transport.RefAdvertiser.PacketLineOutRefAdvertiser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +39,7 @@ import com.quantasnet.gitserver.jgit.vendor.SmartOutputStream;
 public class ReceivePackController {
 
 	@RequestMapping(value = "/info/refs", params = "service=git-receive-pack", method = RequestMethod.GET, produces = "application/x-git-receive-pack-advertisement")
-	public ResponseEntity<byte[]> receivePackAdv(final GitRepository repo, @AuthenticationPrincipal final User user, final HttpServletRequest req, @RequestHeader(value="User-Agent") String userAgent) throws ServiceMayNotContinueException, IOException, Exception {
+	public ResponseEntity<byte[]> receivePackAdv(final GitRepository repo, @AuthenticationPrincipal final User user, final HttpServletRequest req, @RequestHeader(value="User-Agent") String userAgent) throws Exception {
 		final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		
 		GitRepository.execute(repo, db -> {
@@ -66,7 +64,7 @@ public class ReceivePackController {
 	@RequestMapping(value = "/git-receive-pack", method = RequestMethod.POST, 
 			consumes = "application/x-git-receive-pack-request", 
 			produces = "application/x-git-receive-pack-result")
-	public void receivePack(final GitRepository repo, @AuthenticationPrincipal final User user, @RequestHeader(value="User-Agent") String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws Exception {
+	public void receivePack(final GitRepository repo, @RequestHeader(value="User-Agent") String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws Exception {
 		
 		int[] version = parseVersion(userAgent);
 		if (hasChunkedEncodingRequestBug(version, req)) {

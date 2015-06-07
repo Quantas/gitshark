@@ -17,14 +17,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jgit.transport.InternalHttpServerGlue;
 import org.eclipse.jgit.transport.PacketLineOut;
+import org.eclipse.jgit.transport.RefAdvertiser.PacketLineOutRefAdvertiser;
 import org.eclipse.jgit.transport.ServiceMayNotContinueException;
 import org.eclipse.jgit.transport.UploadPack;
 import org.eclipse.jgit.transport.UploadPackInternalServerErrorException;
-import org.eclipse.jgit.transport.RefAdvertiser.PacketLineOutRefAdvertiser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,7 +61,7 @@ public class UploadPackController {
 	@RequestMapping(value = "/git-upload-pack", method = RequestMethod.POST, 
 			consumes = "application/x-git-upload-pack-request", 
 			produces = "application/x-git-upload-pack-result")
-	public void uploadPack(final GitRepository repo, @AuthenticationPrincipal final User user, @RequestHeader(value="User-Agent") String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws Exception {
+	public void uploadPack(final GitRepository repo, @RequestHeader(value="User-Agent") String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws Exception {
 		
 		int[] version = parseVersion(userAgent);
 		if (hasChunkedEncodingRequestBug(version, req)) {
