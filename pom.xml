@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.2.3.RELEASE</version>
+		<version>1.2.4.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -23,7 +23,7 @@
 		<start-class>com.quantasnet.gitserver.GitServerApplication</start-class>
 		<java.version>1.8</java.version>
 		
-		<org.eclipse.jgit.version>4.0.0.201505260635-rc2</org.eclipse.jgit.version>
+		<org.eclipse.jgit.version>4.0.0.201506020755-rc3</org.eclipse.jgit.version>
 		
 		<org.webjars.bootstrap.version>3.3.1</org.webjars.bootstrap.version>
 		<org.webjars.fontawesome.version>4.2.0</org.webjars.fontawesome.version>
