@@ -71,9 +71,7 @@ public class NoCacheFilter implements Filter {
 
 		rsp.setHeader("Expires", "Fri, 01 Jan 1980 00:00:00 GMT");
 		rsp.setHeader("Pragma", "no-cache");
-
-		final String nocache = "no-cache, max-age=0, must-revalidate";
-		rsp.setHeader("Cache-Control", nocache);
+		rsp.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate");
 
 		chain.doFilter(request, response);
 	}
