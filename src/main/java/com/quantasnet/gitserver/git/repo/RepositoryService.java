@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
 import com.quantasnet.gitserver.git.exception.RepositoryNotFoundException;
 
 @Service
@@ -31,14 +32,16 @@ public class RepositoryService {
 	@Autowired
 	private RepoFolderUtil folderUtil;
 	
-	public GitRepository getRepository(final String owner, final String repoName) throws RepositoryNotFoundException {
-		final File gitFolder = folderUtil.getRepoDir(owner, endsWithGit(repoName));
-		
-		if (gitFolder.exists() && gitFolder.isDirectory()) {
-			return new GitRepository(gitFolder, owner, gitFolder.getName());
+	public GitRepository getRepository(final String userName, final String owner, final String repoName) throws RepositoryNotFoundException, RepositoryAccessDeniedException {
+		if (owner.equals(userName)) {
+			final File gitFolder = folderUtil.getRepoDir(owner, endsWithGit(repoName));
+			if (gitFolder.exists() && gitFolder.isDirectory()) {
+				return new GitRepository(gitFolder, owner, gitFolder.getName());
+			}
+			throw new RepositoryNotFoundException(gitFolder.getName());
 		}
 		
-		throw new RepositoryNotFoundException(gitFolder.getName());
+		throw new RepositoryAccessDeniedException();
 	}
 	
 	public Set<GitRepository> getRepositories(final String owner) {
