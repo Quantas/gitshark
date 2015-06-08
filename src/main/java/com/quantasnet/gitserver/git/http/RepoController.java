@@ -1,4 +1,4 @@
-package com.quantasnet.gitserver.git.repo.http;
+package com.quantasnet.gitserver.git.http;
 
 import java.io.File;
 import java.io.IOException;

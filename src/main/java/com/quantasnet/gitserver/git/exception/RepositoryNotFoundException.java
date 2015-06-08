@@ -1,4 +1,4 @@
-package com.quantasnet.gitserver.exception;
+package com.quantasnet.gitserver.git.exception;
 
 public class RepositoryNotFoundException extends Exception {
 

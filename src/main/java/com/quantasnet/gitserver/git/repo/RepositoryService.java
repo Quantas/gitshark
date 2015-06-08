@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.exception.RepositoryNotFoundException;
+import com.quantasnet.gitserver.git.exception.RepositoryNotFoundException;
 
 @Service
 public class RepositoryService {
