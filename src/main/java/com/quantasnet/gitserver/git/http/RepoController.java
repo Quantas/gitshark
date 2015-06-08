@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.RefDatabase;
 import org.eclipse.jgit.transport.RefAdvertiser;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}.git")
@@ -28,7 +28,7 @@ public class RepoController {
 		return new ResponseEntity<byte[]>(head, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/info/refs", method = RequestMethod.GET, produces = "text/plain")
+	@RequestMapping(value = "/info/refs", method = RequestMethod.GET, produces = Constants.MIME_TEXT_PLAIN)
 	public ResponseEntity<String> infoRefs(final GitRepository repo) throws Exception {
 		final StringBuilder output = new StringBuilder();
 		

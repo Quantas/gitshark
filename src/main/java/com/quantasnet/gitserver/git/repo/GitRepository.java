@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
 
+import com.quantasnet.gitserver.Constants;
+
 public class GitRepository {
 
 	private final File fullRepoDirectory;
@@ -56,7 +58,7 @@ public class GitRepository {
 	}
 	
 	public String getDisplayName() {
-		return name.replaceAll("\\.git", "");
+		return name.replaceAll("\\" + Constants.DOT_GIT_SUFFIX, "");
 	}
 
 	@Override

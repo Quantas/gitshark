@@ -5,7 +5,6 @@ import static javax.servlet.http.HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE;
 import static org.eclipse.jgit.http.server.ClientVersionUtil.hasChunkedEncodingRequestBug;
 import static org.eclipse.jgit.http.server.ClientVersionUtil.hasPushStatusBug;
 import static org.eclipse.jgit.http.server.ClientVersionUtil.parseVersion;
-import static org.eclipse.jgit.http.server.GitSmartHttpTools.RECEIVE_PACK_RESULT_TYPE;
 import static org.eclipse.jgit.http.server.GitSmartHttpTools.sendError;
 import static org.eclipse.jgit.http.server.ServletUtils.consumeRequestBody;
 import static org.eclipse.jgit.http.server.ServletUtils.getInputStream;
@@ -31,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.jgit.vendor.SmartOutputStream;
 
@@ -38,8 +38,9 @@ import com.quantasnet.gitserver.jgit.vendor.SmartOutputStream;
 @Controller
 public class ReceivePackController {
 
-	@RequestMapping(value = "/info/refs", params = "service=git-receive-pack", method = RequestMethod.GET, produces = "application/x-git-receive-pack-advertisement")
-	public ResponseEntity<byte[]> receivePackAdv(final GitRepository repo, @AuthenticationPrincipal final User user, final HttpServletRequest req, @RequestHeader(value="User-Agent") String userAgent) throws Exception {
+	@RequestMapping(value = "/info/refs", params = "service=" + Constants.GIT_RECEIVE_PACK, method = RequestMethod.GET, 
+			produces = "application/x-git-receive-pack-advertisement")
+	public ResponseEntity<byte[]> receivePackAdv(final GitRepository repo, @AuthenticationPrincipal final User user, final HttpServletRequest req, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent) throws Exception {
 		final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		
 		GitRepository.execute(repo, db -> {
@@ -48,7 +49,7 @@ public class ReceivePackController {
 			InternalHttpServerGlue.setPeerUserAgent(rp, userAgent);
 			
 			final PacketLineOut packetOut = new PacketLineOut(buf);
-			packetOut.writeString("# service=git-receive-pack\n");
+			packetOut.writeString("# service=" + Constants.GIT_RECEIVE_PACK + "\n");
 			packetOut.end();
 			
 			try {
@@ -61,10 +62,10 @@ public class ReceivePackController {
 		return new ResponseEntity<byte[]>(buf.toByteArray(), HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/git-receive-pack", method = RequestMethod.POST, 
+	@RequestMapping(value = "/" + Constants.GIT_RECEIVE_PACK, method = RequestMethod.POST, 
 			consumes = "application/x-git-receive-pack-request", 
-			produces = "application/x-git-receive-pack-result")
-	public void receivePack(final GitRepository repo, @RequestHeader(value="User-Agent") String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws Exception {
+			produces = Constants.GIT_RECEIVE_PACK_RESULT)
+	public void receivePack(final GitRepository repo, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws Exception {
 		
 		int[] version = parseVersion(userAgent);
 		if (hasChunkedEncodingRequestBug(version, req)) {
@@ -79,7 +80,7 @@ public class ReceivePackController {
 			try {
 				rp.setBiDirectionalPipe(false);
 				rp.setEchoCommandFailures(hasPushStatusBug(version));
-				rsp.setContentType(RECEIVE_PACK_RESULT_TYPE);
+				rsp.setContentType(Constants.GIT_RECEIVE_PACK_RESULT);
 				rp.receive(getInputStream(req), out, null);
 				out.close();
 			} catch (CorruptObjectException | UnpackException e) {
