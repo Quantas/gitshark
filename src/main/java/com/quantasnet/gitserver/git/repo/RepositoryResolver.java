@@ -12,6 +12,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import com.quantasnet.gitserver.exception.RepositoryAccessDeniedException;
+
 @Component
 public class RepositoryResolver implements HandlerMethodArgumentResolver {
 
@@ -35,22 +37,13 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 		final String requestURI = webRequest.getNativeRequest(HttpServletRequest.class).getServletPath();
 
 		final String owner = requestURI.split("/")[2];
-		final String repoName = endsWithGit(requestURI.split("/")[3]);
+		final String repoName = requestURI.split("/")[3];
 		
+		// TODO move access checks to repositoryService
 		if (owner.equals(userName)) {
-			final GitRepository repo = repositoryService.getRepository(userName, repoName);
-			if (null != repo) {
-				return repo;
-			}
+			return repositoryService.getRepository(userName, repoName);
 		}
 		
-		throw new Exception("TODO");
-	}
-	
-	private String endsWithGit(final String name) {
-		if (!name.endsWith(".git")) {
-			return name + ".git";
-		}
-		return name;
+		throw new RepositoryAccessDeniedException();
 	}
 }

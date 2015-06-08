@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.quantasnet.gitserver.exception.RepositoryNotFoundException;
+
 @Service
 public class RepositoryService {
 
@@ -28,13 +30,14 @@ public class RepositoryService {
 	@Autowired
 	private RepoFolderUtil folderUtil;
 	
-	public GitRepository getRepository(final String owner, final String repoName) {
-		final File gitFolder = folderUtil.getRepoDir(owner, repoName);
+	public GitRepository getRepository(final String owner, final String repoName) throws RepositoryNotFoundException {
+		final File gitFolder = folderUtil.getRepoDir(owner, endsWithGit(repoName));
+		
 		if (gitFolder.exists() && gitFolder.isDirectory()) {
 			return new GitRepository(gitFolder, owner, gitFolder.getName());
 		}
 		
-		return null;
+		throw new RepositoryNotFoundException(gitFolder.getName());
 	}
 	
 	public Set<GitRepository> getRepositories(final String owner) {
@@ -53,7 +56,7 @@ public class RepositoryService {
 	
 	public GitRepository createRepo(final String name, final String owner) throws IOException {
 		final File rootFolder = folderUtil.getOwnerRootDir(owner);
-		final File newRepo = new File(rootFolder, name + ".git");
+		final File newRepo = new File(rootFolder, endsWithGit(name));
 		
 		try {
 			Git.init().setGitDir(newRepo).setBare(true).call();
@@ -62,5 +65,12 @@ public class RepositoryService {
 		}
 		
 		return new GitRepository(newRepo, owner, name);
+	}
+	
+	private String endsWithGit(final String name) {
+		if (!name.endsWith(".git")) {
+			return name + ".git";
+		}
+		return name;
 	}
 }
