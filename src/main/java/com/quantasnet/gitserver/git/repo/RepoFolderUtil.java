@@ -6,6 +6,8 @@ import java.util.regex.Matcher;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.quantasnet.gitserver.Constants;
+
 @Component
 public class RepoFolderUtil {
 
@@ -34,6 +36,6 @@ public class RepoFolderUtil {
 	private String expand(final String location) {
 		return location
 				.replaceAll("/", Matcher.quoteReplacement(File.separator))
-				.replaceFirst("^~", Matcher.quoteReplacement(System.getProperty("user.home")));
+				.replaceFirst("^~", Matcher.quoteReplacement(Constants.OS_USER_HOME));
 	}
 }

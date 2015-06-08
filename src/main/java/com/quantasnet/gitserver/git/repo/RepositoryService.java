@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.exception.RepositoryNotFoundException;
 
 @Service
@@ -23,7 +24,7 @@ public class RepositoryService {
 	private static final FileFilter GIT_ONLY_FILTER = new FileFilter() {
 		@Override
 		public boolean accept(File pathname) {
-			return pathname.getAbsolutePath().endsWith(".git");
+			return pathname.getAbsolutePath().endsWith(Constants.DOT_GIT_SUFFIX);
 		}
 	};
 	
@@ -68,8 +69,8 @@ public class RepositoryService {
 	}
 	
 	private String endsWithGit(final String name) {
-		if (!name.endsWith(".git")) {
-			return name + ".git";
+		if (!name.endsWith(Constants.DOT_GIT_SUFFIX)) {
+			return name + Constants.DOT_GIT_SUFFIX;
 		}
 		return name;
 	}
