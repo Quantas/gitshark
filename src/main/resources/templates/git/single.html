@@ -8,13 +8,23 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <h1 th:text="${repo.owner} + '/' + ${repo.displayName}">owner/name</h1>
+    <h1 th:text="${repo.owner} + ' / ' + ${repo.displayName}">owner / name</h1>
+    <hr />
+    Git URL : <input type="text" size="60" readonly="readonly" th:value="${#httpServletRequest.scheme} + '://' + ${#httpServletRequest.serverName} + ':' + ${#httpServletRequest.serverPort} + '/repo/' + ${repo.owner} + '/' + ${repo.name}"></input>
     <hr />
     <div th:if="${commits}">
-    	This repo has things, show them
+    	Branches
+    	<ul th:each="branch : ${branches}">
+    		<li th:text="${branch}">Branch Name</li>
+    	</ul>
+    	<hr />
+    	Files
+    	<ul th:each="file : ${files}">
+    		<li th:text="${file.name} + ' - dir=' + ${file.directory}">File Name</li>
+    	</ul>
     </div>
     <div th:if="${!commits}">
-    	This repo is empty, you should a few commits...
+    	This repo is empty, you should add a few commits...
     </div>
 </div>
 </body>
