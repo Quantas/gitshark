@@ -1,7 +1,6 @@
 package com.quantasnet.gitserver.git.repo;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
@@ -20,10 +19,6 @@ public class GitRepository {
 		this.name = name;
 	}
 	
-	public Repository getDB() throws IOException {
-		return Git.open(getFullRepoDirectory()).getRepository();
-	}
-
 	public static void execute(final GitRepository repo, final RepositoryAction repoAction) throws Exception {
 		Repository db = null;
 		
