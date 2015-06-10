@@ -20,15 +20,8 @@ public class GitRepository {
 	}
 	
 	public static void execute(final GitRepository repo, final RepositoryAction repoAction) throws Exception {
-		Repository db = null;
-		
-		try {
-			db = Git.open(repo.getFullRepoDirectory()).getRepository();
+		try (final Repository db = Git.open(repo.getFullRepoDirectory()).getRepository()) {
 			repoAction.doAction(db);
-		} finally {
-			if (null != db) {
-				db.close();
-			}
 		}
 	}
 	
