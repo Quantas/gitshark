@@ -12,25 +12,31 @@
     <hr />
     Git URL : <input type="text" size="60" readonly="readonly" th:value="${#httpServletRequest.scheme} + '://' + ${repo.owner} + '@' + ${#httpServletRequest.serverName} + ':' + ${#httpServletRequest.serverPort} + '/repo/' + ${repo.owner} + '/' + ${repo.name}"></input>
     <hr />
-    <div th:if="${commits}">
-    	Branches
-    	<ul th:each="branch : ${branches}">
-    		<li th:text="${branch}">Branch Name</li>
-    	</ul>
-    	<hr />
-    	<table class="table">
-    		<tr th:each="file : ${files}">
-    			<td>
-    				<i th:class="${file.directory ? 'fa fa-fw fa-folder' : 'fa fa-fw fa-file-o'}"></i>
-    				&nbsp;&nbsp;
-    				<a th:href="@{/repo/} + ${repo.owner} + '/' + ${repo.displayName} + '/blob/' + ${file.objectId}" th:text="${file.name}">Filename</a>
-   				</td>
-    		</tr>
-    	</table>
-    </div>
-    <div th:if="${!commits}">
-    	This repo is empty, you should add a few commits...
-    </div>
+   	Branches
+   	<ul th:each="branch : ${branches}">
+   		<li th:text="${branch}">Branch Name</li>
+   	</ul>
+   	<hr />
+   	<span th:text="${path}">path</span>
+   	<br />
+   	<table class="table">
+   		<tr th:each="file : ${files}">
+   			<td>
+   				<i th:class="${file.directory ? 'fa fa-fw fa-folder' : 'fa fa-fw fa-file-o'}"></i>
+   				&nbsp;&nbsp;
+   				<a th:href="@{/repo/} + ${repo.owner} + '/' + ${repo.displayName} + '/tree/' + ${file.parent} + ${file.name} + ${file.directory ? '' : '?file=true'}" th:text="${file.display}">Filename</a>
+			</td>
+			<td>
+				<span th:text="${file.directory ? '' : file.size + ' Bytes'}">size</span>
+			</td>
+			<td>
+				<span th:text="${file.directory ? '' : file.commit.committerIdent.when}">date</span>
+			</td>
+			<td>
+				<span th:text="${file.directory ? '' : file.commit.shortMessage}">message</span>
+			</td>
+   		</tr>
+   	</table>
 </div>
 </body>
 </html>

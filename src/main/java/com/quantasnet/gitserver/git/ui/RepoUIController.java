@@ -5,12 +5,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.AmbiguousObjectException;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.LargeObjectException;
 import org.eclipse.jgit.errors.MissingObjectException;
+import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
@@ -18,7 +27,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.HandlerMapping;
 
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.model.RepoFile;
@@ -45,73 +55,152 @@ public class RepoUIController {
 	}
 	
 	@RequestMapping("/{repoOwner}/{repoName}")
-	public String displayRepo(@AuthenticationPrincipal final User user, final GitRepository repo, final Model model) throws Exception {
+	public String displayRepo(final GitRepository repo, final Model model) throws Exception {
 
 		GitRepository.execute(repo, db -> {
-			final RevWalk revWalk = new RevWalk(db);
-			final TreeWalk treeWalk = new TreeWalk(db);
-			
 			final boolean commits = GitRepository.hasCommits(db);
 			
 			model.addAttribute("repo", repo);
 			model.addAttribute("commits", commits);
 			
 			if (commits) {
-				
-				final RevCommit headCommit = revWalk.parseCommit(db.resolve(Constants.HEAD));
-				
-				treeWalk.addTree(headCommit.getTree());
-				treeWalk.setRecursive(false);
-				
-				final List<RepoFile> files = new ArrayList<>();
-				while (treeWalk.next()) {
-					final boolean directory = treeWalk.isSubtree();
-					final ObjectId objectId = treeWalk.getObjectId(0);
-					
-					long size = 0;
-					
-					if (!directory) {
-						try {
-							size = treeWalk.getObjectReader().getObjectSize(objectId, 3); // 3 = BLOB
-						} catch (Exception e) {
-							
-						}
-					}
-					
-					files.add(new RepoFile(treeWalk.getPathString(), directory, size, objectId.getName()));
-				}
-				
-				Collections.sort(files);
-				
-				model.addAttribute("files", files);
-				
+				model.addAttribute("files", getFiles(db, null, false));
 				model.addAttribute("branches", db.getRefDatabase().getRefs("refs/heads/").keySet());
 			}
 			
-			treeWalk.close();
-			revWalk.close();
 		});
 		
 		return "git/single";
 	}
 	
-	@RequestMapping(value = "/{repoOwner}/{repoName}/blob/{objectId}", method = RequestMethod.GET)
-	public String showFile(final GitRepository repo, @PathVariable final String objectId, final Model model) throws IOException, Exception {
+	/**
+	 * For browsing the tree and viewing files
+	 */
+	@RequestMapping("/{repoOwner}/{repoName}/tree/**")
+	public String displayRepoTree(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, @RequestParam(required = false) final boolean file, final Model model, final HttpServletRequest req) throws Exception {
 
+		final String repoPath = "/repo/" + repoOwner + '/' + repoName + "/tree/";
+		final String path = ((String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).replaceAll(repoPath, "");
+		
 		model.addAttribute("repo", repo);
+		model.addAttribute("path", path);
 		
 		GitRepository.execute(repo, db -> {
-			try {
-				final ObjectId objId = ObjectId.fromString(objectId);
-				model.addAttribute("fileString", new String(db.newObjectReader().open(objId).getBytes()));
+			if (file) {
+				
+				final RepoFile repoFile = getFiles(db, path, true).get(0);
+				
+				model.addAttribute("fileString", repoFile.getFileContents());
+				model.addAttribute("commitText", getFileContents(db, repoFile.getCommit().getId()));
 				model.addAttribute("found", Boolean.TRUE);
-			} catch (final MissingObjectException | IllegalArgumentException e) {
-				model.addAttribute("found", Boolean.FALSE);
-			} catch (final LargeObjectException e) {
-				model.addAttribute("display", Boolean.FALSE);
+			} else {
+				model.addAttribute("files", getFiles(db, path, false));
+				model.addAttribute("branches", db.getRefDatabase().getRefs("refs/heads/").keySet());
 			}
 		});
 		
-		return "git/file";
+		if (file) {
+			return "git/file";
+		}
+		
+		return "git/single";
+	}
+	
+	private List<RepoFile> getFiles(final Repository db, final String path, final boolean file) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException, GitAPIException {
+		final RevWalk revWalk = new RevWalk(db);
+		final TreeWalk treeWalk = new TreeWalk(db);
+		
+		final RevCommit headCommit = revWalk.parseCommit(db.resolve(Constants.HEAD));
+		
+		treeWalk.addTree(headCommit.getTree());
+		treeWalk.setRecursive(false);
+		
+		final boolean customPath = null != path && path.length() > 1; 
+		
+		if (customPath) {
+			treeWalk.setFilter(PathFilter.create(path));
+		}
+		
+		final List<RepoFile> files = new ArrayList<>();
+		
+		// if we are at root already, we can assume we are in the folder we want to be already
+		boolean alreadyInside = !customPath;
+		
+		while (treeWalk.next()) {
+			final String pathString = treeWalk.getPathString();
+			final boolean directory = treeWalk.isSubtree();
+			
+			if (directory && customPath && !alreadyInside) {
+				// if we aren't in the directory we want to be yet, go to the next one
+				treeWalk.enterSubtree();
+			}
+
+			// If we found the folder we are looking for, set boolean and add dummy file
+			if (pathString.equals(path)) {
+				alreadyInside = true;
+				
+				// If we don't want a single file, we need a dummy file for navigating backwards
+				if (!file) {
+					String parent;
+					// If parent is not root, remove trailer, else set to blank
+					if (pathString.indexOf("/") > 0) {
+						parent = pathString.substring(0, pathString.lastIndexOf("/"));
+					} else {
+						parent = "";
+					}
+					
+					// Add dummy file for navigating backwards
+					files.add(new RepoFile("", ". .", parent, true, 0, null, null));
+					continue;
+				}
+			}
+			
+			// If we found the path we were looking for, start lining up the files
+			if (alreadyInside) {
+				final ObjectId objectId = treeWalk.getObjectId(0);
+				
+				long size = 0;
+				
+				if (!directory) {
+					try {
+						size = treeWalk.getObjectReader().getObjectSize(objectId, 3); // 3 = BLOB
+					} catch (Exception e) {
+						
+					}
+				}
+				
+				final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
+				final String parent = pathString.substring(0, pathString.lastIndexOf("/") + 1);
+				
+				RevCommit commit = null;
+				
+				if (!directory) {
+					try (final Git git = new Git(db)) {
+						commit = git.log().addPath(pathString).setMaxCount(1).call().iterator().next();
+					}
+				}
+				
+				final RepoFile repoFile = new RepoFile(name, parent, directory, size, objectId.getName(), commit); 
+
+				files.add(repoFile);
+				
+				// if we wanted just a single file, get it's contents for display
+				if (file) {
+					repoFile.setFileContents(getFileContents(db, objectId));
+					break;
+				}
+			}
+		}
+		
+		treeWalk.close();
+		revWalk.close();
+		
+		Collections.sort(files);
+		
+		return files;
+	}
+	
+	private String getFileContents(final Repository db, final ObjectId objectId) throws LargeObjectException, MissingObjectException, IOException {
+		return new String(db.newObjectReader().open(objectId).getBytes());
 	}
 }

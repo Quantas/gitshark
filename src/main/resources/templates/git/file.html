@@ -25,6 +25,8 @@
     	<h1>File not found!</h1>
     </div>
     <div th:if="${found}">
+    	<pre th:text="${commitText}"></pre>
+    	<hr />
    		<pre th:text="${fileString}"></pre>
     </div>
 </div>
