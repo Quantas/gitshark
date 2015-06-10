@@ -59,7 +59,6 @@ public class RepoUIController {
 
 		GitRepository.execute(repo, db -> {
 			final boolean commits = GitRepository.hasCommits(db);
-			
 			model.addAttribute("repo", repo);
 			model.addAttribute("commits", commits);
 			
@@ -87,9 +86,7 @@ public class RepoUIController {
 		
 		GitRepository.execute(repo, db -> {
 			if (file) {
-				
 				final RepoFile repoFile = getFiles(db, path, true).get(0);
-				
 				model.addAttribute("fileString", repoFile.getFileContents());
 				model.addAttribute("commitText", getFileContents(db, repoFile.getCommit().getId()));
 				model.addAttribute("found", Boolean.TRUE);
@@ -107,96 +104,89 @@ public class RepoUIController {
 	}
 	
 	private List<RepoFile> getFiles(final Repository db, final String path, final boolean file) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException, GitAPIException {
-		final RevWalk revWalk = new RevWalk(db);
-		final TreeWalk treeWalk = new TreeWalk(db);
-		
-		final RevCommit headCommit = revWalk.parseCommit(db.resolve(Constants.HEAD));
-		
-		treeWalk.addTree(headCommit.getTree());
-		treeWalk.setRecursive(false);
-		
-		final boolean customPath = null != path && path.length() > 1; 
-		
-		if (customPath) {
-			treeWalk.setFilter(PathFilter.create(path));
-		}
-		
 		final List<RepoFile> files = new ArrayList<>();
 		
-		// if we are at root already, we can assume we are in the folder we want to be already
-		boolean alreadyInside = !customPath;
+		try (final RevWalk revWalk = new RevWalk(db); final TreeWalk treeWalk = new TreeWalk(db)) {
 		
-		while (treeWalk.next()) {
-			final String pathString = treeWalk.getPathString();
-			final boolean directory = treeWalk.isSubtree();
+			final RevCommit headCommit = revWalk.parseCommit(db.resolve(Constants.HEAD));
 			
-			if (directory && customPath && !alreadyInside) {
-				// if we aren't in the directory we want to be yet, go to the next one
-				treeWalk.enterSubtree();
+			treeWalk.addTree(headCommit.getTree());
+			treeWalk.setRecursive(false);
+			
+			final boolean customPath = null != path && path.length() > 1; 
+			
+			if (customPath) {
+				treeWalk.setFilter(PathFilter.create(path));
 			}
-
-			// If we found the folder we are looking for, set boolean and add dummy file
-			if (pathString.equals(path)) {
-				alreadyInside = true;
+			
+			// if we are at root already, we can assume we are in the folder we want to be already
+			boolean alreadyInside = !customPath;
+			
+			while (treeWalk.next()) {
+				final String pathString = treeWalk.getPathString();
+				final boolean directory = treeWalk.isSubtree();
 				
-				// If we don't want a single file, we need a dummy file for navigating backwards
-				if (!file) {
-					String parent;
-					// If parent is not root, remove trailer, else set to blank
-					if (pathString.indexOf("/") > 0) {
-						parent = pathString.substring(0, pathString.lastIndexOf("/"));
-					} else {
-						parent = "";
+				if (directory && customPath && !alreadyInside) {
+					// if we aren't in the directory we want to be yet, go to the next one
+					treeWalk.enterSubtree();
+				}
+	
+				// If we found the folder we are looking for, set boolean and add dummy file
+				if (pathString.equals(path)) {
+					alreadyInside = true;
+					
+					// If we don't want a single file, we need a dummy file for navigating backwards
+					if (!file) {
+						String parent;
+						// If parent is not root, remove trailer, else set to blank
+						if (pathString.indexOf("/") > 0) {
+							parent = pathString.substring(0, pathString.lastIndexOf("/"));
+						} else {
+							parent = "";
+						}
+						
+						// Add dummy file for navigating backwards
+						files.add(new RepoFile("", ". .", parent, true, 0, null, null));
+						continue;
+					}
+				}
+				
+				// If we found the path we were looking for, start lining up the files
+				if (alreadyInside) {
+					final ObjectId objectId = treeWalk.getObjectId(0);
+					final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
+					final String parent = pathString.substring(0, pathString.lastIndexOf("/") + 1);
+	
+					long size = 0;
+					RevCommit commit = null;
+					
+					// WE only need commit and size information if this isn't a directory
+					if (!directory) {
+						try {
+							size = treeWalk.getObjectReader().getObjectSize(objectId, 3); // 3 = BLOB
+						} catch (Exception e) {
+							// TODO: hmmm
+						}
+						
+						try (final Git git = new Git(db)) {
+							commit = git.log().addPath(pathString).setMaxCount(1).call().iterator().next();
+						}
 					}
 					
-					// Add dummy file for navigating backwards
-					files.add(new RepoFile("", ". .", parent, true, 0, null, null));
-					continue;
-				}
-			}
-			
-			// If we found the path we were looking for, start lining up the files
-			if (alreadyInside) {
-				final ObjectId objectId = treeWalk.getObjectId(0);
-				
-				long size = 0;
-				
-				if (!directory) {
-					try {
-						size = treeWalk.getObjectReader().getObjectSize(objectId, 3); // 3 = BLOB
-					} catch (Exception e) {
-						
+					final RepoFile repoFile = new RepoFile(name, parent, directory, size, objectId.getName(), commit); 
+	
+					files.add(repoFile);
+					
+					// if we wanted just a single file, get it's contents for display and get out of here
+					if (file) {
+						repoFile.setFileContents(getFileContents(db, objectId));
+						break;
 					}
-				}
-				
-				final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
-				final String parent = pathString.substring(0, pathString.lastIndexOf("/") + 1);
-				
-				RevCommit commit = null;
-				
-				if (!directory) {
-					try (final Git git = new Git(db)) {
-						commit = git.log().addPath(pathString).setMaxCount(1).call().iterator().next();
-					}
-				}
-				
-				final RepoFile repoFile = new RepoFile(name, parent, directory, size, objectId.getName(), commit); 
-
-				files.add(repoFile);
-				
-				// if we wanted just a single file, get it's contents for display
-				if (file) {
-					repoFile.setFileContents(getFileContents(db, objectId));
-					break;
 				}
 			}
 		}
 		
-		treeWalk.close();
-		revWalk.close();
-		
 		Collections.sort(files);
-		
 		return files;
 	}
 	
