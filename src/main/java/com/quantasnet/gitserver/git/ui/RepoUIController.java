@@ -56,27 +56,14 @@ public class RepoUIController {
 	}
 	
 	@RequestMapping("/{repoOwner}/{repoName}")
-	public String displayRepo(final GitRepository repo, final Model model) throws Exception {
-
-		GitRepository.execute(repo, db -> {
-			final boolean commits = GitRepository.hasCommits(db);
-			model.addAttribute("repo", repo);
-			model.addAttribute("commits", commits);
-			
-			if (commits) {
-				model.addAttribute("files", getFiles(db, null, false));
-				model.addAttribute("branches", db.getRefDatabase().getRefs("refs/heads/").keySet());
-			}
-			
-		});
-		
-		return "git/single";
+	public String displayRepo(@PathVariable final String repoOwner, @PathVariable final String repoName) {
+		return "redirect:/repo/" + repoOwner + '/' + repoName + "/tree/";
 	}
 	
 	/**
 	 * For browsing the tree and viewing files
 	 */
-	@RequestMapping("/{repoOwner}/{repoName}/tree/**")
+	@RequestMapping({ "/{repoOwner}/{repoName}/tree", "/{repoOwner}/{repoName}/tree/**" })
 	public String displayRepoTree(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, @RequestParam(required = false) final boolean file, final Model model, final HttpServletRequest req) throws Exception {
 
 		final String repoPath = "/repo/" + repoOwner + '/' + repoName + "/tree/";
@@ -106,7 +93,12 @@ public class RepoUIController {
 	}
 
 	private String resolvePath(final HttpServletRequest req, final String repoPath) {
-		String path = ((String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).replaceAll(repoPath, "");
+		String path = ((String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
+		if (!path.endsWith("/")) {
+			path = path + "/";
+		}
+		
+		path = path.replaceAll(repoPath, "");
 		
 		if (path.endsWith("/")) {
 			path = path.substring(0, path.length() - 1);
