@@ -91,7 +91,10 @@ public class RepoUIController {
 			if (file) {
 				model.addAttribute("file", getFileToDisplay(db, path));
 			} else {
-				model.addAttribute("files", getFiles(db, path, false));
+				final List<RepoFile> files = getFiles(db, path, false);
+				
+				model.addAttribute("readme", resolveReadMeFile(db, files));
+				model.addAttribute("files", files);
 			}
 		});
 		
@@ -191,6 +194,21 @@ public class RepoUIController {
 		
 		// Add dummy file for navigating backwards
 		return new RepoFile("", ". .", parent, true, 0, null, null);
+	}
+	
+	private String resolveReadMeFile(final Repository db, final List<RepoFile> files) throws LargeObjectException, MissingObjectException, IOException {
+		for (final RepoFile file : files) {
+			if (isReadmeFile(file.getName())) {
+				return getFileContents(db, ObjectId.fromString(file.getObjectId()));
+			}
+ 		}
+		return null;
+	}
+	
+	private boolean isReadmeFile(final String path) {
+		final String smallPath = path.toLowerCase();
+		
+		return "readme.md".equals(smallPath) || "readme.markdown".equals(smallPath); 
 	}
 	
 	private RepoFile buildRepoFileObject(final Repository db, final String path, final TreeWalk treeWalk, final boolean customPath, final String pathString, 

@@ -5,10 +5,17 @@
       layout:decorator="layouts/default"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
+	<script type="text/javascript" th:src="@{/webjars/highlightjs/8.4-4/highlight.min.js}"></script>
+	
+	<script type="text/javascript" th:src="@{/webjars/showdown/0.3.1/compressed/showdown.js}"></script>
+
 	<script type="text/javascript" th:src="@{/js/timeago.min.js}"></script>
 	<script>
-		jQuery(document).ready(function() {
-			jQuery("time.timeago").timeago();
+		$(document).ready(function() {
+			$("time.timeago").timeago();
+			
+			var $md = $(".markdown");
+			$md.html(new Showdown.converter().makeHtml($md.html()));
 		});
 	</script>
 </head>
@@ -22,27 +29,43 @@
    	<ul th:each="branch : ${branches}">
    		<li th:text="${branch}">Branch Name</li>
    	</ul>
-   	<hr />
-   	<span th:text="${path}">path</span>
-   	<br />
-   	<table class="table">
-   		<tr th:each="file : ${files}">
-   			<td>
-   				<i th:class="${file.directory ? 'fa fa-fw fa-folder' : 'fa fa-fw fa-file-o'}"></i>
-   				&nbsp;&nbsp;
-   				<a th:href="@{/repo/} + ${repo.owner} + '/' + ${repo.displayName} + '/tree/' + ${file.parent} + ${file.name} + ${file.directory ? '' : '?file=true'}" th:text="${file.display}">Filename</a>
-			</td>
-			<td>
-				<span th:text="${file.directory ? '' : file.size + ' Bytes'}">size</span>
-			</td>
-			<td>
-				<time class="timeago" th:attr="datetime=${file.directory ? '' : file.dateTimeString}"></time>
-			</td>
-			<td>
-				<span th:text="${file.directory ? '' : file.commit.shortMessage}">message</span>
-			</td>
-   		</tr>
-   	</table>
+   	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">
+				<span style="font-weight: bold;" th:text="${path == '' ? '/' : path}">path</span>
+			</h3>
+		</div>
+  		<div class="panel-body">
+	    	<table class="table">
+		   		<tr th:each="file : ${files}">
+		   			<td>
+		   				<i th:class="${file.directory ? 'fa fa-fw fa-folder' : 'fa fa-fw fa-file-o'}"></i>
+		   				&nbsp;&nbsp;
+		   				<a th:href="@{/repo/} + ${repo.owner} + '/' + ${repo.displayName} + '/tree/' + ${file.parent} + ${file.name} + ${file.directory ? '' : '?file=true'}" th:text="${file.display}">Filename</a>
+					</td>
+					<td>
+						<span th:if="${!file.directory}" th:text="${file.size} + ' Bytes'">size</span>
+					</td>
+					<td>
+						<time class="timeago" th:if="${!file.directory}" th:attr="datetime=${file.dateTimeString}"></time>
+					</td>
+					<td>
+						<span th:if="${!file.directory}" th:text="${file.commit.shortMessage}">message</span>
+					</td>
+		   		</tr>
+		   	</table>
+		</div>
+	</div>
+	
+   	<div th:if="${readme != null}" class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">
+				<span style="font-weight: bold;">README</span>
+			</h3>
+		</div>
+  		<div class="panel-body markdown" th:text="${readme}">
+		</div>
+	</div>
 </div>
 </body>
 </html>

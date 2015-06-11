@@ -30,29 +30,43 @@
     	<h1>File not found!</h1>
     </div>
     <div th:if="${file != null}">
-    	<span th:text="${file.parent}"></span>
-    	<div>
-    		<table class="committerInfo">
-    			<tr>
-    				<th>Commit ID</th>
-    				<td th:text="${file.commit.id.name}"></td>
-    			</tr>
-    			<tr>
-    				<th>Committer</th>
-    				<td th:text="${file.commit.committerIdent.name} + ' &lt;' + ${file.commit.committerIdent.emailAddress} + '&gt; ' + ${file.commit.committerIdent.when}"></td>
-    			</tr>
-    			<tr>
-    				<th>Author</th>
-    				<td th:text="${file.commit.authorIdent.name} + ' &lt;' + ${file.commit.authorIdent.emailAddress} + '&gt; ' + ${file.commit.authorIdent.when}"></td>
-    			</tr>
-    			<tr>
-    				<th>Message</th>
-    				<td th:text="${file.commit.fullMessage}"></td>
-    			</tr>
-    		</table>
-    	</div>
-    	<hr />
-   		<pre th:text="${file.fileContents}"></pre>
+    	<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<span style="font-weight: bold;">Commit Information</span>
+				</h3>
+			</div>
+	  		<div class="panel-body">
+	  			<table class="committerInfo">
+	    			<tr>
+	    				<th>Commit ID</th>
+	    				<td th:text="${file.commit.id.name}"></td>
+	    			</tr>
+	    			<tr>
+	    				<th>Committer</th>
+	    				<td th:text="${file.commit.committerIdent.name} + ' &lt;' + ${file.commit.committerIdent.emailAddress} + '&gt; ' + ${file.commit.committerIdent.when}"></td>
+	    			</tr>
+	    			<tr>
+	    				<th>Author</th>
+	    				<td th:text="${file.commit.authorIdent.name} + ' &lt;' + ${file.commit.authorIdent.emailAddress} + '&gt; ' + ${file.commit.authorIdent.when}"></td>
+	    			</tr>
+	    			<tr>
+	    				<th>Message</th>
+	    				<td th:text="${file.commit.fullMessage}"></td>
+	    			</tr>
+	    		</table>
+			</div>
+		</div>
+   	   	<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<span style="font-weight: bold;" th:text="${file.name}"></span>
+				</h3>
+			</div>
+	  		<div class="panel-body">
+	  			<pre th:text="${file.fileContents}"></pre>
+			</div>
+		</div>
     </div>
 </div>
 </body>
