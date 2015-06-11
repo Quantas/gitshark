@@ -5,6 +5,12 @@
       layout:decorator="layouts/default"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
+	<script type="text/javascript" th:src="@{/js/timeago.min.js}"></script>
+	<script>
+		jQuery(document).ready(function() {
+			jQuery("time.timeago").timeago();
+		});
+	</script>
 </head>
 <body>
 <div layout:fragment="content">
@@ -30,7 +36,7 @@
 				<span th:text="${file.directory ? '' : file.size + ' Bytes'}">size</span>
 			</td>
 			<td>
-				<span th:text="${file.directory ? '' : file.commit.committerIdent.when}">date</span>
+				<time class="timeago" th:attr="datetime=${file.directory ? '' : file.dateTimeString}"></time>
 			</td>
 			<td>
 				<span th:text="${file.directory ? '' : file.commit.shortMessage}">message</span>

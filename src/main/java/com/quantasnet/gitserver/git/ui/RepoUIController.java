@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.LargeObjectException;
@@ -79,20 +80,18 @@ public class RepoUIController {
 	public String displayRepoTree(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, @RequestParam(required = false) final boolean file, final Model model, final HttpServletRequest req) throws Exception {
 
 		final String repoPath = "/repo/" + repoOwner + '/' + repoName + "/tree/";
-		final String path = ((String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).replaceAll(repoPath, "");
+		final String path = resolvePath(req, repoPath);
 		
 		model.addAttribute("repo", repo);
 		model.addAttribute("path", path);
 		
 		GitRepository.execute(repo, db -> {
+			model.addAttribute("branches", db.getRefDatabase().getRefs("refs/heads/").keySet());
+			
 			if (file) {
-				final RepoFile repoFile = getFiles(db, path, true).get(0);
-				model.addAttribute("fileString", repoFile.getFileContents());
-				model.addAttribute("commitText", getFileContents(db, repoFile.getCommit().getId()));
-				model.addAttribute("found", Boolean.TRUE);
+				model.addAttribute("file", getFileToDisplay(db, path));
 			} else {
 				model.addAttribute("files", getFiles(db, path, false));
-				model.addAttribute("branches", db.getRefDatabase().getRefs("refs/heads/").keySet());
 			}
 		});
 		
@@ -101,6 +100,25 @@ public class RepoUIController {
 		}
 		
 		return "git/single";
+	}
+
+	private String resolvePath(final HttpServletRequest req, final String repoPath) {
+		String path = ((String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).replaceAll(repoPath, "");
+		
+		if (path.endsWith("/")) {
+			path = path.substring(0, path.length() - 1);
+		}
+		
+		return path;
+	}
+	
+	private RepoFile getFileToDisplay(final Repository db, final String path) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException, GitAPIException {
+		final List<RepoFile> files = getFiles(db, path, true);
+		if (!files.isEmpty()) {
+			return files.get(0);
+		}
+		
+		return null;
 	}
 	
 	private List<RepoFile> getFiles(final Repository db, final String path, final boolean file) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException, GitAPIException {
@@ -137,16 +155,8 @@ public class RepoUIController {
 					
 					// If we don't want a single file, we need a dummy file for navigating backwards
 					if (!file) {
-						String parent;
-						// If parent is not root, remove trailer, else set to blank
-						if (pathString.indexOf("/") > 0) {
-							parent = pathString.substring(0, pathString.lastIndexOf("/"));
-						} else {
-							parent = "";
-						}
-						
 						// Add dummy file for navigating backwards
-						files.add(new RepoFile("", ". .", parent, true, 0, null, null));
+						files.add(buildBackwardsNavigationFile(pathString));
 						continue;
 					}
 				}
@@ -154,27 +164,7 @@ public class RepoUIController {
 				// If we found the path we were looking for, start lining up the files
 				if (alreadyInside) {
 					final ObjectId objectId = treeWalk.getObjectId(0);
-					final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
-					final String parent = pathString.substring(0, pathString.lastIndexOf("/") + 1);
-	
-					long size = 0;
-					RevCommit commit = null;
-					
-					// WE only need commit and size information if this isn't a directory
-					if (!directory) {
-						try {
-							size = treeWalk.getObjectReader().getObjectSize(objectId, 3); // 3 = BLOB
-						} catch (Exception e) {
-							// TODO: hmmm
-						}
-						
-						try (final Git git = new Git(db)) {
-							commit = git.log().addPath(pathString).setMaxCount(1).call().iterator().next();
-						}
-					}
-					
-					final RepoFile repoFile = new RepoFile(name, parent, directory, size, objectId.getName(), commit); 
-	
+					final RepoFile repoFile = buildRepoFileObject(db, path, treeWalk, customPath, pathString, directory, objectId); 
 					files.add(repoFile);
 					
 					// if we wanted just a single file, get it's contents for display and get out of here
@@ -188,6 +178,44 @@ public class RepoUIController {
 		
 		Collections.sort(files);
 		return files;
+	}
+
+	private RepoFile buildBackwardsNavigationFile(final String pathString) {
+		String parent;
+		// If parent is not root, remove trailer, else set to blank
+		if (pathString.indexOf("/") > 0) {
+			parent = pathString.substring(0, pathString.lastIndexOf("/"));
+		} else {
+			parent = "";
+		}
+		
+		// Add dummy file for navigating backwards
+		return new RepoFile("", ". .", parent, true, 0, null, null);
+	}
+	
+	private RepoFile buildRepoFileObject(final Repository db, final String path, final TreeWalk treeWalk, final boolean customPath, final String pathString, 
+			final boolean directory, final ObjectId objectId) throws GitAPIException, NoHeadException {
+		
+		final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
+		final String parent = pathString.substring(0, pathString.lastIndexOf("/") + 1);
+
+		long size = 0;
+		RevCommit commit = null;
+		
+		// WE only need commit and size information if this isn't a directory
+		if (!directory) {
+			try {
+				size = treeWalk.getObjectReader().getObjectSize(objectId, 3); // 3 = BLOB
+			} catch (Exception e) {
+				size = 0;
+			}
+			
+			try (final Git git = new Git(db)) {
+				commit = git.log().addPath(pathString).setMaxCount(1).call().iterator().next();
+			}
+		}
+		
+		return new RepoFile(name, parent, directory, size, objectId.getName(), commit);
 	}
 	
 	private String getFileContents(final Repository db, final ObjectId objectId) throws LargeObjectException, MissingObjectException, IOException {

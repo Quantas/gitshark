@@ -1,6 +1,7 @@
 package com.quantasnet.gitserver.git.model;
 
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.joda.time.DateTime;
 
 import com.google.common.collect.ComparisonChain;
 
@@ -56,6 +57,14 @@ public class RepoFile implements Comparable<RepoFile> {
 	
 	public RevCommit getCommit() {
 		return commit;
+	}
+	
+	public String getDateTimeString() {
+		if (null != commit) {
+			return new DateTime(commit.getCommitterIdent().getWhen().getTime()).toString("yyyy-MM-dd'T'HH:mm:ssZ");
+		}
+		
+		return null;
 	}
 	
 	public void setFileContents(String fileContents) {

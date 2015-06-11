@@ -14,6 +14,11 @@
 			});
 		});
 	</script>
+	<style>
+		table.committerInfo td,th {
+			padding: 3px;
+		}
+	</style>
 </head>
 <body>
 <div layout:fragment="content">
@@ -21,13 +26,33 @@
     <hr />
     Git URL : <input type="text" size="60" readonly="readonly" th:value="${#httpServletRequest.scheme} + '://' + ${repo.owner} + '@' + ${#httpServletRequest.serverName} + ':' + ${#httpServletRequest.serverPort} + '/repo/' + ${repo.owner} + '/' + ${repo.name}"></input>
     <hr />
-    <div th:if="${!found}">
+    <div th:if="${file == null}">
     	<h1>File not found!</h1>
     </div>
-    <div th:if="${found}">
-    	<pre th:text="${commitText}"></pre>
+    <div th:if="${file != null}">
+    	<span th:text="${file.parent}"></span>
+    	<div>
+    		<table class="committerInfo">
+    			<tr>
+    				<th>Commit ID</th>
+    				<td th:text="${file.commit.id.name}"></td>
+    			</tr>
+    			<tr>
+    				<th>Committer</th>
+    				<td th:text="${file.commit.committerIdent.name} + ' &lt;' + ${file.commit.committerIdent.emailAddress} + '&gt; ' + ${file.commit.committerIdent.when}"></td>
+    			</tr>
+    			<tr>
+    				<th>Author</th>
+    				<td th:text="${file.commit.authorIdent.name} + ' &lt;' + ${file.commit.authorIdent.emailAddress} + '&gt; ' + ${file.commit.authorIdent.when}"></td>
+    			</tr>
+    			<tr>
+    				<th>Message</th>
+    				<td th:text="${file.commit.fullMessage}"></td>
+    			</tr>
+    		</table>
+    	</div>
     	<hr />
-   		<pre th:text="${fileString}"></pre>
+   		<pre th:text="${file.fileContents}"></pre>
     </div>
 </div>
 </body>
