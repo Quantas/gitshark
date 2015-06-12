@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.HandlerMapping;
 
 import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.model.Breadcrumb;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.git.repo.RepositoryService;
@@ -71,6 +72,7 @@ public class RepoUIController {
 		
 		model.addAttribute("repo", repo);
 		model.addAttribute("path", path);
+		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repoPath, path));
 		
 		GitRepository.execute(repo, db -> {
 			model.addAttribute("branches", db.getRefDatabase().getRefs("refs/heads/").keySet());
@@ -91,7 +93,7 @@ public class RepoUIController {
 		
 		return "git/single";
 	}
-
+	
 	private String resolvePath(final HttpServletRequest req, final String repoPath) {
 		String path = ((String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
 		if (!path.endsWith("/")) {

@@ -14,8 +14,12 @@
 		$(document).ready(function() {
 			$("time.timeago").timeago();
 			
-			var $md = $(".markdown");
-			$md.html(new Showdown.converter().makeHtml($md.html()));
+			try {
+				var $md = $(".markdown");
+				$md.html(new Showdown.converter().makeHtml($md.html()));
+			} catch (err) {
+				
+			}
 		});
 	</script>
 </head>
@@ -31,9 +35,13 @@
    	</ul>
    	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h3 class="panel-title">
-				<span style="font-weight: bold;" th:text="${path == '' ? '/' : path}">path</span>
-			</h3>
+			<div class="panel-title" style="font-weight: bold;">
+				<span th:each="crumb : ${breadcrumbs}">
+					<a th:if="${crumb.link}" th:href="${crumb.url}" th:text="${crumb.name}"></a>
+					<span th:if="${!crumb.link}" th:text="${crumb.name}"></span>
+					<span th:if="${!crumb.first and crumb.link}">/</span>
+				</span>
+			</div>
 		</div>
   		<div class="panel-body">
 	    	<table class="table">

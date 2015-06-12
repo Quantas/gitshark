@@ -52,16 +52,20 @@
 	    			</tr>
 	    			<tr>
 	    				<th>Message</th>
-	    				<td th:text="${file.commit.fullMessage}"></td>
+	    				<td><pre th:text="${file.commit.fullMessage}"></pre></td>
 	    			</tr>
 	    		</table>
 			</div>
 		</div>
    	   	<div class="panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title">
-					<span style="font-weight: bold;" th:text="${file.name}"></span>
-				</h3>
+				<div class="panel-title" style="font-weight: bold;">
+					<span th:each="crumb : ${breadcrumbs}">
+						<a th:if="${crumb.link}" th:href="${crumb.url}" th:text="${crumb.name}"></a>
+						<span th:if="${!crumb.link}" th:text="${crumb.name}"></span>
+						<span th:if="${!crumb.first and crumb.link}">/</span>
+					</span>
+				</div>
 			</div>
 	  		<div class="panel-body">
 	  			<pre th:text="${file.fileContents}"></pre>
