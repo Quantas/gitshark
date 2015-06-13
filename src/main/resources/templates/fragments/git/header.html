@@ -11,7 +11,7 @@
 	  			<div class="panel-body">
 	  				<label for="checkoutUrl">URL</label>
 	  				&nbsp;
-	  				<input id="checkoutUrl" type="text" size="60" readonly="readonly" th:value="${checkoutUrl}"></input>
+	  				<input class="form-control" id="checkoutUrl" type="text" readonly="readonly" th:value="${checkoutUrl}"></input>
 				</div>
 				<div class="panel-footer">
 					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl}">summary</a>
