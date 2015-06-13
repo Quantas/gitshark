@@ -27,9 +27,11 @@ public class SummaryController {
 				git.log().setMaxCount(20).call().forEach(commit -> {
 					commits.add(new Commit(commit));
 				});
+				
+				model.addAttribute("commits", commits);
+			} catch (Exception e) {
+				
 			}
-			
-			model.addAttribute("commits", commits);
 		});
 		
 		return "git/summary";
