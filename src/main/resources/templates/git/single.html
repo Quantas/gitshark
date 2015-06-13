@@ -25,14 +25,12 @@
     <div layout:include="fragments/git/header :: header">
     	Git Header here
     </div>
-   	Branches
-   	<ul th:each="branch : ${branches}">
-   		<li th:text="${branch}">Branch Name</li>
-   	</ul>
    	<div class="panel panel-default">
 		<div class="panel-heading">
-			<div class="panel-title" style="font-weight: bold;" layout:include="fragments/git/breadcrumbs :: breadcrumbs">
-				breadcrumbs
+			<div class="panel-title" style="font-weight: bold;">
+				<div style="display: inline;" layout:include="fragments/git/breadcrumbs :: breadcrumbs">
+					breadcrumbs
+				</div>
 			</div>
 		</div>
 		<table class="table">

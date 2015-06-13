@@ -6,6 +6,10 @@
 	</head>
 	<body>
 		<div layout:fragment="breadcrumbs">
+			<i class="fa fa-code-fork"></i>
+			<select class="form-control" style="display: inline; width: 10%;">
+		   		<option th:each="branch : ${branches}" th:value="${branch}" th:text="${branch}">branch</option>
+		    </select>
 			<span th:each="crumb : ${breadcrumbs}">
 				<a th:if="${crumb.link}" th:href="${crumb.url}" th:text="${crumb.name}"></a>
 				<span th:if="${!crumb.link}" th:text="${crumb.name}"></span>
