@@ -33,15 +33,15 @@ public class RepositoryService {
 	private RepoFolderUtil folderUtil;
 	
 	public GitRepository getRepository(final String userName, final String owner, final String repoName) throws RepositoryNotFoundException, RepositoryAccessDeniedException {
-		if (owner.equals(userName)) {
+		// if (owner.equals(userName)) {
 			final File gitFolder = folderUtil.getRepoDir(owner, endsWithGit(repoName));
 			if (gitFolder.exists() && gitFolder.isDirectory()) {
-				return new GitRepository(gitFolder, owner, gitFolder.getName());
+				return new GitRepository(gitFolder, owner, gitFolder.getName(), true, false); // TODO fix
 			}
 			throw new RepositoryNotFoundException(gitFolder.getName());
-		}
+		// }
 		
-		throw new RepositoryAccessDeniedException();
+		// throw new RepositoryAccessDeniedException();
 	}
 	
 	public Set<GitRepository> getRepositories(final String owner) {
@@ -52,7 +52,7 @@ public class RepositoryService {
 			// get all the child folders
 			for (final File child : rootFolder.listFiles(GIT_ONLY_FILTER)) {
 				LOG.info("CHILD={}", child);
-				repos.add(new GitRepository(child, owner, child.getName()));
+				repos.add(new GitRepository(child, owner, child.getName(), true, false)); // TODO fix
 			}
 		}
 		return repos;
@@ -68,7 +68,7 @@ public class RepositoryService {
 			throw new RuntimeException(e);
 		}
 		
-		return new GitRepository(newRepo, owner, name);
+		return new GitRepository(newRepo, owner, name, true, false); // TODO fix
 	}
 	
 	private String endsWithGit(final String name) {

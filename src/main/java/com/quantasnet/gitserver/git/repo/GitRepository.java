@@ -13,10 +13,15 @@ public class GitRepository {
 	private final String owner;
 	private final String name;
 	
-	public GitRepository(final File fullRepoDirectory, final String owner, final String name) {
+	private final boolean anonRead;
+	private final boolean anonWrite;
+	
+	public GitRepository(final File fullRepoDirectory, final String owner, final String name, final boolean anonRead, final boolean anonWrite) {
 		this.fullRepoDirectory = fullRepoDirectory;
 		this.owner = owner;
 		this.name = name;
+		this.anonRead = anonRead;
+		this.anonWrite = anonWrite;
 	}
 	
 	public static void execute(final GitRepository repo, final RepositoryAction repoAction) throws Exception {
@@ -43,6 +48,14 @@ public class GitRepository {
 
 	public String getName() {
 		return name;
+	}
+	
+	public boolean isAnonRead() {
+		return anonRead;
+	}
+	
+	public boolean isAnonWrite() {
+		return anonWrite;
 	}
 	
 	public String getDisplayName() {
