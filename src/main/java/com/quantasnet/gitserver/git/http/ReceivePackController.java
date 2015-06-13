@@ -1,14 +1,5 @@
 package com.quantasnet.gitserver.git.http;
 
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-import static javax.servlet.http.HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE;
-import static org.eclipse.jgit.http.server.ClientVersionUtil.hasChunkedEncodingRequestBug;
-import static org.eclipse.jgit.http.server.ClientVersionUtil.hasPushStatusBug;
-import static org.eclipse.jgit.http.server.ClientVersionUtil.parseVersion;
-import static org.eclipse.jgit.http.server.GitSmartHttpTools.sendError;
-import static org.eclipse.jgit.http.server.ServletUtils.consumeRequestBody;
-import static org.eclipse.jgit.http.server.ServletUtils.getInputStream;
-
 import java.io.ByteArrayOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +7,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jgit.errors.CorruptObjectException;
 import org.eclipse.jgit.errors.UnpackException;
+import org.eclipse.jgit.http.server.ClientVersionUtil;
+import org.eclipse.jgit.http.server.GitSmartHttpTools;
+import org.eclipse.jgit.http.server.ServletUtils;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.transport.InternalHttpServerGlue;
 import org.eclipse.jgit.transport.PacketLineOut;
@@ -39,12 +33,13 @@ import com.quantasnet.gitserver.jgit.vendor.SmartOutputStream;
 public class ReceivePackController {
 
 	@RequestMapping(value = "/info/refs", params = "service=" + Constants.GIT_RECEIVE_PACK, method = RequestMethod.GET, 
-			produces = "application/x-git-receive-pack-advertisement")
+			produces = Constants.GIT_RECEIVE_PACK_ADV)
 	public ResponseEntity<byte[]> receivePackAdv(final GitRepository repo, @AuthenticationPrincipal final User user, final HttpServletRequest req, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent) throws Exception {
 		final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		
 		GitRepository.execute(repo, db -> {
 			final ReceivePack rp = new ReceivePack(db);
+			// TODO replace email with user's email
 			rp.setRefLogIdent(new PersonIdent(user.getUsername(), user.getUsername() + "@" + req.getRemoteHost()));
 			InternalHttpServerGlue.setPeerUserAgent(rp, userAgent);
 			
@@ -63,13 +58,14 @@ public class ReceivePackController {
 	}
 	
 	@RequestMapping(value = "/" + Constants.GIT_RECEIVE_PACK, method = RequestMethod.POST, 
-			consumes = "application/x-git-receive-pack-request", 
+			consumes = Constants.GIT_RECEIVE_PACK_REQUEST, 
 			produces = Constants.GIT_RECEIVE_PACK_RESULT)
 	public void receivePack(final GitRepository repo, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws Exception {
 		
-		int[] version = parseVersion(userAgent);
-		if (hasChunkedEncodingRequestBug(version, req)) {
-			rsp.sendError(SC_UNSUPPORTED_MEDIA_TYPE);
+		final int[] version = ClientVersionUtil.parseVersion(userAgent);
+		
+		if (ClientVersionUtil.hasChunkedEncodingRequestBug(version, req)) {
+			rsp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 			return;
 		}
 		
@@ -79,17 +75,17 @@ public class ReceivePackController {
 			final ReceivePack rp = new ReceivePack(db);
 			try {
 				rp.setBiDirectionalPipe(false);
-				rp.setEchoCommandFailures(hasPushStatusBug(version));
+				rp.setEchoCommandFailures(ClientVersionUtil.hasPushStatusBug(version));
 				rsp.setContentType(Constants.GIT_RECEIVE_PACK_RESULT);
-				rp.receive(getInputStream(req), out, null);
+				rp.receive(ServletUtils.getInputStream(req), out, null);
 				out.close();
-			} catch (CorruptObjectException | UnpackException e) {
-				consumeRequestBody(req);
+			} catch (final CorruptObjectException | UnpackException e) {
+				ServletUtils.consumeRequestBody(req);
 				out.close();
-			} catch (Throwable e) {
+			} catch (final Throwable e) {
 				if (!rsp.isCommitted()) {
 					rsp.reset();
-					sendError(req, rsp, SC_INTERNAL_SERVER_ERROR);
+					GitSmartHttpTools.sendError(req, rsp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				}
 				return;
 			}

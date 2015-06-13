@@ -1,19 +1,13 @@
 package com.quantasnet.gitserver.git.http;
 
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-import static javax.servlet.http.HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE;
-import static org.eclipse.jgit.http.server.ClientVersionUtil.hasChunkedEncodingRequestBug;
-import static org.eclipse.jgit.http.server.ClientVersionUtil.parseVersion;
-import static org.eclipse.jgit.http.server.GitSmartHttpTools.sendError;
-import static org.eclipse.jgit.http.server.ServletUtils.consumeRequestBody;
-import static org.eclipse.jgit.http.server.ServletUtils.getInputStream;
-
 import java.io.ByteArrayOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jgit.http.server.ClientVersionUtil;
+import org.eclipse.jgit.http.server.GitSmartHttpTools;
+import org.eclipse.jgit.http.server.ServletUtils;
 import org.eclipse.jgit.transport.InternalHttpServerGlue;
 import org.eclipse.jgit.transport.PacketLineOut;
 import org.eclipse.jgit.transport.RefAdvertiser.PacketLineOutRefAdvertiser;
@@ -36,7 +30,7 @@ import com.quantasnet.gitserver.jgit.vendor.SmartOutputStream;
 public class UploadPackController {
 
 	@RequestMapping(value = "/info/refs", params = "service=" + Constants.GIT_UPLOAD_PACK, method = RequestMethod.GET, 
-			produces = "application/x-git-upload-pack-advertisement")
+			produces = Constants.GIT_UPLOAD_PACK_ADV)
 	public ResponseEntity<byte[]> uploadPackAdv(final GitRepository repo, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent) throws Exception {
 		final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		
@@ -59,14 +53,14 @@ public class UploadPackController {
 		return new ResponseEntity<byte[]>(buf.toByteArray(), HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/git-upload-pack", method = RequestMethod.POST, 
-			consumes = "application/x-git-upload-pack-request", 
+	@RequestMapping(value = "/" + Constants.GIT_UPLOAD_PACK, method = RequestMethod.POST, 
+			consumes = Constants.GIT_UPLOAD_PACK_REQUEST, 
 			produces = Constants.GIT_UPLOAD_PACK_RESULT)
 	public void uploadPack(final GitRepository repo, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws Exception {
 		
-		int[] version = parseVersion(userAgent);
-		if (hasChunkedEncodingRequestBug(version, req)) {
-			rsp.sendError(SC_UNSUPPORTED_MEDIA_TYPE);
+		final int[] version = ClientVersionUtil.parseVersion(userAgent);
+		if (ClientVersionUtil.hasChunkedEncodingRequestBug(version, req)) {
+			rsp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 			return;
 		}
 		
@@ -78,25 +72,25 @@ public class UploadPackController {
 				up.setBiDirectionalPipe(false);
 				rsp.setContentType(Constants.GIT_UPLOAD_PACK_RESULT);
 
-				up.upload(getInputStream(req), out, null);
+				up.upload(ServletUtils.getInputStream(req), out, null);
 				out.close();
 
-			} catch (ServiceMayNotContinueException e) {
+			} catch (final ServiceMayNotContinueException e) {
 				if (e.isOutput()) {
-					consumeRequestBody(req);
+					ServletUtils.consumeRequestBody(req);
 					out.close();
 				} else if (!rsp.isCommitted()) {
 					rsp.reset();
-					sendError(req, rsp, SC_FORBIDDEN, e.getMessage());
+					GitSmartHttpTools.sendError(req, rsp, HttpServletResponse.SC_FORBIDDEN, e.getMessage());
 				}
 				return;
-			} catch (UploadPackInternalServerErrorException e) {
-				consumeRequestBody(req);
+			} catch (final UploadPackInternalServerErrorException e) {
+				ServletUtils.consumeRequestBody(req);
 				out.close();
-			} catch (Throwable e) {
+			} catch (final Throwable e) {
 				if (!rsp.isCommitted()) {
 					rsp.reset();
-					sendError(req, rsp, SC_INTERNAL_SERVER_ERROR);
+					GitSmartHttpTools.sendError(req, rsp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				}
 				return;
 			}

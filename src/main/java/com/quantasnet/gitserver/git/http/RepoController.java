@@ -28,7 +28,7 @@ public class RepoController {
 		return new ResponseEntity<byte[]>(head, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/info/refs", method = RequestMethod.GET, produces = Constants.MIME_TEXT_PLAIN)
+	@RequestMapping(value = "/info/refs", method = RequestMethod.GET, produces = Constants.TEXT_PLAIN)
 	public ResponseEntity<String> infoRefs(final GitRepository repo) throws Exception {
 		final StringBuilder output = new StringBuilder();
 		
