@@ -56,11 +56,6 @@ public class RepoUIController {
 		return "redirect:/repo/";
 	}
 	
-	@RequestMapping("/{repoOwner}/{repoName}")
-	public String displayRepo(@PathVariable final String repoOwner, @PathVariable final String repoName) {
-		return "redirect:/repo/" + repoOwner + '/' + repoName + "/tree/";
-	}
-	
 	/**
 	 * For browsing the tree and viewing files
 	 */
