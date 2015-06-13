@@ -32,7 +32,7 @@
 	   				<time class="timeago" th:attr="datetime=${commit.dateTimeString}"></time>
 	   			</td>
 	   			<td th:text="${commit.commit.shortMessage}"></td>
-				<td th:text="${commit.commit.id.name}"></td>
+				<td th:text="${commit.shortId}"></td>
 	   		</tr>
 	   	</table>
 	</div>

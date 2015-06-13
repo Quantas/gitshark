@@ -15,6 +15,14 @@ public abstract class BaseCommit {
 		return commit;
 	}
 	
+	public String getId() {
+		return commit.getId().getName();
+	}
+	
+	public String getShortId() {
+		return commit.getId().getName().substring(0, 7);
+	}
+	
 	public String getDateTimeString() {
 		if (null != commit) {
 			return new DateTime(commit.getCommitterIdent().getWhen().getTime()).toString("yyyy-MM-dd'T'HH:mm:ssZ");

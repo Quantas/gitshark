@@ -9,10 +9,6 @@ public class Commit extends BaseCommit {
 		super(commit);
 	}
 	
-	public String getId() {
-		return commit.getId().getName();
-	}
-	
 	public String getCommitterName() {
 		return commit.getCommitterIdent().getName();
 	}
