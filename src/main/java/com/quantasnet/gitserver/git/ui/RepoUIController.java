@@ -65,7 +65,6 @@ public class RepoUIController {
 		final String repoPath = "/repo/" + repoOwner + '/' + repoName + "/tree/";
 		final String path = resolvePath(req, repoPath);
 		
-		model.addAttribute("path", path);
 		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repoName, repoPath, path));
 		
 		GitRepository.execute(repo, db -> {
@@ -75,7 +74,6 @@ public class RepoUIController {
 				model.addAttribute("file", getFileToDisplay(repo, db, path));
 			} else {
 				final List<RepoFile> files = getFiles(repo, db, path, false);
-				
 				model.addAttribute("readme", resolveReadMeFile(db, files));
 				model.addAttribute("files", files);
 			}
