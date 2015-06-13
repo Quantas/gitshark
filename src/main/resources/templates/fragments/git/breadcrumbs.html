@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<head>
+	</head>
+	<body>
+		<div layout:fragment="breadcrumbs">
+			<span th:each="crumb : ${breadcrumbs}">
+				<a th:if="${crumb.link}" th:href="${crumb.url}" th:text="${crumb.name}"></a>
+				<span th:if="${!crumb.link}" th:text="${crumb.name}"></span>
+				<span th:if="${crumb.link}">/</span>
+			</span>
+		</div>
+	</body>
+</html>

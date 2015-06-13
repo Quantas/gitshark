@@ -67,7 +67,7 @@ public class RepoUIController {
 		
 		model.addAttribute("repo", repo);
 		model.addAttribute("path", path);
-		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repoPath, path));
+		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repoName, repoPath, path));
 		
 		GitRepository.execute(repo, db -> {
 			model.addAttribute("branches", db.getRefDatabase().getRefs("refs/heads/").keySet());
