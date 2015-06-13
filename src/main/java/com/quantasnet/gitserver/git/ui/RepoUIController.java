@@ -65,7 +65,6 @@ public class RepoUIController {
 		final String repoPath = "/repo/" + repoOwner + '/' + repoName + "/tree/";
 		final String path = resolvePath(req, repoPath);
 		
-		model.addAttribute("repo", repo);
 		model.addAttribute("path", path);
 		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repoName, repoPath, path));
 		

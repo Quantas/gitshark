@@ -38,6 +38,7 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 		final String repoName = requestURI.split("/")[3];
 		
 		final GitRepository repo = repositoryService.getRepository(userName, owner, repoName);
+		mavContainer.addAttribute("repo", repo);
 		mavContainer.addAttribute("checkoutUrl", buildCheckoutUrl(request, userName, repo));
 		
 		return repo;

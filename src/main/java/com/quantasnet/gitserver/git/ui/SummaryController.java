@@ -20,8 +20,6 @@ public class SummaryController {
 	@RequestMapping({ "", "/" })
 	public String summary(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, final Model model) throws Exception {
 		
-		model.addAttribute("repo", repo);
-		
 		GitRepository.execute(repo, db -> {
 			
 			final List<Commit> commits = new ArrayList<>();
