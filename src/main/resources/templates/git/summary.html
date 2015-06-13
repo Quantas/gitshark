@@ -14,10 +14,9 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <h1 th:text="${repo.owner} + ' / ' + ${repo.displayName}">owner / name</h1>
-    <hr />
-    Git URL : <input type="text" size="60" readonly="readonly" th:value="${#httpServletRequest.scheme} + '://' + ${repo.owner} + '@' + ${#httpServletRequest.serverName} + ':' + ${#httpServletRequest.serverPort} + '/repo/' + ${repo.owner} + '/' + ${repo.name}"></input>
-    <hr />
+    <div layout:include="fragments/git/header :: header">
+    	Git Header here
+    </div>
    	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title">
@@ -26,8 +25,14 @@
 		</div>
     	<table class="table">
 	   		<tr th:each="commit : ${commits}">
-	   			<td th:text="${commit.shortMessage}"></td>
-				<td th:text="${commit.id.name}"></td>
+	   			<td>
+	   				<img th:src="${commit.gravatarUrl} + '&amp;s=25'"></img>
+	   			</td>
+	   			<td>
+	   				<time class="timeago" th:attr="datetime=${commit.dateTimeString}"></time>
+	   			</td>
+	   			<td th:text="${commit.commit.shortMessage}"></td>
+				<td th:text="${commit.commit.id.name}"></td>
 	   		</tr>
 	   	</table>
 	</div>

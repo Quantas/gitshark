@@ -48,6 +48,10 @@ public class GitRepository {
 	public String getDisplayName() {
 		return name.replaceAll("\\" + Constants.DOT_GIT_SUFFIX, "");
 	}
+	
+	public String getInterfaceBaseUrl() {
+		return getOwner() + '/' + getDisplayName();
+	}
 
 	@Override
 	public String toString() {

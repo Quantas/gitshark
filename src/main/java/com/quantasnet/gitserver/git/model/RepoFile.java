@@ -1,7 +1,6 @@
 package com.quantasnet.gitserver.git.model;
 
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.joda.time.DateTime;
 
 import com.google.common.collect.ComparisonChain;
 import com.quantasnet.gitserver.git.repo.GitRepository;
@@ -11,7 +10,7 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
  * 
  * @author andrewlandsverk
  */
-public class RepoFile implements Comparable<RepoFile> {
+public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 
 	private final String name;
 	private final String display;
@@ -19,7 +18,6 @@ public class RepoFile implements Comparable<RepoFile> {
 	private final boolean directory;
 	private final long size;
 	private final String objectId;
-	private final RevCommit commit;
 	private final String url;
 	
 	private String fileContents;
@@ -29,13 +27,13 @@ public class RepoFile implements Comparable<RepoFile> {
 	}
 	
 	public RepoFile(final GitRepository repo, final String name, final String display, final String parent, final boolean directory, final long size, final String objectId, final RevCommit commit) {
+		super(commit);
 		this.name = name;
 		this.display = display;
 		this.parent = parent;
 		this.directory = directory;
 		this.size = size;
 		this.objectId = objectId;
-		this.commit = commit;
 		this.url = generateUrl(repo);
 	}
 
@@ -80,20 +78,8 @@ public class RepoFile implements Comparable<RepoFile> {
 		return objectId;
 	}
 	
-	public RevCommit getCommit() {
-		return commit;
-	}
-	
 	public String getUrl() {
 		return url;
-	}
-	
-	public String getDateTimeString() {
-		if (null != commit) {
-			return new DateTime(commit.getCommitterIdent().getWhen().getTime()).toString("yyyy-MM-dd'T'HH:mm:ssZ");
-		}
-		
-		return null;
 	}
 	
 	public void setFileContents(String fileContents) {
