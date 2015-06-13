@@ -6,9 +6,7 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
 	<script type="text/javascript" th:src="@{/webjars/highlightjs/8.4-4/highlight.min.js}"></script>
-	
 	<script type="text/javascript" th:src="@{/webjars/showdown/0.3.1/compressed/showdown.js}"></script>
-
 	<script type="text/javascript" th:src="@{/js/timeago.min.js}"></script>
 	<script>
 		$(document).ready(function() {
@@ -24,10 +22,9 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <h1 th:text="${repo.owner} + ' / ' + ${repo.displayName}">owner / name</h1>
-    <hr />
-    Git URL : <input type="text" size="60" readonly="readonly" th:value="${#httpServletRequest.scheme} + '://' + ${repo.owner} + '@' + ${#httpServletRequest.serverName} + ':' + ${#httpServletRequest.serverPort} + '/repo/' + ${repo.owner} + '/' + ${repo.name}"></input>
-    <hr />
+    <div layout:include="fragments/git/header :: header">
+    	Git Header here
+    </div>
    	Branches
    	<ul th:each="branch : ${branches}">
    		<li th:text="${branch}">Branch Name</li>
@@ -38,26 +35,25 @@
 				breadcrumbs
 			</div>
 		</div>
-  		<div class="panel-body">
-	    	<table class="table">
-		   		<tr th:each="file : ${files}">
-		   			<td>
-		   				<i th:class="${file.directory ? 'fa fa-fw fa-folder' : 'fa fa-fw fa-file-o'}"></i>
-		   				&nbsp;&nbsp;
-		   				<a th:href="@{/repo/} + ${repo.owner} + '/' + ${repo.displayName} + '/tree/' + ${file.parent} + ${file.name} + ${file.directory ? '' : '?file=true'}" th:text="${file.display}">Filename</a>
-					</td>
-					<td>
-						<span th:if="${!file.directory}" th:text="${file.size} + ' Bytes'">size</span>
-					</td>
-					<td>
-						<time class="timeago" th:if="${!file.directory}" th:attr="datetime=${file.dateTimeString}"></time>
-					</td>
-					<td>
-						<span th:if="${!file.directory}" th:text="${file.commit.shortMessage}">message</span>
-					</td>
-		   		</tr>
-		   	</table>
-		</div>
+		<table class="table">
+	   		<tr th:each="file : ${files}">
+	   			<td>
+	   				<i th:if="${file.directory}" class="fa fa-fw fa-folder"></i>
+	   				<i th:if="${!file.directory}" class="fa fa-fw fa-file-o"></i>
+	   				&nbsp;&nbsp;
+	   				<a th:href="@{/repo/} + ${file.url}" th:text="${file.display}">Filename</a>
+				</td>
+				<td>
+					<span th:if="${!file.directory}" th:text="${file.size} + ' Bytes'">size</span>
+				</td>
+				<td>
+					<time th:if="${!file.directory}" class="timeago" th:attr="datetime=${file.dateTimeString}"></time>
+				</td>
+				<td>
+					<span th:if="${!file.directory}" th:text="${file.commit.shortMessage}">message</span>
+				</td>
+	   		</tr>
+	   	</table>
 	</div>
 	
    	<div th:if="${readme != null}" class="panel panel-default">

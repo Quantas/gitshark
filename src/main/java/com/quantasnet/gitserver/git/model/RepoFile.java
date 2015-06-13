@@ -4,7 +4,13 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.joda.time.DateTime;
 
 import com.google.common.collect.ComparisonChain;
+import com.quantasnet.gitserver.git.repo.GitRepository;
 
+/**
+ * Note: this class has a natural ordering that is inconsistent with equals.
+ * 
+ * @author andrewlandsverk
+ */
 public class RepoFile implements Comparable<RepoFile> {
 
 	private final String name;
@@ -14,14 +20,15 @@ public class RepoFile implements Comparable<RepoFile> {
 	private final long size;
 	private final String objectId;
 	private final RevCommit commit;
+	private final String url;
 	
 	private String fileContents;
 
-	public RepoFile(final String name, final String parent, final boolean directory, final long size, final String objectId, final RevCommit commit) {
-		this(name, name, parent, directory, size, objectId, commit);
+	public RepoFile(final GitRepository repo, final String name, final String parent, final boolean directory, final long size, final String objectId, final RevCommit commit) {
+		this(repo, name, name, parent, directory, size, objectId, commit);
 	}
 	
-	public RepoFile(final String name, final String display, final String parent, final boolean directory, final long size, final String objectId, final RevCommit commit) {
+	public RepoFile(final GitRepository repo, final String name, final String display, final String parent, final boolean directory, final long size, final String objectId, final RevCommit commit) {
 		this.name = name;
 		this.display = display;
 		this.parent = parent;
@@ -29,8 +36,26 @@ public class RepoFile implements Comparable<RepoFile> {
 		this.size = size;
 		this.objectId = objectId;
 		this.commit = commit;
+		this.url = generateUrl(repo);
 	}
 
+	private String generateUrl(final GitRepository repo) {
+		final StringBuilder builder = new StringBuilder();
+		
+		builder.append(repo.getOwner())
+			.append('/')
+			.append(repo.getDisplayName())
+			.append("/tree/")
+			.append(parent)
+			.append(name);
+		
+		if (!directory) {
+			builder.append("?file=true");
+		}
+		
+		return builder.toString();
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -57,6 +82,10 @@ public class RepoFile implements Comparable<RepoFile> {
 	
 	public RevCommit getCommit() {
 		return commit;
+	}
+	
+	public String getUrl() {
+		return url;
 	}
 	
 	public String getDateTimeString() {

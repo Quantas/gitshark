@@ -24,14 +24,12 @@
 				<span style="font-weight: bold;">Log</span>
 			</h3>
 		</div>
-  		<div class="panel-body">
-	    	<table class="table">
-		   		<tr th:each="commit : ${commits}">
-		   			<td th:text="${commit.shortMessage}"></td>
-					<td th:text="${commit.id.name}"></td>
-		   		</tr>
-		   	</table>
-		</div>
+    	<table class="table">
+	   		<tr th:each="commit : ${commits}">
+	   			<td th:text="${commit.shortMessage}"></td>
+				<td th:text="${commit.id.name}"></td>
+	   		</tr>
+	   	</table>
 	</div>
 </div>
 </body>

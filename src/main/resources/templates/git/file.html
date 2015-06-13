@@ -22,10 +22,9 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <h1 th:text="${repo.owner} + ' / ' + ${repo.displayName}">owner / name</h1>
-    <hr />
-    Git URL : <input type="text" size="60" readonly="readonly" th:value="${#httpServletRequest.scheme} + '://' + ${repo.owner} + '@' + ${#httpServletRequest.serverName} + ':' + ${#httpServletRequest.serverPort} + '/repo/' + ${repo.owner} + '/' + ${repo.name}"></input>
-    <hr />
+    <div layout:include="fragments/git/header :: header">
+    	Git Header here
+    </div>
     <div th:if="${file == null}">
     	<h1>File not found!</h1>
     </div>

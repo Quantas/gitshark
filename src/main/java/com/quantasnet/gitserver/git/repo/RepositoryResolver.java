@@ -32,11 +32,30 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 			userName = principalObject.getName();
 		}
 		
-		final String requestURI = webRequest.getNativeRequest(HttpServletRequest.class).getServletPath();
-
+		final HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+		final String requestURI = request.getServletPath();
 		final String owner = requestURI.split("/")[2];
 		final String repoName = requestURI.split("/")[3];
 		
-		return repositoryService.getRepository(userName, owner, repoName);
+		final GitRepository repo = repositoryService.getRepository(userName, owner, repoName);
+		mavContainer.addAttribute("checkoutUrl", buildCheckoutUrl(request, userName, repo));
+		
+		return repo;
+	}
+	
+	private String buildCheckoutUrl(final HttpServletRequest request, final String userName, final GitRepository repo) {
+		return new StringBuilder()
+			.append(request.getScheme())
+			.append("://")
+			.append(userName)
+			.append('@')
+			.append(request.getServerName())
+			.append(':')
+			.append(request.getServerPort())
+			.append("/repo/")
+			.append(repo.getOwner())
+			.append('/')
+			.append(repo.getName())
+			.toString();
 	}
 }

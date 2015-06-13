@@ -9,7 +9,7 @@ public class Breadcrumb {
 	private final String url;
 	private final boolean link;
 	
-	private Breadcrumb(String name, String url, boolean link) {
+	private Breadcrumb(final String name, final String url, final boolean link) {
 		this.name = name;
 		this.url = url;
 		this.link = link;
