@@ -42,9 +42,6 @@
 	   				<a th:href="@{/repo/} + ${file.url}" th:text="${file.display}">Filename</a>
 				</td>
 				<td>
-					<span th:if="${!file.directory}" th:text="${file.size} + ' Bytes'">size</span>
-				</td>
-				<td>
 					<time th:if="${!file.directory}" class="timeago" th:attr="datetime=${file.dateTimeString}"></time>
 				</td>
 				<td>

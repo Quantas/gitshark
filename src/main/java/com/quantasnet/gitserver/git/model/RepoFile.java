@@ -16,23 +16,23 @@ public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 	private final String display;
 	private final String parent;
 	private final boolean directory;
-	private final long size;
+	private final String branch;
 	private final String objectId;
 	private final String url;
 	
 	private String fileContents;
 
-	public RepoFile(final GitRepository repo, final String name, final String parent, final boolean directory, final long size, final String objectId, final RevCommit commit) {
-		this(repo, name, name, parent, directory, size, objectId, commit);
+	public RepoFile(final GitRepository repo, final String name, final String parent, final boolean directory, final String branch, final String objectId, final RevCommit commit) {
+		this(repo, name, name, parent, directory, branch, objectId, commit);
 	}
 	
-	public RepoFile(final GitRepository repo, final String name, final String display, final String parent, final boolean directory, final long size, final String objectId, final RevCommit commit) {
+	public RepoFile(final GitRepository repo, final String name, final String display, final String parent, final boolean directory, final String branch, final String objectId, final RevCommit commit) {
 		super(commit);
 		this.name = name;
 		this.display = display;
 		this.parent = parent;
 		this.directory = directory;
-		this.size = size;
+		this.branch = branch;
 		this.objectId = objectId;
 		this.url = generateUrl(repo);
 	}
@@ -44,6 +44,8 @@ public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 			.append('/')
 			.append(repo.getDisplayName())
 			.append("/tree/")
+			.append(branch)
+			.append('/')
 			.append(parent)
 			.append(name);
 		
@@ -68,10 +70,6 @@ public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 	
 	public boolean isDirectory() {
 		return directory;
-	}
-	
-	public long getSize() {
-		return size;
 	}
 	
 	public String getObjectId() {

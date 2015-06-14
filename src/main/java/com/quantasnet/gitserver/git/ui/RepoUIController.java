@@ -56,24 +56,34 @@ public class RepoUIController {
 		return "redirect:/repo/";
 	}
 	
+	@RequestMapping("/{repoOwner}/{repoName}/tree")
+	public String displayRepoTreeNoBranch(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, final Model model, final HttpServletRequest req) throws Exception {
+		final StringBuilder builder = new StringBuilder();
+		GitRepository.execute(repo, db -> {
+			builder.append(db.getBranch());
+		});
+		return displayRepoTree(repo, repoOwner, repoName, builder.toString(), false, model, req);
+	}
+	
+	
 	/**
 	 * For browsing the tree and viewing files
 	 */
-	@RequestMapping({ "/{repoOwner}/{repoName}/tree", "/{repoOwner}/{repoName}/tree/**" })
-	public String displayRepoTree(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, @RequestParam(required = false) final boolean file, final Model model, final HttpServletRequest req) throws Exception {
-
-		final String repoPath = "/repo/" + repoOwner + '/' + repoName + "/tree/";
-		final String path = resolvePath(req, repoPath);
+	@RequestMapping("/{repoOwner}/{repoName}/tree/{branch}/**")
+	public String displayRepoTree(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, @PathVariable final String branch, @RequestParam(required = false) final boolean file, final Model model, final HttpServletRequest req) throws Exception {
+		final String repoPath = "/repo/" + repoOwner + '/' + repoName + "/tree/" + branch + '/';
+		final String path = resolvePath(req, repoPath, branch);
 		
+		model.addAttribute("branch", branch);
 		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repoName, repoPath, path));
 		
 		GitRepository.execute(repo, db -> {
 			model.addAttribute("branches", db.getRefDatabase().getRefs("refs/heads/").keySet());
 			
 			if (file) {
-				model.addAttribute("file", getFileToDisplay(repo, db, path));
+				model.addAttribute("file", getFileToDisplay(repo, db, branch, path));
 			} else {
-				final List<RepoFile> files = getFiles(repo, db, path, false);
+				final List<RepoFile> files = getFiles(repo, db, branch, path, false);
 				model.addAttribute("readme", resolveReadMeFile(db, files));
 				model.addAttribute("files", files);
 			}
@@ -86,8 +96,13 @@ public class RepoUIController {
 		return "git/single";
 	}
 	
-	private String resolvePath(final HttpServletRequest req, final String repoPath) {
+	private String resolvePath(final HttpServletRequest req, final String repoPath, final String branch) {
 		String path = ((String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
+		
+		if (path.endsWith("/tree")) {
+			path += "/" + branch + "/";
+		}
+		
 		if (!path.endsWith("/")) {
 			path = path + "/";
 		}
@@ -101,8 +116,8 @@ public class RepoUIController {
 		return path;
 	}
 	
-	private RepoFile getFileToDisplay(final GitRepository repo, final Repository db, final String path) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException, GitAPIException {
-		final List<RepoFile> files = getFiles(repo, db, path, true);
+	private RepoFile getFileToDisplay(final GitRepository repo, final Repository db, final String branch, final String path) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException, GitAPIException {
+		final List<RepoFile> files = getFiles(repo, db, branch, path, true);
 		if (!files.isEmpty()) {
 			return files.get(0);
 		}
@@ -110,12 +125,12 @@ public class RepoUIController {
 		return null;
 	}
 	
-	private List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String path, final boolean file) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException, GitAPIException {
+	private List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String branch, final String path, final boolean file) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException, GitAPIException {
 		final List<RepoFile> files = new ArrayList<>();
 		
 		try (final RevWalk revWalk = new RevWalk(db); final TreeWalk treeWalk = new TreeWalk(db)) {
 		
-			final RevCommit headCommit = revWalk.parseCommit(db.resolve(Constants.HEAD));
+			final RevCommit headCommit = revWalk.parseCommit(db.resolve("refs/heads/" + branch));
 			
 			treeWalk.addTree(headCommit.getTree());
 			treeWalk.setRecursive(false);
@@ -145,7 +160,7 @@ public class RepoUIController {
 					// If we don't want a single file, we need a dummy file for navigating backwards
 					if (!file) {
 						// Add dummy file for navigating backwards
-						files.add(buildBackwardsNavigationFile(repo, pathString));
+						files.add(buildBackwardsNavigationFile(repo, pathString, branch));
 						continue;
 					}
 				}
@@ -153,7 +168,7 @@ public class RepoUIController {
 				// If we found the path we were looking for, start lining up the files
 				if (alreadyInside) {
 					final ObjectId objectId = treeWalk.getObjectId(0);
-					final RepoFile repoFile = buildRepoFileObject(repo, db, path, treeWalk, customPath, pathString, directory, objectId); 
+					final RepoFile repoFile = buildRepoFileObject(repo, db, path, branch, treeWalk, customPath, pathString, directory, objectId); 
 					files.add(repoFile);
 					
 					// if we wanted just a single file, get it's contents for display and get out of here
@@ -169,7 +184,7 @@ public class RepoUIController {
 		return files;
 	}
 
-	private RepoFile buildBackwardsNavigationFile(final GitRepository repo, final String pathString) {
+	private RepoFile buildBackwardsNavigationFile(final GitRepository repo, final String pathString, final String branch) {
 		String parent;
 		// If parent is not root, remove trailer, else set to blank
 		if (pathString.indexOf("/") > 0) {
@@ -179,7 +194,7 @@ public class RepoUIController {
 		}
 		
 		// Add dummy file for navigating backwards
-		return new RepoFile(repo, "", ". .", parent, true, 0, null, null);
+		return new RepoFile(repo, "", ". .", parent, true, branch, null, null);
 	}
 	
 	private String resolveReadMeFile(final Repository db, final List<RepoFile> files) throws LargeObjectException, MissingObjectException, IOException {
@@ -197,29 +212,22 @@ public class RepoUIController {
 		return "readme.md".equals(smallPath) || "readme.markdown".equals(smallPath); 
 	}
 	
-	private RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final TreeWalk treeWalk, final boolean customPath, final String pathString, 
+	private RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final String branch, final TreeWalk treeWalk, final boolean customPath, final String pathString, 
 			final boolean directory, final ObjectId objectId) throws GitAPIException, NoHeadException {
 		
 		final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
 		final String parent = pathString.substring(0, pathString.lastIndexOf("/") + 1);
 
-		long size = 0;
 		RevCommit commit = null;
 		
-		// WE only need commit and size information if this isn't a directory
+		// WE only need commit information if this isn't a directory
 		if (!directory) {
-			try {
-				size = treeWalk.getObjectReader().getObjectSize(objectId, 3); // 3 = BLOB
-			} catch (Exception e) {
-				size = 0;
-			}
-			
 			try (final Git git = new Git(db)) {
 				commit = git.log().addPath(pathString).setMaxCount(1).call().iterator().next();
 			}
 		}
 		
-		return new RepoFile(repo, name, parent, directory, size, objectId.getName(), commit);
+		return new RepoFile(repo, name, parent, directory, branch, objectId.getName(), commit);
 	}
 	
 	private String getFileContents(final Repository db, final ObjectId objectId) throws LargeObjectException, MissingObjectException, IOException {
