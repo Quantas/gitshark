@@ -21,6 +21,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.pegdown.PegDownProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
@@ -31,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.HandlerMapping;
 
-import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.model.Breadcrumb;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
@@ -93,7 +93,7 @@ public class RepoUIController {
 			return "git/file";
 		}
 		
-		return "git/single";
+		return "git/repo";
 	}
 	
 	private String resolvePath(final HttpServletRequest req, final String repoPath, final String branch) {
@@ -200,7 +200,9 @@ public class RepoUIController {
 	private String resolveReadMeFile(final Repository db, final List<RepoFile> files) throws LargeObjectException, MissingObjectException, IOException {
 		for (final RepoFile file : files) {
 			if (isReadmeFile(file.getName())) {
-				return getFileContents(db, ObjectId.fromString(file.getObjectId()));
+				final String markdown = getFileContents(db, ObjectId.fromString(file.getObjectId()));
+				final PegDownProcessor pegdown = new PegDownProcessor();
+				return pegdown.markdownToHtml(markdown);
 			}
  		}
 		return null;
