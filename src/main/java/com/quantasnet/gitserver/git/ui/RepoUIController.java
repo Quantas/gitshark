@@ -78,14 +78,17 @@ public class RepoUIController {
 		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repoName, repoPath, path));
 		
 		GitRepository.execute(repo, db -> {
-			model.addAttribute("branches", db.getRefDatabase().getRefs("refs/heads/").keySet());
-			
-			if (file) {
-				model.addAttribute("file", getFileToDisplay(repo, db, branch, path));
-			} else {
-				final List<RepoFile> files = getFiles(repo, db, branch, path, false);
-				model.addAttribute("readme", resolveReadMeFile(db, files));
-				model.addAttribute("files", files);
+			final boolean hasCommits = GitRepository.hasCommits(db);
+			model.addAttribute("hasCommits", hasCommits);
+			if (hasCommits) {
+				model.addAttribute("branches", db.getRefDatabase().getRefs("refs/heads/").keySet());
+				if (file) {
+					model.addAttribute("file", getFileToDisplay(repo, db, branch, path));
+				} else {
+					final List<RepoFile> files = getFiles(repo, db, branch, path, false);
+					model.addAttribute("readme", resolveReadMeFile(db, files));
+					model.addAttribute("files", files);
+				}
 			}
 		});
 		

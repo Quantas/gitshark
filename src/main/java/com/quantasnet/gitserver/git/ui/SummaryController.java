@@ -28,45 +28,47 @@ public class SummaryController {
 	@RequestMapping({ "", "/" })
 	public String summary(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, final Model model) throws Exception {
 		GitRepository.execute(repo, db -> {
-			final int maxCount = 20;
-			final List<Commit> commits = new ArrayList<>();
-			
-			try (final RevWalk revWalk = new RevWalk(db)) {
-				final List<RevCommit> headCommits = new ArrayList<>();
-				final Map<String, Ref> refs = db.getRefDatabase().getRefs(ALL);
-				for (Ref ref : refs.values()) {
-					if(!ref.isPeeled()) {
-						ref = db.peel(ref);
+			final boolean hasCommits = GitRepository.hasCommits(db);
+			model.addAttribute("hasCommits", hasCommits);
+			if (hasCommits) {
+				final int maxCount = 20;
+				final List<Commit> commits = new ArrayList<>();
+				
+				try (final RevWalk revWalk = new RevWalk(db)) {
+					final List<RevCommit> headCommits = new ArrayList<>();
+					final Map<String, Ref> refs = db.getRefDatabase().getRefs(ALL);
+					for (Ref ref : refs.values()) {
+						if(!ref.isPeeled()) {
+							ref = db.peel(ref);
+						}
+						
+						ObjectId objectId = ref.getPeeledObjectId();
+						if (null == objectId) {
+							objectId = ref.getObjectId();
+						}
+						RevCommit commit = null;
+						try {
+							commit = revWalk.parseCommit(objectId);
+						} catch (MissingObjectException | IncorrectObjectTypeException e) {
+						}
+						if (commit != null) {
+							headCommits.add(commit);
+						}
 					}
+					revWalk.markStart(headCommits);
 					
-					ObjectId objectId = ref.getPeeledObjectId();
-					if (null == objectId) {
-						objectId = ref.getObjectId();
+					for (final RevCommit rev : revWalk) {
+						commits.add(new Commit(rev));
+						if (commits.size() == maxCount) {
+							break;
+						}
 					}
-					RevCommit commit = null;
-					try {
-						commit = revWalk.parseCommit(objectId);
-					} catch (MissingObjectException | IncorrectObjectTypeException e) {
-					}
-					if (commit != null) {
-						headCommits.add(commit);
-					}
+					model.addAttribute("commits", commits);
+				} catch (Exception e) {
+					
 				}
-				revWalk.markStart(headCommits);
-				
-				for (final RevCommit rev : revWalk) {
-					commits.add(new Commit(rev));
-					if (commits.size() == maxCount) {
-						break;
-					}
-				}
-				model.addAttribute("commits", commits);
-			} catch (Exception e) {
-				
 			}
 		});
-		
 		return "git/summary";
 	}
-	
 }
