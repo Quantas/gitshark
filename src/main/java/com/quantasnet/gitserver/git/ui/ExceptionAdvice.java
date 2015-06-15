@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.quantasnet.gitserver.git.exception.RepositoryNotFoundException;
 
-@ControllerAdvice(assignableTypes = { RepoUIController.class, SummaryController.class })
+@ControllerAdvice(assignableTypes = { SummaryController.class, RepoUIController.class, LogController.class })
 public class ExceptionAdvice {
 
 	@ExceptionHandler(RepositoryNotFoundException.class)

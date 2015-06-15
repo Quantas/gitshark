@@ -22,21 +22,21 @@
    	<div th:if="${hasCommits}" class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title">
-				<span style="font-weight: bold;">Summary</span>
+				<span style="font-weight: bold;">Log</span>
 			</h3>
 		</div>
     	<table class="table">
+	   		<tr th:each="commit : ${commits}">
+	   			<td>
+	   				<img th:src="${commit.gravatarUrl} + '&amp;s=25'"></img>
+	   			</td>
+	   			<td>
+	   				<time class="timeago" th:attr="datetime=${commit.dateTimeString}"></time>
+	   			</td>
+	   			<td th:text="${commit.commit.shortMessage}"></td>
+				<td th:text="${commit.shortId}"></td>
+	   		</tr>
 	   	</table>
-	</div>
-	
-   	<div th:if="${readme != null}" class="panel panel-default">
-		<div class="panel-heading">
-			<h3 class="panel-title">
-				<span style="font-weight: bold;">README</span>
-			</h3>
-		</div>
-  		<div class="panel-body" th:utext="${readme}">
-		</div>
 	</div>
 </div>
 </body>
