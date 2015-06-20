@@ -26,7 +26,9 @@
 	   				<time class="timeago" th:attr="datetime=${commit.dateTimeString}"></time>
 	   			</td>
 	   			<td th:text="${commit.commit.shortMessage}"></td>
-				<td th:text="${commit.shortId}"></td>
+	   			<td>
+					<a th:href="@{'/repo/'} + ${repo.interfaceBaseUrl} + '/commit/' + ${commit.commit.id.name}" th:text="${commit.shortId}"></a>
+				</td>
 	   		</tr>
 	   	</table>
 	</div>

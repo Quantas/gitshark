@@ -6,20 +6,21 @@
 	</head>
 	<body>
 		<div layout:fragment="header">
-			<h2 th:text="${repo.owner} + ' / ' + ${repo.displayName}">owner / name</h2>
+			<h3 th:text="${repo.owner} + ' / ' + ${repo.displayName}">owner / name</h3>
 			<div class="panel panel-default">
 	  			<div class="panel-body">
 	  				<div class="pull-left" style="width: 3em;">URL</div>
-	  				<div class="pull-left" th:text="${checkoutUrl}">
-	  				</div>
+	  				<div class="pull-left" th:text="${checkoutUrl}"></div>
 	  				<div class="clearfix"></div>
 				</div>
 				<div class="panel-footer">
 					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl}">summary</a>
 					&nbsp;&nbsp;
-					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree'">tree</a>
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/commits'">commits</a>
 					&nbsp;&nbsp;
-					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/log'">log</a>
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/branches'">branches</a>
+					&nbsp;&nbsp;
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree'">tree</a>
 					&nbsp;&nbsp;
 					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/settings'">settings</a>
 				</div>

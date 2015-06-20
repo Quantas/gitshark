@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/default"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+	<script type="text/javascript" th:src="@{/webjars/highlightjs/8.4-4/highlight.min.js}"></script>
+	<link rel="stylesheet" th:href="@{/webjars/highlightjs/8.4-4/styles/github.min.css}" />
+	<script>
+		$(document).ready(function() {
+			$('pre.file').each(function(i, block) {
+			  hljs.highlightBlock(block);
+			});
+		});
+	</script>
+	<style>
+		table.committerInfo td,th {
+			padding: 3px;
+		}
+	</style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div layout:include="git/fragments/header :: header">
+    	Git Header here
+    </div>
+   	<div class="panel panel-default" th:if="${commit != null}">
+		<div class="panel-heading">
+			<h3 class="panel-title">
+				<span style="font-weight: bold;">Commit Information</span>
+			</h3>
+		</div>
+  		<div class="panel-body">
+  			<table class="committerInfo">
+    			<tr>
+    				<th>Commit ID</th>
+    				<td th:text="${commit.id.name}"></td>
+    			</tr>
+    			<tr>
+    				<th>Committer</th>
+    				<td th:text="${commit.committerIdent.name} + ' &lt;' + ${commit.committerIdent.emailAddress} + '&gt; ' + ${commit.committerIdent.when}"></td>
+    			</tr>
+    			<tr>
+    				<th>Author</th>
+    				<td th:text="${commit.authorIdent.name} + ' &lt;' + ${commit.authorIdent.emailAddress} + '&gt; ' + ${commit.authorIdent.when}"></td>
+    			</tr>
+    			<tr>
+    				<th>Message</th>
+    				<td><pre th:text="${commit.fullMessage}"></pre></td>
+    			</tr>
+    		</table>
+		</div>
+	</div>
+   	<div class="panel panel-default" th:if="${diffs == null}">
+  		<div class="panel-body">
+   			<h1>Commit not found!</h1>
+		</div>
+	</div>
+	<div th:if="${diffs != null}" th:each="diff : ${diffs}">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title" th:text="${diff.fileName} + ' - ' + ${diff.changeType}"></h3>
+			</div>
+	  		<div class="panel-body">
+	  			<pre class="file diff" th:text="${diff.diffString}"></pre>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
