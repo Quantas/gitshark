@@ -13,7 +13,31 @@
 					</h3>
 				</div>
 				<div class="panel-body">
-					This is an empty repository.
+					<h4>This is an empty repository.&nbsp;&nbsp;Let's get started!</h4>
+					<br />
+					<h4>Existing Project</h4>
+					<hr />
+					<ol>
+						<li th:text="'cd ~/' + ${repo.displayName}"></li>
+						<li th:text="'git remote add origin ' + ${checkoutUrl}"></li>
+						<li>git push -u origin --all</li>
+						<li>git push -u origin --tags</li>
+					</ol>
+					<br />
+					<h4>Starting Fresh</h4>
+					<hr />
+					<ol>
+						<li th:text="'mkdir ~/' + ${repo.displayName}"></li>
+						<li th:text="'cd ~/' + ${repo.displayName}"></li>
+						<li>git init</li>
+						<li th:text="'git remote add origin ' + ${checkoutUrl}"></li>
+						<li>echo "README" &gt;&gt; README.md</li>
+						<li>git add README.md</li>
+						<li>git commit -m 'Initial README.md file'</li>
+						<li>git push -u origin master</li>
+					</ol>
+					<br />
+					<h4>Once you've got some commits in the repository, refresh this page to see them.</h4>
 				</div>
 			</div>
 		</div>
