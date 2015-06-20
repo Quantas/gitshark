@@ -25,6 +25,7 @@ import org.pegdown.PegDownProcessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerMapping;
 
+import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
@@ -65,7 +66,7 @@ public class RepositoryUtilities {
 		
 		try (final RevWalk revWalk = new RevWalk(db); final TreeWalk treeWalk = new TreeWalk(db)) {
 		
-			final RevCommit headCommit = revWalk.parseCommit(db.resolve("refs/heads/" + branch));
+			final RevCommit headCommit = revWalk.parseCommit(db.resolve(qualifyBranchName(branch)));
 			
 			treeWalk.addTree(headCommit.getTree());
 			treeWalk.setRecursive(false);
@@ -166,7 +167,9 @@ public class RepositoryUtilities {
 		// WE only need commit information if this isn't a directory
 		if (!directory) {
 			try (final Git git = new Git(db)) {
-				commit = git.log().addPath(pathString).setMaxCount(1).call().iterator().next();
+					commit = git.log().add(db.resolve(qualifyBranchName(branch))).addPath(pathString).setMaxCount(1).call().iterator().next();
+			} catch (RevisionSyntaxException | IOException e) {
+				
 			}
 		}
 		
@@ -175,6 +178,10 @@ public class RepositoryUtilities {
 	
 	public String getFileContents(final Repository db, final ObjectId objectId) throws LargeObjectException, MissingObjectException, IOException {
 		return new String(db.newObjectReader().open(objectId).getBytes());
+	}
+	
+	private String qualifyBranchName(final String branch) {
+		return Constants.REFS_HEADS + branch;
 	}
 	
 }

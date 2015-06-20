@@ -45,7 +45,7 @@
 					<time th:if="${!file.directory}" class="timeago" th:attr="datetime=${file.dateTimeString}"></time>
 				</td>
 				<td>
-					<span th:if="${!file.directory}" th:text="${file.commit.shortMessage}">message</span>
+					<span th:if="${!file.directory and file.commit != null}" th:text="${file.commit.shortMessage}">message</span>
 				</td>
 	   		</tr>
 	   	</table>

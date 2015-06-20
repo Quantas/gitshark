@@ -25,48 +25,46 @@
     <div layout:include="git/fragments/header :: header">
     	Git Header here
     </div>
-    <div th:if="${file == null}">
-    	<h1>File not found!</h1>
-    </div>
-    <div th:if="${file != null}">
-    	<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">
-					<span style="font-weight: bold;">Commit Information</span>
-				</h3>
-			</div>
-	  		<div class="panel-body">
-	  			<table class="committerInfo">
-	    			<tr>
-	    				<th>Commit ID</th>
-	    				<td th:text="${file.commit.id.name}"></td>
-	    			</tr>
-	    			<tr>
-	    				<th>Committer</th>
-	    				<td th:text="${file.commit.committerIdent.name} + ' &lt;' + ${file.commit.committerIdent.emailAddress} + '&gt; ' + ${file.commit.committerIdent.when}"></td>
-	    			</tr>
-	    			<tr>
-	    				<th>Author</th>
-	    				<td th:text="${file.commit.authorIdent.name} + ' &lt;' + ${file.commit.authorIdent.emailAddress} + '&gt; ' + ${file.commit.authorIdent.when}"></td>
-	    			</tr>
-	    			<tr>
-	    				<th>Message</th>
-	    				<td><pre th:text="${file.commit.fullMessage}"></pre></td>
-	    			</tr>
-	    		</table>
+   	<div class="panel panel-default" th:if="${file != null and file.commit != null}">
+		<div class="panel-heading">
+			<h3 class="panel-title">
+				<span style="font-weight: bold;">Commit Information</span>
+			</h3>
+		</div>
+  		<div class="panel-body">
+  			<table class="committerInfo">
+    			<tr>
+    				<th>Commit ID</th>
+    				<td th:text="${file.commit.id.name}"></td>
+    			</tr>
+    			<tr>
+    				<th>Committer</th>
+    				<td th:text="${file.commit.committerIdent.name} + ' &lt;' + ${file.commit.committerIdent.emailAddress} + '&gt; ' + ${file.commit.committerIdent.when}"></td>
+    			</tr>
+    			<tr>
+    				<th>Author</th>
+    				<td th:text="${file.commit.authorIdent.name} + ' &lt;' + ${file.commit.authorIdent.emailAddress} + '&gt; ' + ${file.commit.authorIdent.when}"></td>
+    			</tr>
+    			<tr>
+    				<th>Message</th>
+    				<td><pre th:text="${file.commit.fullMessage}"></pre></td>
+    			</tr>
+    		</table>
+		</div>
+	</div>
+  	   	<div class="panel panel-default">
+		<div class="panel-heading">
+			<div class="panel-title" style="font-weight: bold;" layout:include="git/fragments/breadcrumbs :: breadcrumbs">
+			breadcrumbs
 			</div>
 		</div>
-   	   	<div class="panel panel-default">
-			<div class="panel-heading">
-				<div class="panel-title" style="font-weight: bold;" layout:include="git/fragments/breadcrumbs :: breadcrumbs">
-				breadcrumbs
-				</div>
-			</div>
-	  		<div class="panel-body">
-	  			<pre th:text="${file.fileContents}"></pre>
-			</div>
+  		<div class="panel-body">
+  			<div th:if="${file == null}">
+    			<h1>File not found!</h1>
+    		</div>
+  			<pre th:if="${file != null}" th:text="${file.fileContents}"></pre>
 		</div>
-    </div>
+	</div>
 </div>
 </body>
 </html>
