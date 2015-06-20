@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -41,8 +42,10 @@ public class GitProtocolService {
 	
 	private boolean isRunning = true;
 	
+	private ServerSocket serverSocket;
+	
 	public void start() throws IOException {
-		final ServerSocket serverSocket = new ServerSocket(GIT_PORT, BACKLOG);
+		serverSocket = new ServerSocket(GIT_PORT, BACKLOG);
 		
 		new Thread("GitProtocolService-Accept") {
 			@Override
@@ -52,8 +55,10 @@ public class GitProtocolService {
 				while(isRunning) {
 					try {
 						startNewClient(serverSocket.accept());
+					} catch (final InterruptedIOException e) {
+						// nothing
 					} catch (final IOException e) {
-						
+						break;
 					}
 				}
 				
@@ -67,7 +72,14 @@ public class GitProtocolService {
 	}
 	
 	public void stop() {
+		LOG.info("Stopping GitProtocolService...");
 		isRunning = false;
+		try {
+			serverSocket.close();
+			LOG.info("GitProtocolService stopped");
+		} catch (final IOException e) {
+			
+		}
 	}
 	
 	private void startNewClient(final Socket socket) {
