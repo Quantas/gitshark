@@ -17,5 +17,10 @@ public class GitProtocolInitalizer implements Initializer {
 	public void init() throws Exception {
 		gitProtocolService.start();
 	}
+	
+	@Override
+	public void stop() {
+		gitProtocolService.stop();
+	}
 
 }
