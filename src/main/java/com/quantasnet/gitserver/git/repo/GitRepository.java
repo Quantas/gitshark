@@ -25,6 +25,8 @@ public class GitRepository implements Comparable<GitRepository> {
 	private final boolean anonRead;
 	private final boolean anonWrite;
 	
+	private boolean hasCommits;
+	
 	public GitRepository(final File fullRepoDirectory, final String owner, final String name, final boolean anonRead, final boolean anonWrite) {
 		this.fullRepoDirectory = fullRepoDirectory;
 		this.owner = owner;
@@ -40,14 +42,6 @@ public class GitRepository implements Comparable<GitRepository> {
 		try (final Repository db = Git.open(getFullRepoDirectory()).getRepository()) {
 			repoAction.doAction(db);
 		}
-	}
-	
-	public boolean hasCommits(final Repository repository) {
-		if (repository != null && repository.getDirectory().exists()) {
-			return (new File(repository.getDirectory(), "objects").list().length > 2)
-					|| (new File(repository.getDirectory(), "objects/pack").list().length > 0);
-		}
-		return false;
 	}
 	
 	public File getFullRepoDirectory() {
@@ -68,6 +62,14 @@ public class GitRepository implements Comparable<GitRepository> {
 	
 	public boolean isAnonWrite() {
 		return anonWrite;
+	}
+	
+	public void setHasCommits(boolean hasCommits) {
+		this.hasCommits = hasCommits;
+	}
+	
+	public boolean isHasCommits() {
+		return hasCommits;
 	}
 	
 	public String getDisplayName() {

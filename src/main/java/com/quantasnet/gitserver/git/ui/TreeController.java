@@ -18,7 +18,7 @@ import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
-@RequestMapping("/repo")
+@RequestMapping("/repo/{repoOwner}/{repoName}")
 @Controller
 public class TreeController {
 
@@ -28,7 +28,7 @@ public class TreeController {
 	@Autowired
 	private ReadmeFileService readmeService;
 	
-	@RequestMapping("/{repoOwner}/{repoName}/tree")
+	@RequestMapping("/tree")
 	public String displayRepoTreeNoBranch(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, final Model model, final HttpServletRequest req) throws Exception {
 		final StringBuilder builder = new StringBuilder();
 		repo.execute(db -> {
@@ -37,7 +37,7 @@ public class TreeController {
 		return displayRepoTree(repo, repoOwner, repoName, builder.toString(), false, model, req);
 	}
 	
-	@RequestMapping("/{repoOwner}/{repoName}/tree/{branch}/**")
+	@RequestMapping("/tree/{branch}/**")
 	public String displayRepoTree(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, @PathVariable final String branch, @RequestParam(required = false) final boolean file, final Model model, final HttpServletRequest req) throws Exception {
 		final String repoPath = "/repo/" + repoOwner + '/' + repoName + "/tree/" + branch + '/';
 		final String path = repoUtils.resolvePath(req, repoPath, branch);
@@ -46,9 +46,7 @@ public class TreeController {
 		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repoName, repoPath, path));
 		
 		repo.execute(db -> {
-			final boolean hasCommits = repo.hasCommits(db);
-			model.addAttribute("hasCommits", hasCommits);
-			if (hasCommits) {
+			if (repo.isHasCommits()) {
 				final RevCommit commit = Git.wrap(db).log().setMaxCount(1).call().iterator().next();
 				model.addAttribute("lastCommit", new Commit(commit));
 				

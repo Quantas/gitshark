@@ -1,9 +1,11 @@
 package com.quantasnet.gitserver.git.repo;
 
+import java.io.File;
 import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.eclipse.jgit.lib.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -41,6 +43,11 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 		mavContainer.addAttribute("repo", repo);
 		mavContainer.addAttribute("checkoutUrl", buildCheckoutUrl(request, userName, repo));
 		
+		repo.execute(db -> {
+			repo.setHasCommits(hasCommits(db));
+			mavContainer.addAttribute("hasCommits", repo.isHasCommits());
+		});
+		
 		return repo;
 	}
 	
@@ -58,5 +65,13 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 			.append('/')
 			.append(repo.getName())
 			.toString();
+	}
+	
+	private boolean hasCommits(final Repository repository) {
+		if (repository != null && repository.getDirectory().exists()) {
+			return (new File(repository.getDirectory(), "objects").list().length > 2)
+					|| (new File(repository.getDirectory(), "objects/pack").list().length > 0);
+		}
+		return false;
 	}
 }
