@@ -26,12 +26,17 @@
 			</div>
 		</div>
 		<div class="panel-heading">
-			<img th:src="${lastCommit.gravatarUrl} + '&amp;s=25'"></img>
-			&nbsp;&nbsp;
-			<span th:text="${lastCommit.committerName}"></span>
-			&nbsp;&nbsp;
-			<span th:text="${lastCommit.commit.shortMessage}"></span>
-			&nbsp;&nbsp;
+			<div class="pull-left">
+				<img th:src="${lastCommit.gravatarUrl} + '&amp;s=25'"></img>
+				&nbsp;&nbsp;
+				<span th:text="${lastCommit.committerName}"></span>
+				&nbsp;-&nbsp;
+				<span th:text="${lastCommit.commit.shortMessage}"></span>
+			</div>
+			<div class="pull-right">
+				<time class="timeago" th:attr="datetime=${lastCommit.dateTimeString}"></time>
+			</div>
+			<div class="clearfix"></div>
 		</div>
 		<table class="table">
 	   		<tr th:each="file : ${files}">
