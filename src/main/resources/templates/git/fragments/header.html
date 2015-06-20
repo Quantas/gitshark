@@ -20,6 +20,8 @@
 					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree'">tree</a>
 					&nbsp;&nbsp;
 					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/log'">log</a>
+					&nbsp;&nbsp;
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/settings'">settings</a>
 				</div>
 			</div>
 		    <div th:if="${!hasCommits}" layout:include="git/fragments/emptyrepo :: emptyrepo">
