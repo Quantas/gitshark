@@ -27,8 +27,8 @@ public class LogController {
 
 	@RequestMapping("/log")
 	public String showLog(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, final Model model) throws Exception {
-		GitRepository.execute(repo, db -> {
-			final boolean hasCommits = GitRepository.hasCommits(db);
+		repo.execute(db -> {
+			final boolean hasCommits = repo.hasCommits(db);
 			model.addAttribute("hasCommits", hasCommits);
 			if (hasCommits) {
 				final int maxCount = 20;

@@ -16,7 +16,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 public class RepositoryResolver implements HandlerMethodArgumentResolver {
 
 	@Autowired
-	private RepositoryService repositoryService;
+	private FilesystemRepositoryService repositoryService;
 	
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {

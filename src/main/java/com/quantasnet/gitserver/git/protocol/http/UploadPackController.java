@@ -34,7 +34,7 @@ public class UploadPackController {
 	public ResponseEntity<byte[]> uploadPackAdv(final GitRepository repo, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent) throws Exception {
 		final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		
-		GitRepository.execute(repo, db -> {
+		repo.execute(db -> {
 			final UploadPack up = new UploadPack(db);
 			InternalHttpServerGlue.setPeerUserAgent(up, userAgent);
 			
@@ -66,7 +66,7 @@ public class UploadPackController {
 		
 		final SmartOutputStream out = new SmartOutputStream(req, rsp, true);
 		
-		GitRepository.execute(repo, db -> {
+		repo.execute(db -> {
 			UploadPack up = new UploadPack(db);
 			try {
 				up.setBiDirectionalPipe(false);

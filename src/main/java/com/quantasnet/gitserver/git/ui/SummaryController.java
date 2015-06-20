@@ -12,17 +12,17 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 public class SummaryController {
 
 	@Autowired
-	private RepositoryUtilities repoUtils;
+	private ReadmeFileService readmeService;
 	
 	@RequestMapping({ "", "/" })
 	public String summary(final GitRepository repo, final Model model) throws Exception {
-		GitRepository.execute(repo, db -> {
-			final boolean hasCommits = GitRepository.hasCommits(db);
+		repo.execute(db -> {
+			final boolean hasCommits = repo.hasCommits(db);
 			
 			model.addAttribute("hasCommits", hasCommits);
 			
 			if (hasCommits) {
-				model.addAttribute("readme", repoUtils.resolveReadMeFile(repo, db, db.getBranch()));
+				model.addAttribute("readme", readmeService.resolveReadMeFile(repo, db, db.getBranch()));
 			}
 		});
 		

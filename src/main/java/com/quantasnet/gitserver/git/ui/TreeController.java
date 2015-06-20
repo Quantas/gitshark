@@ -1,6 +1,5 @@
 package com.quantasnet.gitserver.git.ui;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,8 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,34 +17,21 @@ import com.quantasnet.gitserver.git.model.Breadcrumb;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.git.repo.RepositoryService;
 
 @RequestMapping("/repo")
 @Controller
-public class RepoUIController {
+public class TreeController {
 
-	@Autowired
-	private RepositoryService repoService;
-	
 	@Autowired
 	private RepositoryUtilities repoUtils;
 	
-	@RequestMapping
-	public String myRepos(@AuthenticationPrincipal final User user, final Model model) {
-		model.addAttribute("repos", repoService.getRepositories(user.getUsername()));
-		return "git/list";
-	}
-	
-	@RequestMapping("/create/{repoName}")
-	public String createRepo(@AuthenticationPrincipal final User user, @PathVariable final String repoName) throws IOException {
-		repoService.createRepo(repoName, user.getUsername());
-		return "redirect:/repo/";
-	}
+	@Autowired
+	private ReadmeFileService readmeService;
 	
 	@RequestMapping("/{repoOwner}/{repoName}/tree")
 	public String displayRepoTreeNoBranch(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, final Model model, final HttpServletRequest req) throws Exception {
 		final StringBuilder builder = new StringBuilder();
-		GitRepository.execute(repo, db -> {
+		repo.execute(db -> {
 			builder.append(db.getBranch());
 		});
 		return displayRepoTree(repo, repoOwner, repoName, builder.toString(), false, model, req);
@@ -61,8 +45,8 @@ public class RepoUIController {
 		model.addAttribute("branch", branch);
 		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repoName, repoPath, path));
 		
-		GitRepository.execute(repo, db -> {
-			final boolean hasCommits = GitRepository.hasCommits(db);
+		repo.execute(db -> {
+			final boolean hasCommits = repo.hasCommits(db);
 			model.addAttribute("hasCommits", hasCommits);
 			if (hasCommits) {
 				final RevCommit commit = Git.wrap(db).log().setMaxCount(1).call().iterator().next();
@@ -73,7 +57,7 @@ public class RepoUIController {
 					model.addAttribute("file", repoUtils.getFileToDisplay(repo, db, branch, path));
 				} else {
 					final List<RepoFile> files = repoUtils.getFiles(repo, db, branch, path, false);
-					model.addAttribute("readme", repoUtils.resolveReadMeFile(repo, db, files));
+					model.addAttribute("readme", readmeService.resolveReadMeFile(repo, db, files));
 					model.addAttribute("files", files);
 				}
 			}

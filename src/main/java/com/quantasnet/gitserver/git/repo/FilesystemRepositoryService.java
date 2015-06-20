@@ -3,8 +3,9 @@ package com.quantasnet.gitserver.git.repo;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -18,9 +19,9 @@ import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
 import com.quantasnet.gitserver.git.exception.RepositoryNotFoundException;
 
 @Service
-public class RepositoryService {
+public class FilesystemRepositoryService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(RepositoryService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(FilesystemRepositoryService.class);
 	
 	private static final FileFilter GIT_ONLY_FILTER = new FileFilter() {
 		@Override
@@ -44,17 +45,20 @@ public class RepositoryService {
 		// throw new RepositoryAccessDeniedException();
 	}
 	
-	public Set<GitRepository> getRepositories(final String owner) {
+	public List<GitRepository> getRepositories(final String owner) {
 		final File rootFolder = folderUtil.getOwnerRootDir(owner);
-		final Set<GitRepository> repos = new HashSet<>();
-		LOG.info("ROOT={}", rootFolder);
+		final List<GitRepository> repos = new ArrayList<>();
+		LOG.debug("ROOT={}", rootFolder);
 		if (rootFolder.isDirectory()) {
 			// get all the child folders
 			for (final File child : rootFolder.listFiles(GIT_ONLY_FILTER)) {
-				LOG.info("CHILD={}", child);
+				LOG.debug("CHILD={}", child);
 				repos.add(new GitRepository(child, owner, child.getName(), true, false)); // TODO fix
 			}
 		}
+		
+		Collections.sort(repos);
+		
 		return repos;
 	}
 	

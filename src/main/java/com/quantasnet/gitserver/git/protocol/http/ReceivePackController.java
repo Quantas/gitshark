@@ -37,7 +37,7 @@ public class ReceivePackController {
 	public ResponseEntity<byte[]> receivePackAdv(final GitRepository repo, @AuthenticationPrincipal final User user, final HttpServletRequest req, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent) throws Exception {
 		final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		
-		GitRepository.execute(repo, db -> {
+		repo.execute(db -> {
 			final ReceivePack rp = new ReceivePack(db);
 			// TODO replace email with user's email
 			rp.setRefLogIdent(new PersonIdent(user.getUsername(), user.getUsername() + "@" + req.getRemoteHost()));
@@ -71,7 +71,7 @@ public class ReceivePackController {
 		
 		final SmartOutputStream out = new SmartOutputStream(req, rsp, true);
 		
-		GitRepository.execute(repo, db -> {
+		repo.execute(db -> {
 			final ReceivePack rp = new ReceivePack(db);
 			try {
 				rp.setBiDirectionalPipe(false);

@@ -21,7 +21,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
-import org.pegdown.PegDownProcessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -120,7 +119,31 @@ public class RepositoryUtilities {
 		return files;
 	}
 
-	public RepoFile buildBackwardsNavigationFile(final GitRepository repo, final String pathString, final String branch) {
+	public RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final String branch, final TreeWalk treeWalk, final boolean customPath, final String pathString, 
+			final boolean directory, final ObjectId objectId) throws GitAPIException, NoHeadException {
+		
+		final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
+		final String parent = pathString.substring(0, pathString.lastIndexOf("/") + 1);
+
+		RevCommit commit = null;
+		
+		// We only need commit information if this isn't a directory
+		if (!directory) {
+			try (final Git git = new Git(db)) {
+				commit = git.log().add(db.resolve(qualifyBranchName(branch))).addPath(pathString).setMaxCount(1).call().iterator().next();
+			} catch (final RevisionSyntaxException | IOException e) {
+				// Something horrible has probably happened, but we don't care really
+			}
+		}
+		
+		return new RepoFile(repo, name, parent, directory, branch, objectId.getName(), commit);
+	}
+	
+	public String getFileContents(final Repository db, final ObjectId objectId) throws LargeObjectException, MissingObjectException, IOException {
+		return new String(db.newObjectReader().open(objectId).getBytes());
+	}
+	
+	private RepoFile buildBackwardsNavigationFile(final GitRepository repo, final String pathString, final String branch) {
 		String parent;
 		// If parent is not root, remove trailer, else set to blank
 		if (pathString.indexOf("/") > 0) {
@@ -133,55 +156,7 @@ public class RepositoryUtilities {
 		return new RepoFile(repo, "", ". .", parent, true, branch, null, null);
 	}
 	
-	public String renderMarkdown(final String originalText) {
-		final PegDownProcessor pegdown = new PegDownProcessor();
-		return pegdown.markdownToHtml(originalText);
-	}
-	
-	public String resolveReadMeFile(final GitRepository repo, final Repository db, final String branch) throws Exception {
-		final List<RepoFile> files = getFiles(repo, db, branch, "", false);
-		return resolveReadMeFile(repo, db, files);
-	}
-	
-	public String resolveReadMeFile(final GitRepository repo, final Repository db, final List<RepoFile> files) throws Exception {
-		if (!files.isEmpty()) {
-			for (final RepoFile file : files) {
-				final String fileName = file.getName();
-				if (fileName.equalsIgnoreCase("readme.md") || fileName.equalsIgnoreCase("readme.markdown")) {
-					final String markdown = getFileContents(db, ObjectId.fromString(file.getObjectId()));
-					return renderMarkdown(markdown);
-				}
-			}
-		}
-		return null;
-	}
-	
-	public RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final String branch, final TreeWalk treeWalk, final boolean customPath, final String pathString, 
-			final boolean directory, final ObjectId objectId) throws GitAPIException, NoHeadException {
-		
-		final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
-		final String parent = pathString.substring(0, pathString.lastIndexOf("/") + 1);
-
-		RevCommit commit = null;
-		
-		// WE only need commit information if this isn't a directory
-		if (!directory) {
-			try (final Git git = new Git(db)) {
-				commit = git.log().add(db.resolve(qualifyBranchName(branch))).addPath(pathString).setMaxCount(1).call().iterator().next();
-			} catch (RevisionSyntaxException | IOException e) {
-				
-			}
-		}
-		
-		return new RepoFile(repo, name, parent, directory, branch, objectId.getName(), commit);
-	}
-	
-	public String getFileContents(final Repository db, final ObjectId objectId) throws LargeObjectException, MissingObjectException, IOException {
-		return new String(db.newObjectReader().open(objectId).getBytes());
-	}
-	
 	private String qualifyBranchName(final String branch) {
 		return Constants.REFS_HEADS + branch;
 	}
-	
 }

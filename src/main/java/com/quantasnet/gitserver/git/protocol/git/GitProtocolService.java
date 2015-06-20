@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.git.repo.RepositoryService;
+import com.quantasnet.gitserver.git.repo.FilesystemRepositoryService;
 
 @Component
 public class GitProtocolService {
@@ -37,7 +37,7 @@ public class GitProtocolService {
 	private static final int BACKLOG = 5;
 	
 	@Autowired
-	private RepositoryService repositoryService;
+	private FilesystemRepositoryService repositoryService;
 	
 	private boolean isRunning = true;
 	
@@ -100,13 +100,13 @@ public class GitProtocolService {
 						
 						if (Constants.GIT_UPLOAD_PACK.equals(requestedMethod)) {
 							if (gitRepo.isAnonRead()) {
-								GitRepository.execute(gitRepo, db -> {
+								gitRepo.execute(db -> {
 									new UploadPack(db).upload(input, output, null);
 								});
 							}
 						} else if (Constants.GIT_RECEIVE_PACK.equals(requestedMethod)) {
 							if (gitRepo.isAnonWrite()) {
-								GitRepository.execute(gitRepo, db -> {
+								gitRepo.execute(db -> {
 									new ReceivePack(db).receive(input, output, null);
 								});
 							}

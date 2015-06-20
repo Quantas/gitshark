@@ -32,7 +32,7 @@ public class RepoController {
 	public ResponseEntity<String> infoRefs(final GitRepository repo) throws Exception {
 		final StringBuilder output = new StringBuilder();
 		
-		GitRepository.execute(repo, db -> {
+		repo.execute(db -> {
 			final RefAdvertiser adv = new RefAdvertiser() {
 				@Override
 				protected void writeOne(final CharSequence line) throws IOException {
