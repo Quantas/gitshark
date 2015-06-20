@@ -17,8 +17,6 @@
     <div layout:include="git/fragments/header :: header">
     	Git Header here
     </div>
-    <div th:if="${!hasCommits}" layout:include="git/fragments/emptyrepo :: emptyrepo">
-	</div>
    	<div th:if="${hasCommits}" class="panel panel-default">
 		<div class="panel-heading">
 			<div class="panel-title" style="font-weight: bold;">
@@ -26,6 +24,14 @@
 					breadcrumbs
 				</div>
 			</div>
+		</div>
+		<div class="panel-heading">
+			<img th:src="${lastCommit.gravatarUrl} + '&amp;s=25'"></img>
+			&nbsp;&nbsp;
+			<span th:text="${lastCommit.committerName}"></span>
+			&nbsp;&nbsp;
+			<span th:text="${lastCommit.commit.shortMessage}"></span>
+			&nbsp;&nbsp;
 		</div>
 		<table class="table">
 	   		<tr th:each="file : ${files}">

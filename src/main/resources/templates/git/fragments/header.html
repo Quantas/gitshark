@@ -6,12 +6,13 @@
 	</head>
 	<body>
 		<div layout:fragment="header">
-			<h1 th:text="${repo.owner} + ' / ' + ${repo.displayName}">owner / name</h1>
+			<h2 th:text="${repo.owner} + ' / ' + ${repo.displayName}">owner / name</h2>
 			<div class="panel panel-default">
 	  			<div class="panel-body">
-	  				<label for="checkoutUrl">URL</label>
-	  				&nbsp;
-	  				<input class="form-control" id="checkoutUrl" type="text" readonly="readonly" th:value="${checkoutUrl}"></input>
+	  				<div class="pull-left" style="width: 3em;">URL</div>
+	  				<div class="pull-left" th:text="${checkoutUrl}">
+	  				</div>
+	  				<div class="clearfix"></div>
 				</div>
 				<div class="panel-footer">
 					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl}">summary</a>
@@ -20,6 +21,8 @@
 					&nbsp;&nbsp;
 					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/log'">log</a>
 				</div>
+			</div>
+		    <div th:if="${!hasCommits}" layout:include="git/fragments/emptyrepo :: emptyrepo">
 			</div>
 		</div>
 	</body>

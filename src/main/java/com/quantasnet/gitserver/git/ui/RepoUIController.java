@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.quantasnet.gitserver.git.model.Breadcrumb;
+import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.git.repo.RepositoryService;
@@ -62,6 +65,9 @@ public class RepoUIController {
 			final boolean hasCommits = GitRepository.hasCommits(db);
 			model.addAttribute("hasCommits", hasCommits);
 			if (hasCommits) {
+				final RevCommit commit = Git.wrap(db).log().setMaxCount(1).call().iterator().next();
+				model.addAttribute("lastCommit", new Commit(commit));
+				
 				model.addAttribute("branches", db.getRefDatabase().getRefs("refs/heads/").keySet());
 				if (file) {
 					model.addAttribute("file", repoUtils.getFileToDisplay(repo, db, branch, path));
