@@ -9,7 +9,7 @@
 	<link rel="stylesheet" th:href="@{/webjars/highlightjs/8.4-4/styles/github.min.css}" />
 	<script>
 		$(document).ready(function() {
-			$('pre').each(function(i, block) {
+			$('pre.file').each(function(i, block) {
 			  hljs.highlightBlock(block);
 			});
 		});
@@ -62,7 +62,7 @@
   			<div th:if="${file == null}">
     			<h1>File not found!</h1>
     		</div>
-  			<pre th:if="${file != null}" th:text="${file.fileContents}"></pre>
+  			<pre class="file" th:if="${file != null}" th:text="${file.fileContents}"></pre>
 		</div>
 	</div>
 </div>
