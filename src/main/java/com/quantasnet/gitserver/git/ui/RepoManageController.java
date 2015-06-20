@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.quantasnet.gitserver.git.repo.FilesystemRepositoryService;
 
@@ -25,7 +26,12 @@ public class RepoManageController {
 		return "git/list";
 	}
 	
-	@RequestMapping("/create/{repoName}")
+	@RequestMapping(value = "/create", method = RequestMethod.GET)
+	public String create() {
+		return "git/create";
+	}
+	
+	@RequestMapping(value = "/create/{repoName}", method = RequestMethod.POST)
 	public String createRepo(@AuthenticationPrincipal final User user, @PathVariable final String repoName) throws IOException {
 		repoService.createRepo(repoName, user.getUsername());
 		return "redirect:/repo/";
