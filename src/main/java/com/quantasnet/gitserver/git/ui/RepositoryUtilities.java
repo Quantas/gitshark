@@ -167,7 +167,7 @@ public class RepositoryUtilities {
 		// WE only need commit information if this isn't a directory
 		if (!directory) {
 			try (final Git git = new Git(db)) {
-					commit = git.log().add(db.resolve(qualifyBranchName(branch))).addPath(pathString).setMaxCount(1).call().iterator().next();
+				commit = git.log().add(db.resolve(qualifyBranchName(branch))).addPath(pathString).setMaxCount(1).call().iterator().next();
 			} catch (RevisionSyntaxException | IOException e) {
 				
 			}
