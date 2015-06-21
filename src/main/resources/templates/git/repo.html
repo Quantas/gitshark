@@ -25,7 +25,7 @@
 				&nbsp;&nbsp;
 				<span th:text="${lastCommit.committerName}"></span>
 				&nbsp;-&nbsp;
-				<span th:text="${lastCommit.commit.shortMessage}"></span>
+				<a th:href="@{/repo/} + ${lastCommit.commitUrl}" th:text="${lastCommit.commit.shortMessage}"></a>
 			</div>
 			<div class="pull-right">
 				<time class="timeago" th:attr="datetime=${lastCommit.dateTimeString}"></time>

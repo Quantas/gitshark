@@ -27,7 +27,7 @@
 	   			</td>
 	   			<td th:text="${commit.commit.shortMessage}"></td>
 	   			<td>
-					<a th:href="@{'/repo/'} + ${repo.interfaceBaseUrl} + '/commit/' + ${commit.commit.id.name}" th:text="${commit.shortId}"></a>
+					<a th:href="@{'/repo/'} + ${commit.commitUrl}" th:text="${commit.shortId}"></a>
 				</td>
 	   		</tr>
 	   	</table>

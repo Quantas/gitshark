@@ -35,19 +35,21 @@
   			<table class="committerInfo">
     			<tr>
     				<th>Commit ID</th>
-    				<td th:text="${commit.id.name}"></td>
+    				<td>
+    					<a th:href="@{/repo/} + ${commit.commitUrl}" th:text="${commit.id}"></a>
+    				</td>
     			</tr>
     			<tr>
     				<th>Committer</th>
-    				<td th:text="${commit.committerIdent.name} + ' &lt;' + ${commit.committerIdent.emailAddress} + '&gt; ' + ${commit.committerIdent.when}"></td>
+    				<td th:text="${commit.commit.committerIdent.name} + ' &lt;' + ${commit.commit.committerIdent.emailAddress} + '&gt; ' + ${commit.commit.committerIdent.when}"></td>
     			</tr>
     			<tr>
     				<th>Author</th>
-    				<td th:text="${commit.authorIdent.name} + ' &lt;' + ${commit.authorIdent.emailAddress} + '&gt; ' + ${commit.authorIdent.when}"></td>
+    				<td th:text="${commit.commit.authorIdent.name} + ' &lt;' + ${commit.commit.authorIdent.emailAddress} + '&gt; ' + ${commit.commit.authorIdent.when}"></td>
     			</tr>
     			<tr>
     				<th>Message</th>
-    				<td><pre th:text="${commit.fullMessage}"></pre></td>
+    				<td><pre th:text="${commit.commit.fullMessage}"></pre></td>
     			</tr>
     		</table>
 		</div>

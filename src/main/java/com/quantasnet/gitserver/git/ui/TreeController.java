@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.model.Breadcrumb;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.RepoFile;
@@ -48,9 +49,9 @@ public class TreeController {
 		repo.execute(db -> {
 			if (repo.isHasCommits()) {
 				final RevCommit commit = Git.wrap(db).log().setMaxCount(1).call().iterator().next();
-				model.addAttribute("lastCommit", new Commit(commit));
+				model.addAttribute("lastCommit", new Commit(commit, repo));
 				
-				model.addAttribute("branches", db.getRefDatabase().getRefs("refs/heads/").keySet());
+				model.addAttribute("branches", db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet());
 				if (file) {
 					model.addAttribute("file", repoUtils.getFileToDisplay(repo, db, branch, path));
 				} else {

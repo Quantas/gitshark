@@ -35,7 +35,9 @@
   			<table class="committerInfo">
     			<tr>
     				<th>Commit ID</th>
-    				<td th:text="${file.commit.id.name}"></td>
+    				<td>
+    					<a th:href="@{/repo/} + ${file.commit.commitUrl}" th:text="${file.commit.id.name}"></a>
+    				</td>
     			</tr>
     			<tr>
     				<th>Committer</th>

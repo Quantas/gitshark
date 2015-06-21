@@ -3,10 +3,12 @@ package com.quantasnet.gitserver.git.model;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.jgit.revwalk.RevCommit;
 
+import com.quantasnet.gitserver.git.repo.GitRepository;
+
 public class Commit extends BaseCommit {
 
-	public Commit(final RevCommit commit) {
-		super(commit);
+	public Commit(final RevCommit commit, final GitRepository repo) {
+		super(commit, repo);
 	}
 	
 	public String getCommitterName() {

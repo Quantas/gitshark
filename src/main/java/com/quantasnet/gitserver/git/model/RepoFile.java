@@ -27,7 +27,7 @@ public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 	}
 	
 	public RepoFile(final GitRepository repo, final String name, final String display, final String parent, final boolean directory, final String branch, final String objectId, final RevCommit commit) {
-		super(commit);
+		super(commit, repo);
 		this.name = name;
 		this.display = display;
 		this.parent = parent;

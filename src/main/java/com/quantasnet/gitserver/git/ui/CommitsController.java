@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
@@ -31,7 +32,11 @@ import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.Diff;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
-
+/**
+ * TODO parse range with ([-+]\d+),(\d+)\s([+-]\d+),(\d+)
+ * @author andrewlandsverk
+ *
+ */
 @RequestMapping("/repo/{repoOwner}/{repoName}")
 @Controller
 public class CommitsController {
@@ -67,7 +72,7 @@ public class CommitsController {
 					revWalk.markStart(headCommits);
 					
 					for (final RevCommit rev : revWalk) {
-						commits.add(new Commit(rev));
+						commits.add(new Commit(rev, repo));
 						if (commits.size() == maxCount) {
 							break;
 						}
@@ -83,31 +88,41 @@ public class CommitsController {
 	
 	@RequestMapping(value = "/commit/{commitId}")
 	public String singleCommit(final GitRepository repo, @PathVariable final String commitId, final Model model) throws Exception {
-		
-		repo.execute(db -> {
-			final RevWalk revWalk = new RevWalk(db);
-			final RevCommit commit = revWalk.parseCommit(ObjectId.fromString(commitId));
-			final RevCommit parent = revWalk.parseCommit(commit.getParent(0).getId());
-			
-			final List<DiffEntry> diff = Git.wrap(db)
-					.diff()
-					.setOldTree(prepareTree(parent, db, revWalk))
-					.setNewTree(prepareTree(commit, db, revWalk))
-					.call();
-			
-			final List<Diff> diffs = new ArrayList<>();
-			
-			for (final DiffEntry entry : diff) {
-	            try (final ByteArrayOutputStream baos = new ByteArrayOutputStream(); final DiffFormatter formatter = new DiffFormatter(baos)) {
-            		formatter.setRepository(db);
-		            formatter.format(entry);
-		            diffs.add(new Diff(baos.toString(), entry.getNewPath(), entry.getChangeType()));
-            	}
-            }
-            
-            model.addAttribute("diffs", diffs);
-            model.addAttribute("commit", commit);
-		});
+		if (repo.isHasCommits()) {
+			repo.execute(db -> {
+				final RevWalk revWalk = new RevWalk(db);
+				final RevCommit commit = revWalk.parseCommit(ObjectId.fromString(commitId));
+				final RevCommit parent = revWalk.parseCommit(commit.getParent(0).getId());
+				
+				final List<DiffEntry> diff = Git.wrap(db)
+						.diff()
+						.setOldTree(prepareTree(parent, db, revWalk))
+						.setNewTree(prepareTree(commit, db, revWalk))
+						.call();
+				
+				final List<Diff> diffs = new ArrayList<>();
+				
+				for (final DiffEntry entry : diff) {
+		            try (final ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
+		            		final DiffFormatter formatter = new DiffFormatter(baos)) {
+	            		formatter.setRepository(db);
+			            formatter.format(entry);
+			            
+			            final ChangeType changeType = entry.getChangeType();
+			            
+			            diffs.add(
+		            		new Diff(
+	            				baos.toString(), 
+	            				changeType == ChangeType.DELETE ? entry.getOldPath() : entry.getNewPath(), 
+	    						changeType)
+		            		);
+	            	}
+	            }
+	            
+	            model.addAttribute("diffs", diffs);
+	            model.addAttribute("commit", new Commit(commit, repo));
+			});
+		}
 		
 		return "git/commit";
 	}
