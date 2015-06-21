@@ -156,7 +156,7 @@ public class RepositoryUtilities {
 		return new RepoFile(repo, "", ". .", parent, true, branch, null, null);
 	}
 	
-	private String qualifyBranchName(final String branch) {
+	public String qualifyBranchName(final String branch) {
 		return Constants.REFS_HEADS + branch;
 	}
 }
