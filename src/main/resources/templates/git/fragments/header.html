@@ -14,15 +14,15 @@
 	  				<div class="clearfix"></div>
 				</div>
 				<div class="panel-footer">
-					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl}">summary</a>
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl}"><i class="fa fa-fw fa-home"></i>summary</a>
 					&nbsp;&nbsp;
-					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/commits'">commits</a>
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/commits'"><i class="fa fa-fw fa-list-ul"></i>commits</a>
 					&nbsp;&nbsp;
-					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/branch'">branches</a>
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/branch'"><i class="fa fa-fw fa-code-fork"></i>branches</a>
 					&nbsp;&nbsp;
-					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree'">tree</a>
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree'"><i class="fa fa-fw fa-sitemap"></i>tree</a>
 					&nbsp;&nbsp;
-					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/settings'">settings</a>
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/settings'"><i class="fa fa-fw fa-cogs"></i>settings</a>
 				</div>
 			</div>
 		    <div th:if="${!hasCommits}" layout:include="git/fragments/emptyrepo :: emptyrepo">
