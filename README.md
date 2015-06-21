@@ -1,6 +1,6 @@
 # gitserver
 
-> A fully Java based Git Server solution.
+> A Java based Git Server solution.
 
 ## Start
 
