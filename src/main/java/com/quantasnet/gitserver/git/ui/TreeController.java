@@ -47,7 +47,7 @@ public class TreeController {
 		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repoName, repoPath, path));
 		
 		repo.execute(db -> {
-			if (repo.isHasCommits()) {
+			if (repo.hasCommits()) {
 				final RevCommit commit = Git.wrap(db).log().add(db.resolve(repoUtils.qualifyBranchName(branch))).setMaxCount(1).call().iterator().next();
 				model.addAttribute("lastCommit", new Commit(commit, repo));
 				

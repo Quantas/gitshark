@@ -17,7 +17,7 @@ public class SummaryController {
 	@RequestMapping({ "", "/" })
 	public String summary(final GitRepository repo, final Model model) throws Exception {
 		repo.execute(db -> {
-			if (repo.isHasCommits()) {
+			if (repo.hasCommits()) {
 				model.addAttribute("readme", readmeService.resolveReadMeFile(repo, db, db.getBranch()));
 			}
 		});

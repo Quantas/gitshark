@@ -11,7 +11,7 @@
     <div layout:include="git/fragments/header :: header">
     	Git Header here
     </div>
-   	<div th:if="${hasCommits}" class="panel panel-default">
+   	<div th:if="${repo.commits}" class="panel panel-default">
 		<div class="panel-heading">
 			<div class="panel-title" style="font-weight: bold;">
 				<div style="display: inline;" layout:include="git/fragments/breadcrumbs :: breadcrumbs">

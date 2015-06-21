@@ -25,7 +25,7 @@ public class GitRepository implements Comparable<GitRepository> {
 	private final boolean anonRead;
 	private final boolean anonWrite;
 	
-	private boolean hasCommits;
+	private boolean commits;
 	
 	public GitRepository(final File fullRepoDirectory, final String owner, final String name, final boolean anonRead, final boolean anonWrite) {
 		this.fullRepoDirectory = fullRepoDirectory;
@@ -64,12 +64,19 @@ public class GitRepository implements Comparable<GitRepository> {
 		return anonWrite;
 	}
 	
-	public void setHasCommits(boolean hasCommits) {
-		this.hasCommits = hasCommits;
+	public void setCommits(boolean commits) {
+		this.commits = commits;
 	}
 	
-	public boolean isHasCommits() {
-		return hasCommits;
+	/**
+	 * alias for isCommits
+	 */
+	public boolean hasCommits() {
+		return isCommits();
+	}
+	
+	public boolean isCommits() {
+		return commits;
 	}
 	
 	public String getDisplayName() {

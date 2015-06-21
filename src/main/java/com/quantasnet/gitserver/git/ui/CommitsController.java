@@ -44,7 +44,7 @@ public class CommitsController {
 	@RequestMapping("/commits")
 	public String showLog(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, final Model model) throws Exception {
 		repo.execute(db -> {
-			if (repo.isHasCommits()) {
+			if (repo.hasCommits()) {
 				final int maxCount = 20;
 				final List<Commit> commits = new ArrayList<>();
 				
@@ -88,7 +88,7 @@ public class CommitsController {
 	
 	@RequestMapping(value = "/commit/{commitId}")
 	public String singleCommit(final GitRepository repo, @PathVariable final String commitId, final Model model) throws Exception {
-		if (repo.isHasCommits()) {
+		if (repo.hasCommits()) {
 			repo.execute(db -> {
 				final RevWalk revWalk = new RevWalk(db);
 				final RevCommit commit = revWalk.parseCommit(ObjectId.fromString(commitId));

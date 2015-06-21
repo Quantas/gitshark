@@ -25,7 +25,7 @@
 					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/settings'"><i class="fa fa-fw fa-cogs"></i>settings</a>
 				</div>
 			</div>
-		    <div th:if="${!hasCommits}" layout:include="git/fragments/emptyrepo :: emptyrepo">
+		    <div th:if="${!repo.commits}" layout:include="git/fragments/emptyrepo :: emptyrepo">
 			</div>
 		</div>
 	</body>
