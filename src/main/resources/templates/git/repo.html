@@ -41,10 +41,10 @@
 	   				<a th:href="@{/repo/} + ${file.url}" th:text="${file.display}">Filename</a>
 				</td>
 				<td>
-					<time th:if="${!file.directory}" class="timeago" th:attr="datetime=${file.dateTimeString}"></time>
-				</td>
-				<td>
 					<a th:if="${!file.directory and file.commit != null}" th:href="@{/repo/} + ${file.commitUrl}" th:text="${file.commit.shortMessage}">message</a>
+				</td>
+				<td class="text-right">
+					<time th:if="${!file.directory}" class="timeago" th:attr="datetime=${file.dateTimeString}"></time>
 				</td>
 	   		</tr>
 	   	</table>

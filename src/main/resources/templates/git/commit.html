@@ -62,7 +62,7 @@
 	<div th:if="${diffs != null}" th:each="diff : ${diffs}">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title" th:text="${diff.fileName} + ' - ' + ${diff.changeType}"></h3>
+				<a class="panel-title" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/master/' + ${diff.fileName} + '?file=true'" th:text="${diff.fileName} + ' - ' + ${diff.changeType}"></a>
 			</div>
 	  		<div class="panel-body">
 	  			<pre class="file diff" th:text="${diff.diffString}"></pre>
