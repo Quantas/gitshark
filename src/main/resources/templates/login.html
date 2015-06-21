@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/default">
+<head>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="center-block" style="max-width: 400px; padding-top: 2em;">
+        <div th:if="${param.error}" class="alert alert-dismissable alert-danger">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            Invalid username or password.
+        </div>
+        <div th:if="${param.logout}" class="alert alert-dismissable alert-success">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            You have been logged out.
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h1 class="panel-title">Sign In</h1>
+            </div>
+            <div class="panel-body">
+                <form th:action="@{/login}" method="post" class="form">
+                    <table class="table">
+                        <tr>
+                            <th><label for="username">User Name</label></th>
+                            <td><input id="username" name="username" type="text" class="form-control imput-md" placeholder="User Name" /></td>
+                        </tr>
+                        <tr>
+                            <th><label for="password">Password</label></th>
+                            <td><input id="password" name="password" type="password" class="form-control imput-md" placeholder="Password" /></td>
+                        </tr>
+                        <tr>
+                            <th><label for="_qlan2_remember_me">Remember Me</label></th>
+                            <td><input type='checkbox' id="_qlan2_remember_me" name="_qlan2_remember_me" /></td>
+                        </tr>
+                    </table>
+                    <button id="submit" type="submit" name="submit" class="btn btn-lg btn-primary btn-block">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
