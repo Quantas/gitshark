@@ -44,7 +44,7 @@
 					<time th:if="${!file.directory}" class="timeago" th:attr="datetime=${file.dateTimeString}"></time>
 				</td>
 				<td>
-					<span th:if="${!file.directory and file.commit != null}" th:text="${file.commit.shortMessage}">message</span>
+					<a th:if="${!file.directory and file.commit != null}" th:href="@{/repo/} + ${file.commitUrl}" th:text="${file.commit.shortMessage}">message</a>
 				</td>
 	   		</tr>
 	   	</table>
