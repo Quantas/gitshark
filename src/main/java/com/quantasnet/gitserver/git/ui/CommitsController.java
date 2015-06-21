@@ -33,7 +33,7 @@ import com.quantasnet.gitserver.git.model.Diff;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
 /**
- * TODO parse range with ([-+]\d+),(\d+)\s([+-]\d+),(\d+)
+ * TODO parse range with ([-+]\d++),(\d++)\s([+-]\d++),(\d++)
  * @author andrewlandsverk
  *
  */
