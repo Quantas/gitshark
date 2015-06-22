@@ -1,6 +1,12 @@
 # gitserver
 
-A fully Java based Git Server solution.
+> A fully Java based Git Server solution.
+
+## Build
+
+``` bash
+mvn clean install
+```
 
 ## Start
 
