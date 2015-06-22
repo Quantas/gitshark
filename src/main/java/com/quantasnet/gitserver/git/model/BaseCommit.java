@@ -1,5 +1,8 @@
 package com.quantasnet.gitserver.git.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.joda.time.DateTime;
 
@@ -9,11 +12,13 @@ public abstract class BaseCommit {
 
 	protected final RevCommit commit;
 	private final String commitUrl;
+	private final List<Parent> parents;
 	private final String dateTimeString;
 	
 	public BaseCommit(final RevCommit commit, final GitRepository repo) {
 		this.commit = commit;
 		this.commitUrl = buildCommitUrl(repo);
+		this.parents = buildParents(repo);
 		this.dateTimeString = buildDateTimeString();
 	}
 	
@@ -23,6 +28,20 @@ public abstract class BaseCommit {
 		}
 		
 		return repo.getInterfaceBaseUrl() + "/commit/" + commit.getId().getName();
+	}
+	
+	private List<Parent> buildParents(final GitRepository repo) {
+		final List<Parent> parents = new ArrayList<>();
+		
+		if (null != commit) {
+			if (commit.getParentCount() > 0) {
+				for (final RevCommit parent : commit.getParents()) {
+					parents.add(new Parent(parent.getId().getName(), repo));
+				}
+			}
+		}
+		
+		return parents;
 	}
 	
 	private String buildDateTimeString() {
@@ -47,6 +66,10 @@ public abstract class BaseCommit {
 	
 	public String getCommitUrl() {
 		return commitUrl;
+	}
+	
+	public List<Parent> getParents() {
+		return parents;
 	}
 	
 	public String getDateTimeString() {

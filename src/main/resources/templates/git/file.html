@@ -40,6 +40,14 @@
     				</td>
     			</tr>
     			<tr>
+    				<th>Parent(s)</th>
+    				<td>
+    					<span th:each="parent : ${file.parents}">
+    						<a th:href="@{/repo/} + ${parent.url}" th:text="${parent.id}"></a>
+    					</span>
+    				</td>
+    			</tr>
+    			<tr>
     				<th>Committer</th>
     				<td th:text="${file.commit.committerIdent.name} + ' &lt;' + ${file.commit.committerIdent.emailAddress} + '&gt; ' + ${file.commit.committerIdent.when}"></td>
     			</tr>

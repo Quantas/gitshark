@@ -23,6 +23,7 @@ import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
+import org.eclipse.jgit.treewalk.EmptyTreeIterator;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -92,7 +93,14 @@ public class CommitsController {
 			repo.execute(db -> {
 				final RevWalk revWalk = new RevWalk(db);
 				final RevCommit commit = revWalk.parseCommit(ObjectId.fromString(commitId));
-				final RevCommit parent = revWalk.parseCommit(commit.getParent(0).getId());
+				RevCommit parent;
+				
+				if (commit.getParentCount() > 0) {
+					parent = revWalk.parseCommit(commit.getParent(0).getId());
+				} else {
+					parent = null;
+				}
+				
 				
 				final List<DiffEntry> diff = Git.wrap(db)
 						.diff()
@@ -128,12 +136,16 @@ public class CommitsController {
 	}
 	
 	private AbstractTreeIterator prepareTree(final RevCommit commit, final Repository db, final RevWalk revWalk) throws MissingObjectException, IncorrectObjectTypeException, IOException {
-		final RevTree tree = revWalk.parseTree(commit.getTree().getId());
-		final CanonicalTreeParser parser = new CanonicalTreeParser();
-        final ObjectReader reader = db.newObjectReader();
-        
-        parser.reset(reader, tree.getId());
-        
-        return parser;
+		if (null == commit) {
+			return new EmptyTreeIterator();
+		} else {
+			final RevTree tree = revWalk.parseTree(commit.getTree().getId());
+			final CanonicalTreeParser parser = new CanonicalTreeParser();
+	        final ObjectReader reader = db.newObjectReader();
+	        
+	        parser.reset(reader, tree.getId());
+	        
+	        return parser;
+		}
 	}
 }

@@ -35,8 +35,15 @@
   			<table class="committerInfo">
     			<tr>
     				<th>Commit ID</th>
+    				<td th:text="${commit.id}">
+    				</td>
+    			</tr>
+    			<tr>
+    				<th>Parent(s)</th>
     				<td>
-    					<a th:href="@{/repo/} + ${commit.commitUrl}" th:text="${commit.id}"></a>
+    					<span th:each="parent : ${commit.parents}">
+    						<a th:href="@{/repo/} + ${parent.url}" th:text="${parent.id}"></a>
+    					</span>
     				</td>
     			</tr>
     			<tr>

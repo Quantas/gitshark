@@ -15,7 +15,11 @@ public class Diff {
 	}
 
 	private String filterDiffString(final String origString) {
-		return origString.substring(origString.indexOf("@@"));
+		final int index = origString.indexOf("@@");
+		if (index > -1) {
+			return origString.substring(index);
+		}
+		return origString;
 	}
 	
 	public String getDiffString() {
