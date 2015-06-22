@@ -12,20 +12,31 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
+
+import com.quantasnet.gitserver.security.GitServerUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired
-	protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
-		auth
-			.inMemoryAuthentication()
-				.withUser("user").password("user").roles("USER").and()
-				.withUser("admin").password("admin").roles("USER", "ADMIN");
+    @Autowired
+    public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
+        auth
+            .userDetailsService(gitServerUserDetailsService())
+            .passwordEncoder(passwordEncoder());
+    }
+    
+	@Bean
+	public UserDetailsService gitServerUserDetailsService() {
+		return new GitServerUserDetailsService();
 	}
 	
     @Bean
@@ -33,13 +44,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
+	
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 	
-    public static String channel(final Environment env) {
+    private static String channel(final Environment env) {
         return env.acceptsProfiles("openshift") ? "REQUIRES_SECURE_CHANNEL" : "REQUIRES_INSECURE_CHANNEL";
     }
     
@@ -65,16 +76,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	            .and()
 	                .sessionManagement().sessionFixation().changeSessionId();
 		}
-		
 	}
 	
 	@Configuration
 	@Order(2)
 	public static class WebUISecurity extends WebSecurityConfigurerAdapter {
 		
+		private static final String KEY = "git-server-remember-me-68debb69-a234-4a4f-8508-ab9234hf8d2a";
+		
 		@Autowired
 		private Environment env;
 		
+	    @Autowired
+	    private PersistentTokenRepository gitServerPersistentTokenRepository;
+		
+	    @Autowired
+	    private UserDetailsService userDetailsService;
+	    
+	    @Autowired
+	    private AuthenticationManager authenticationManager;
+	    
 		@Override
 		public void configure(WebSecurity web) throws Exception {
 			web
@@ -98,11 +119,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                .and()
 	                .requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env))
 	            .and()
-	                .sessionManagement().sessionFixation().changeSessionId();
-	            /*.and()
-	                .rememberMe().key(KEY).rememberMeServices(rememberMeServices());*/
+	                .sessionManagement().sessionFixation().changeSessionId()
+	            .and()
+	                .rememberMe().key(KEY).rememberMeServices(rememberMeServices());
 		}
 		
+	    @Bean
+	    public RememberMeServices rememberMeServices() {
+	        final PersistentTokenBasedRememberMeServices rememberMeServices =
+	                new PersistentTokenBasedRememberMeServices(KEY, userDetailsService, gitServerPersistentTokenRepository);
+	        rememberMeServices.setCookieName("GIT_SERVER_REMEMBER_ME");
+	        rememberMeServices.setParameter("_git_server_remember_me");
+	        return rememberMeServices;
+	    }
+	    
+	    @Bean
+	    public RememberMeAuthenticationFilter rememberMeAuthenticationFilter() throws Exception {
+	        return new RememberMeAuthenticationFilter(authenticationManager, rememberMeServices());
+	    }
 	}
 	
 }
