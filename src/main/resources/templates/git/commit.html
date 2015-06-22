@@ -42,7 +42,7 @@
     				<th>Parent(s)</th>
     				<td>
     					<span th:each="parent : ${commit.parents}">
-    						<a th:href="@{/repo/} + ${parent.url}" th:text="${parent.id}"></a>
+    						<a th:href="@{/repo/} + ${parent.url}" th:text="${parent.id}"></a><br />
     					</span>
     				</td>
     			</tr>

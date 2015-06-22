@@ -72,6 +72,10 @@ public abstract class BaseCommit {
 		return parents;
 	}
 	
+	public boolean isMerge() {
+		return parents.size() > 1;
+	}
+	
 	public String getDateTimeString() {
 		return dateTimeString;
 	}

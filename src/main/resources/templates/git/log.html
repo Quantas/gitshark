@@ -29,6 +29,7 @@
 	   			<td>
 					<a th:href="@{'/repo/'} + ${commit.commitUrl}" th:text="${commit.shortId}"></a>
 				</td>
+				<td th:text="${commit.merge ? 'M' : ''}"></td>
 	   		</tr>
 	   	</table>
 	</div>
