@@ -15,7 +15,7 @@ import com.quantasnet.gitserver.jgit.vendor.NoCacheFilter;
 @Configuration
 public class FilterConfig {
 
-private static final List<String> GIT_URL_PATTERNS = Arrays.asList("/repo/*");  
+	private static final List<String> GIT_URL_PATTERNS = Arrays.asList("/repo/*");  
 	
 	@Bean
 	public FilterRegistrationBean etagFilter() {
