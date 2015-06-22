@@ -23,28 +23,8 @@ import org.springframework.security.web.authentication.rememberme.RememberMeAuth
 import com.quantasnet.gitserver.security.GitServerUserDetailsService;
 
 @Configuration
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
 
-    @Autowired
-    public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
-        auth
-            .userDetailsService(gitServerUserDetailsService())
-            .passwordEncoder(passwordEncoder());
-    }
-    
-	@Bean
-	public UserDetailsService gitServerUserDetailsService() {
-		return new GitServerUserDetailsService();
-	}
-	
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-	
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -54,6 +34,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return env.acceptsProfiles("openshift") ? "REQUIRES_SECURE_CHANNEL" : "REQUIRES_INSECURE_CHANNEL";
     }
     
+    @EnableWebSecurity
+    @EnableGlobalMethodSecurity(prePostEnabled = true)
 	@Configuration
 	@Order(1)
 	public static class GitRepoSecurity extends WebSecurityConfigurerAdapter {
@@ -78,6 +60,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		}
 	}
 	
+    @EnableWebSecurity
+    @EnableGlobalMethodSecurity(prePostEnabled = true)
 	@Configuration
 	@Order(2)
 	public static class WebUISecurity extends WebSecurityConfigurerAdapter {
@@ -90,11 +74,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	    @Autowired
 	    private PersistentTokenRepository gitServerPersistentTokenRepository;
 		
-	    @Autowired
-	    private UserDetailsService userDetailsService;
-	    
-	    @Autowired
-	    private AuthenticationManager authenticationManager;
+		@Autowired
+		private PasswordEncoder passwordEncoder;
 	    
 		@Override
 		public void configure(WebSecurity web) throws Exception {
@@ -108,6 +89,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			http
 	            .authorizeRequests()
 	                .antMatchers("/admin/**").hasRole("ADMIN")
+	                .antMatchers("/management/**").hasRole("ADMIN")
 	                .anyRequest().authenticated()
 	            .and()
 	                .formLogin()
@@ -117,6 +99,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	                .logout()
 	                .permitAll()
                .and()
+               .csrf().disable()
 	                .requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env))
 	            .and()
 	                .sessionManagement().sessionFixation().changeSessionId()
@@ -124,10 +107,28 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	                .rememberMe().key(KEY).rememberMeServices(rememberMeServices());
 		}
 		
+		@Autowired
+	    public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
+	        auth
+	            .userDetailsService(gitServerUserDetailsService())
+	            .passwordEncoder(passwordEncoder);
+	    }
+	    
+		@Bean
+		public UserDetailsService gitServerUserDetailsService() {
+			return new GitServerUserDetailsService();
+		}
+		
+	    @Bean
+	    @Override
+	    public AuthenticationManager authenticationManagerBean() throws Exception {
+	        return super.authenticationManagerBean();
+	    }
+		
 	    @Bean
 	    public RememberMeServices rememberMeServices() {
 	        final PersistentTokenBasedRememberMeServices rememberMeServices =
-	                new PersistentTokenBasedRememberMeServices(KEY, userDetailsService, gitServerPersistentTokenRepository);
+	                new PersistentTokenBasedRememberMeServices(KEY, userDetailsService(), gitServerPersistentTokenRepository);
 	        rememberMeServices.setCookieName("GIT_SERVER_REMEMBER_ME");
 	        rememberMeServices.setParameter("_git_server_remember_me");
 	        return rememberMeServices;
@@ -135,8 +136,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	    
 	    @Bean
 	    public RememberMeAuthenticationFilter rememberMeAuthenticationFilter() throws Exception {
-	        return new RememberMeAuthenticationFilter(authenticationManager, rememberMeServices());
+	        return new RememberMeAuthenticationFilter(authenticationManager(), rememberMeServices());
 	    }
 	}
-	
 }
