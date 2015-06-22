@@ -2,6 +2,12 @@
 
 > A Java based Git Server solution.
 
+## Build
+
+``` bash
+mvn clean install
+```
+
 ## Start
 
 ``` bash
