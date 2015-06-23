@@ -29,7 +29,9 @@
 					<a th:href="@{'/repo/'} + ${commit.commitUrl}" th:text="${commit.shortId}"></a>
 				</td>
 	   			<td th:text="${commit.commit.shortMessage}"></td>
-	   			<td><span class="label label-default" th:text="${commit.branchHead}"></span></td>
+	   			<td>
+	   				<a class="label label-default" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/' + ${commit.branchHead}" th:text="${commit.branchHead}"></a>
+   				</td>
 				<td th:text="${commit.merge ? 'Merge' : ''}"></td>
 	   		</tr>
 	   	</table>
