@@ -18,18 +18,18 @@
 			</h3>
 		</div>
     	<table class="table">
-	   		<tr th:each="commit : ${commits}">
+	   		<tr th:each="commit : ${commits}" th:class="${commit.merge ? 'merged' : ''}">
 	   			<td>
 	   				<img th:src="${commit.gravatarUrl} + '&amp;s=25'"></img>
 	   			</td>
 	   			<td>
 	   				<time class="timeago" th:attr="datetime=${commit.dateTimeString}"></time>
 	   			</td>
-	   			<td th:text="${commit.commit.shortMessage}"></td>
 	   			<td>
 					<a th:href="@{'/repo/'} + ${commit.commitUrl}" th:text="${commit.shortId}"></a>
 				</td>
-				<td th:text="${commit.merge ? 'M' : ''}"></td>
+	   			<td th:text="${commit.commit.shortMessage}"></td>
+				<td th:text="${commit.merge ? 'Merge' : ''}"></td>
 	   		</tr>
 	   	</table>
 	</div>
