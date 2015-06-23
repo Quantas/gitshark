@@ -30,7 +30,7 @@
 				</td>
 	   			<td th:text="${commit.commit.shortMessage}"></td>
 	   			<td>
-	   				<a class="label label-default" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/' + ${commit.branchHead}" th:text="${commit.branchHead}"></a>
+	   				<a class="label label-primary" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/' + ${commit.branchHead}" th:text="${commit.branchHead}"></a>
    				</td>
 				<td th:text="${commit.merge ? 'Merge' : ''}"></td>
 	   		</tr>
