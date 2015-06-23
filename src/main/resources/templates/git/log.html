@@ -27,12 +27,13 @@
 	   			</td>
 	   			<td>
 					<a th:href="@{'/repo/'} + ${commit.commitUrl}" th:text="${commit.shortId}"></a>
+					&nbsp;&nbsp;
+					<span class="badge" th:if="${commit.merge}">Merge</span>
 				</td>
 	   			<td th:text="${commit.commit.shortMessage}"></td>
 	   			<td>
 	   				<a class="label label-primary" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/' + ${commit.branchHead}" th:text="${commit.branchHead}"></a>
    				</td>
-				<td th:text="${commit.merge ? 'Merge' : ''}"></td>
 	   		</tr>
 	   	</table>
 	</div>
