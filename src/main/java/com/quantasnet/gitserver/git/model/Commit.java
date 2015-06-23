@@ -7,8 +7,15 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 
 public class Commit extends BaseCommit {
 
+	private final String branchHead;
+	
 	public Commit(final RevCommit commit, final GitRepository repo) {
+		this(commit, repo, null);
+	}
+	
+	public Commit(final RevCommit commit, final GitRepository repo, final String branchHead) {
 		super(commit, repo);
+		this.branchHead = branchHead;
 	}
 	
 	public String getCommitterName() {
@@ -17,6 +24,10 @@ public class Commit extends BaseCommit {
 	
 	public String getCommitterEmail() {
 		return commit.getCommitterIdent().getEmailAddress();
+	}
+	
+	public String getBranchHead() {
+		return branchHead;
 	}
 	
 	public String getGravatarUrl() {

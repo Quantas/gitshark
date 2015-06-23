@@ -5,8 +5,10 @@ import static org.eclipse.jgit.lib.RefDatabase.ALL;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -29,6 +31,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.Diff;
 import com.quantasnet.gitserver.git.repo.GitRepository;
@@ -46,6 +49,16 @@ public class CommitsController {
 	public String showLog(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, final Model model) throws Exception {
 		repo.execute(db -> {
 			if (repo.hasCommits()) {
+				
+				final Set<String> branches = db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet();
+				
+				final Map<ObjectId, String> branchHeads = new HashMap<>();
+				
+				for (final String branch : branches) {
+					final RevCommit commit = Git.wrap(db).log().add(db.resolve(branch)).setMaxCount(1).call().iterator().next();
+					branchHeads.put(commit.getId(), branch);
+				}
+				
 				final int maxCount = 20;
 				final List<Commit> commits = new ArrayList<>();
 				
@@ -73,7 +86,7 @@ public class CommitsController {
 					revWalk.markStart(headCommits);
 					
 					for (final RevCommit rev : revWalk) {
-						commits.add(new Commit(rev, repo));
+						commits.add(new Commit(rev, repo, branchHeads.get(rev.getId())));
 						if (commits.size() == maxCount) {
 							break;
 						}
