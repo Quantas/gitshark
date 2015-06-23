@@ -12,7 +12,7 @@ import org.springframework.util.StringUtils;
 
 public class Diff {
 
-	private static final String HUNK_HEADER_REGEX = "(?:@@) ([-+]\\d+),(\\d+)\\s([+-]\\d+),(\\d+) (?:@@)";
+	private static final String HUNK_HEADER_REGEX = "(?:@@ )([-+]\\d+),(\\d+) ([+-]\\d+),(\\d+)(?: @@)";
 	
 	private static final Pattern HUNK_HEADER = Pattern.compile(HUNK_HEADER_REGEX);
 	
