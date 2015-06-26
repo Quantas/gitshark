@@ -15,8 +15,15 @@
 
         <link rel="stylesheet" th:href="@{/webjars/bootswatch/3.3.1+2/yeti/bootstrap.min.css}" />
         <link rel="stylesheet" th:href="@{/webjars/font-awesome/4.2.0/css/font-awesome.min.css}" />
+        <link rel="stylesheet" th:href="@{/css/menu.css}" />
         <link rel="stylesheet" th:href="@{/css/gitserver.css}" />
         
+        <style th:if="${repo == null}">
+        	#wrapper {
+        		padding-left: 0;
+        	}
+        </style>
+               
         <script>
             $(document).ready(function() {
             	$("time.timeago").timeago();
@@ -63,31 +70,22 @@
 		</script>
     </head>
     <body>
-        <div class="container-fluid">
-            <div id="top">
-                <div layout:include="fragments/header :: header">
-                    Header
-                </div>
-            </div>
-            <br />
-            <div id="middle" style="margin-bottom: 30px">
-                    <div th:if="${successStatus != null}" class="alert alert-dismissable alert-success">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <span th:text="${successStatus}">Success!</span>
-                    </div>
-                    <div th:if="${failureStatus != null}" class="alert alert-dismissable alert-danger">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <span th:text="${failureStatus}">Failure!</span>
-                    </div>
-                <div layout:fragment="content">
-                    Content
-                </div>
-            </div>
-            <div id="bottom">
-                <div layout:include="fragments/footer :: footer">
-                    Footer
-                </div>
-            </div>
-        </div>
-    </body>
+    	<div id="wrapper">
+			<div id="top" layout:include="fragments/header :: header">Header</div>
+			<div id="page-wrapper">
+				<div class="container-fluid">
+					<div th:if="${successStatus != null}" class="alert alert-dismissable alert-success">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<span th:text="${successStatus}">Success!</span>
+					</div>
+					<div th:if="${failureStatus != null}" class="alert alert-dismissable alert-danger">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<span th:text="${failureStatus}">Failure!</span>
+					</div>
+					<div layout:fragment="content">Content</div>
+					<div id="bottom" layout:include="fragments/footer :: footer">Footer</div>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>

@@ -1,5 +1,27 @@
 body {
-	padding-top: 1.5em;
+	padding-top: 7em;
+}
+
+@media(min-width:768px) {
+	body {
+		padding-top: 0em;
+	}
+}
+
+table,.label,.navbar,pre {
+	font-size: 15px;
+}
+
+.navbar-brand {
+	width: 125px;
+}
+
+.navbar-nav li a:hover, 
+.navbar-nav li a:focus,
+.navbar-brand:hover, 
+.navbar-brand:focus {
+	outline: none;
+	background-color: #555 !important;
 }
 
 .merged {
