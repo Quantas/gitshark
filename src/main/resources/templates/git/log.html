@@ -20,7 +20,7 @@
     	<table class="table">
 	   		<tr th:each="commit : ${commits}" th:class="${commit.merge ? 'merged' : ''}">
 	   			<td>
-	   				<img th:src="${commit.gravatarUrl} + '&amp;s=25'"></img>
+	   				<img th:src="${commit.gravatarUrl} + '&amp;s=25'" data-toggle="tooltip" data-placement="right" th:title="${commit.committerName}"></img>
 	   			</td>
 	   			<td>
 	   				<time class="timeago" th:attr="datetime=${commit.dateTimeString}"></time>
