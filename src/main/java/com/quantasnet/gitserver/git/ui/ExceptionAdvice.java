@@ -13,7 +13,7 @@ public class ExceptionAdvice {
 	@ExceptionHandler({ RepositoryNotFoundException.class, IllegalArgumentException.class })
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public String repoNotFound() {
-		return "notfound";
+		return "forward:/404";
 	}
 	
 }

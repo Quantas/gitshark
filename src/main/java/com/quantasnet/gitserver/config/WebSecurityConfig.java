@@ -90,6 +90,7 @@ public class WebSecurityConfig {
 	            .authorizeRequests()
 	                .antMatchers("/admin/**").hasRole("ADMIN")
 	                .antMatchers("/management/**").hasRole("ADMIN")
+	                .antMatchers("/404", "/403", "/401", "/503").permitAll()
 	                .anyRequest().authenticated()
 	            .and()
 	                .formLogin()
