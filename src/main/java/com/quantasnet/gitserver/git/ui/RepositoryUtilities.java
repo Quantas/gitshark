@@ -24,7 +24,6 @@ import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerMapping;
 
-import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
