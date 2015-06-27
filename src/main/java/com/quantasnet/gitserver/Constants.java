@@ -14,6 +14,8 @@ public abstract class Constants {
 	
 	public static final String REFS_HEADS = "refs/heads/";
 	
+	public static final String REFS_TAGS = "refs/tags/";
+	
 	
 	public static final String GIT_RECEIVE_PACK = "git-receive-pack";
 	

@@ -48,8 +48,12 @@ public class TreeController {
 		
 		repo.execute(db -> {
 			if (repo.hasCommits()) {
-				final RevCommit commit = Git.wrap(db).log().add(db.resolve(repoUtils.qualifyBranchName(branch))).setMaxCount(1).call().iterator().next();
-				model.addAttribute("lastCommit", new Commit(commit, repo));
+				try {
+					final RevCommit commit = Git.wrap(db).log().add(db.resolve(branch)).setMaxCount(1).call().iterator().next();
+					model.addAttribute("lastCommit", new Commit(commit, repo));
+				} catch (final Exception e) {
+					
+				}
 				
 				model.addAttribute("branches", db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet());
 				if (file) {

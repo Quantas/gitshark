@@ -14,20 +14,20 @@
    	<div class="panel panel-default" th:if="${repo.commits}">
 		<div class="panel-heading">
 			<h3 class="panel-title">
-				<span style="font-weight: bold;">Branches</span>
+				<span style="font-weight: bold;">Tags</span>
 			</h3>
 		</div>
 		<table class="table table-hover">
-			<tr th:each="branch : ${branches}">
-				<td th:text="${branch}">
+			<tr th:each="tag : ${tags}">
+				<td th:text="${tag}">
 				</td>
 				<td>
-					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/' + ${branch}">tree</a>
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/' + ${tag}">tree</a>
 				</td>
 			</tr>
 		</table>
 	</div>
-	 <a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/branch/create'" class="btn btn-default btn-md" role="button">Create Branch</a>
+	 <a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tag/create'" class="btn btn-default btn-md" role="button">Create Tag</a>
 </div>
 </body>
 </html>

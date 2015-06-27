@@ -65,7 +65,7 @@ public class RepositoryUtilities {
 		
 		try (final RevWalk revWalk = new RevWalk(db); final TreeWalk treeWalk = new TreeWalk(db)) {
 		
-			final RevCommit headCommit = revWalk.parseCommit(db.resolve(qualifyBranchName(branch)));
+			final RevCommit headCommit = revWalk.parseCommit(db.resolve(branch));
 			
 			treeWalk.addTree(headCommit.getTree());
 			treeWalk.setRecursive(false);
@@ -130,7 +130,7 @@ public class RepositoryUtilities {
 		// We only need commit information if this isn't a directory
 		if (!directory) {
 			try (final Git git = new Git(db)) {
-				commit = git.log().add(db.resolve(qualifyBranchName(branch))).addPath(pathString).setMaxCount(1).call().iterator().next();
+				commit = git.log().add(db.resolve(branch)).addPath(pathString).setMaxCount(1).call().iterator().next();
 			} catch (final RevisionSyntaxException | IOException e) {
 				// Something horrible has probably happened, but we don't care really
 			}
@@ -154,9 +154,5 @@ public class RepositoryUtilities {
 		
 		// Add dummy file for navigating backwards
 		return new RepoFile(repo, "", ". .", parent, true, branch, null, null);
-	}
-	
-	public String qualifyBranchName(final String branch) {
-		return Constants.REFS_HEADS + branch;
 	}
 }
