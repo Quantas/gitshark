@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePack;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.jgit.vendor.SmartOutputStream;
 
@@ -38,7 +39,7 @@ public class ReceivePackController {
 		final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		
 		repo.execute(db -> {
-			final ReceivePack rp = new ReceivePack(db);
+			final ReceivePack rp = new GitServerReceivePack(db, repo, user);
 			// TODO replace email with user's email
 			rp.setRefLogIdent(new PersonIdent(user.getUsername(), user.getUsername() + "@" + req.getRemoteHost()));
 			InternalHttpServerGlue.setPeerUserAgent(rp, userAgent);
@@ -60,7 +61,7 @@ public class ReceivePackController {
 	@RequestMapping(value = "/" + Constants.GIT_RECEIVE_PACK, method = RequestMethod.POST, 
 			consumes = Constants.GIT_RECEIVE_PACK_REQUEST, 
 			produces = Constants.GIT_RECEIVE_PACK_RESULT)
-	public void receivePack(final GitRepository repo, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws Exception {
+	public void receivePack(final GitRepository repo, @AuthenticationPrincipal final User user, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws Exception {
 		
 		final int[] version = ClientVersionUtil.parseVersion(userAgent);
 		
@@ -72,7 +73,7 @@ public class ReceivePackController {
 		final SmartOutputStream out = new SmartOutputStream(req, rsp, true);
 		
 		repo.execute(db -> {
-			final ReceivePack rp = new ReceivePack(db);
+			final ReceivePack rp = new GitServerReceivePack(db, repo, user);
 			try {
 				rp.setBiDirectionalPipe(false);
 				rp.setEchoCommandFailures(ClientVersionUtil.hasPushStatusBug(version));
