@@ -26,6 +26,8 @@ public class GitServerReceivePack extends ReceivePack implements PreReceiveHook,
 		this.user = user;
 		setPreReceiveHook(this);
 		setPostReceiveHook(this);
+		// seems strange, but meh, force reflog updates
+		into.getConfig().setBoolean("core", null, "logAllRefUpdates", true);
 	}
 	
 	@Override

@@ -67,7 +67,8 @@ public class FilesystemRepositoryService {
 		final File newRepo = new File(rootFolder, endsWithGit(name));
 		
 		try {
-			Git.init().setGitDir(newRepo).setBare(true).call();
+			final Git repo = Git.init().setGitDir(newRepo).setBare(true).call();
+			repo.getRepository().getConfig().setBoolean("core", null, "logAllRefUpdates", true);
 		} catch (IllegalStateException | GitAPIException e) {
 			throw new RuntimeException(e);
 		}
