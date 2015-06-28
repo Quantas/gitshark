@@ -19,7 +19,7 @@ public class RefLogController {
 	public String branches(final GitRepository repo, final Model model) throws Exception {
 		
 		repo.execute(db -> {
-			model.addAttribute("logs", Git.wrap(db).reflog().call()
+			model.addAttribute("logs", Git.wrap(db).reflog().setRef(db.getBranch()).call()
 					.stream()
 					.map(reflog -> { return new RefLog(reflog, repo); })
 					.collect(Collectors.toList()));
