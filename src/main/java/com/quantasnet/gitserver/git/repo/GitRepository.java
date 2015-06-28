@@ -20,6 +20,7 @@ public class GitRepository implements Comparable<GitRepository> {
 	private final String name;
 	
 	private final String displayName;
+	private final String fullDisplayName;
 	private final String interfaceBaseUrl;
 	
 	private final boolean anonRead;
@@ -35,6 +36,7 @@ public class GitRepository implements Comparable<GitRepository> {
 		this.anonWrite = anonWrite;
 		
 		this.displayName = name.replaceAll("\\" + Constants.DOT_GIT_SUFFIX, "");
+		this.fullDisplayName = getOwner() + '/' + getDisplayName();
 		this.interfaceBaseUrl = getOwner() + '/' + getDisplayName();
 	}
 	
@@ -81,6 +83,10 @@ public class GitRepository implements Comparable<GitRepository> {
 	
 	public String getDisplayName() {
 		return displayName;
+	}
+	
+	public String getFullDisplayName() {
+		return fullDisplayName;
 	}
 	
 	public String getInterfaceBaseUrl() {
