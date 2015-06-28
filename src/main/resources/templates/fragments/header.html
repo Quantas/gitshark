@@ -18,46 +18,47 @@
                 </button>
                 <a class="navbar-brand" th:href="@{/}">Git Server</a>
             </div>
-
-            <ul class="nav navbar-nav">
-                <li>
-                    <a th:href="@{/repo}">Repositories</a>
-                </li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li sec:authorize="!isAuthenticated()">
-                    <a th:href="@{/login}"><i class="fa fa-sign-in fa-fw"></i>&nbsp;&nbsp;Login/Sign Up</a>
-                </li>
-                <li class="dropdown" sec:authorize="hasRole('ROLE_ADMIN')">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <i class="fa fa-rocket fa-fw"></i>&nbsp;&nbsp;Admin
-                        <b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a th:href="@{/admin/system}"><i class="fa fa-home fa-fw"></i>&nbsp;&nbsp;Home</a>
-                        </li>
-                        <li>
-                            <a th:href="@{/admin/users}"><i class="fa fa-users fa-fw"></i>&nbsp;&nbsp;Users</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="dropdown" sec:authorize="isAuthenticated()">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <!--<img th:src="${#authentication.principal.imageUrl}" width="20" />
-                        &nbsp;&nbsp;<span th:text="${#authentication.principal.firstName + ' ' + #authentication.principal.lastName}">User</span>
-                        --><span th:text="${#authentication.name}"></span><b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a id="profile" th:href="@{/profile}"><i class="fa fa-user fa-fw"></i>&nbsp;&nbsp;Profile</a>
-                        </li>
-                        <li>
-                            <a id="logoutLink" href="#"><i class="fa fa-sign-out fa-fw"></i>&nbsp;&nbsp;Logout</a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+			<div class="collapse navbar-collapse navbar-ex1-collapse">
+	            <ul class="nav navbar-nav">
+	                <li>
+	                    <a th:href="@{/repo}">Repositories</a>
+	                </li>
+	            </ul>
+	            <ul class="nav navbar-nav navbar-right">
+	                <li sec:authorize="!isAuthenticated()">
+	                    <a th:href="@{/login}"><i class="fa fa-sign-in fa-fw"></i>&nbsp;&nbsp;Login/Sign Up</a>
+	                </li>
+	                <li class="dropdown" sec:authorize="hasRole('ROLE_ADMIN')">
+	                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+	                        <i class="fa fa-rocket fa-fw"></i>&nbsp;&nbsp;Admin
+	                        <b class="caret"></b>
+	                    </a>
+	                    <ul class="dropdown-menu">
+	                        <li>
+	                            <a th:href="@{/admin/system}"><i class="fa fa-home fa-fw"></i>&nbsp;&nbsp;Home</a>
+	                        </li>
+	                        <li>
+	                            <a th:href="@{/admin/users}"><i class="fa fa-users fa-fw"></i>&nbsp;&nbsp;Users</a>
+	                        </li>
+	                    </ul>
+	                </li>
+	                <li class="dropdown" sec:authorize="isAuthenticated()">
+	                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+	                        <!--<img th:src="${#authentication.principal.imageUrl}" width="20" />
+	                        &nbsp;&nbsp;<span th:text="${#authentication.principal.firstName + ' ' + #authentication.principal.lastName}">User</span>
+	                        --><span th:text="${#authentication.name}"></span><b class="caret"></b>
+	                    </a>
+	                    <ul class="dropdown-menu">
+	                        <li>
+	                            <a id="profile" th:href="@{/profile}"><i class="fa fa-user fa-fw"></i>&nbsp;&nbsp;Profile</a>
+	                        </li>
+	                        <li>
+	                            <a id="logoutLink" href="#"><i class="fa fa-sign-out fa-fw"></i>&nbsp;&nbsp;Logout</a>
+	                        </li>
+	                    </ul>
+	                </li>
+	            </ul>
+            </div>
             
              <div class="collapse navbar-collapse navbar-ex1-collapse" th:if="${repo != null}">
                 <ul class="nav navbar-nav side-nav">
