@@ -3,3 +3,4 @@
 .project
 .settings
 *.db
+hs_err_pid*.log
