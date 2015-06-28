@@ -1,5 +1,6 @@
 package com.quantasnet.gitserver.git.model;
 
+import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.google.common.collect.ComparisonChain;
@@ -37,6 +38,11 @@ public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 		this.url = generateUrl(repo);
 	}
 
+	@Override
+	protected PersonIdent getCommitter() {
+		return commit.getCommitterIdent();
+	}
+	
 	private String generateUrl(final GitRepository repo) {
 		final StringBuilder builder = new StringBuilder();
 		

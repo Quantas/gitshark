@@ -3,6 +3,8 @@ package com.quantasnet.gitserver.git.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.joda.time.DateTime;
 
@@ -14,6 +16,8 @@ public abstract class BaseCommit {
 	private final String commitUrl;
 	private final List<Parent> parents;
 	private final String dateTimeString;
+	
+	protected abstract PersonIdent getCommitter();
 	
 	public BaseCommit(final RevCommit commit, final GitRepository repo) {
 		this.commit = commit;
@@ -49,7 +53,21 @@ public abstract class BaseCommit {
 			return "";
 		}
 		
-		return new DateTime(commit.getCommitterIdent().getWhen().getTime()).toString("yyyy-MM-dd'T'HH:mm:ssZ");
+		return new DateTime(getCommitter().getWhen().getTime()).toString("yyyy-MM-dd'T'HH:mm:ssZ");
+	}
+	
+	public String getCommitterName() {
+		return getCommitter().getName();
+	}
+	
+	public String getCommitterEmail() {
+		return getCommitter().getEmailAddress();
+	}
+	
+	public String getGravatarUrl() {
+		final String email = getCommitter().getEmailAddress();
+		final String theEmail = null == email ? "" : email;
+		return "//www.gravatar.com/avatar/" + DigestUtils.md5Hex(theEmail.trim().toLowerCase()) + "?d=identicon&rating=g";
 	}
 	
 	public RevCommit getCommit() {
