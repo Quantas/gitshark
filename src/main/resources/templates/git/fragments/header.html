@@ -10,7 +10,7 @@
 				<span class="h2" th:text="${repo.owner} + ' / ' + ${repo.displayName}">owner / name</span>
 				&nbsp;&nbsp;
 				<blockquote style="display: inline-block; vertical-align: middle;">
-					<p class="h5" th:text="${checkoutUrl}"></p>
+					<p class="h5 giturl" th:text="${checkoutUrl}"></p>
 				</blockquote>
 			</div>			
 		    <div th:if="${!repo.commits}" layout:include="git/fragments/emptyrepo :: emptyrepo">

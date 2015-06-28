@@ -27,3 +27,7 @@ table,.label,.navbar,pre {
 .merged {
 	color: #cccccc;
 }
+
+.giturl {
+	margin-top: 0;
+}
