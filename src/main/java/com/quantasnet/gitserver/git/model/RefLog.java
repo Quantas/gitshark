@@ -1,38 +1,74 @@
 package com.quantasnet.gitserver.git.model;
 
-import org.eclipse.jgit.lib.CheckoutEntry;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.ReflogEntry;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
 
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
 public class RefLog extends BaseCommit {
 
-	private final ReflogEntry refLogEntry;
+	private final ReflogEntry reflogEntry;
+	private final String message;
 	
-	public RefLog(final ReflogEntry refLogEntry, final GitRepository repo) {
+	public RefLog(final ReflogEntry reflogEntry, final GitRepository repo, final Repository db) {
 		super(null, repo);
-		this.refLogEntry = refLogEntry;
+		this.reflogEntry = reflogEntry;
+		this.message = generateMessage(reflogEntry, db);
 	}
 
+	private String generateMessage(final ReflogEntry reflogEntry, final Repository db) {
+		
+		final StringBuilder output = new StringBuilder();
+		
+		try (final RevWalk revWalk = new RevWalk(db)) {
+			
+			final ObjectId newId = reflogEntry.getNewId();
+			final ObjectId oldId = reflogEntry.getOldId();
+			
+			revWalk.markStart(revWalk.parseCommit(newId));
+			
+			final List<RevCommit> commits = new ArrayList<>();
+			
+			for (final RevCommit commit : revWalk) {
+				if (commit.getId().equals(oldId)) {
+					break;
+				}
+				
+				commits.add(commit);
+			}
+			
+			commits.forEach(commit -> {
+				output
+					.append("commit=")
+					.append(commit.getId().getName())
+					.append(", ");
+			});
+		} catch(final IOException io) {
+			
+		}
+		
+		return output.toString();
+		
+	}
+	
 	@Override
 	protected PersonIdent getCommitter() {
-		return refLogEntry.getWho();
-	}
-
-	/**
-	 * @return textual description of the change
-	 */
-	public String getComment() {
-		return refLogEntry.getComment();
-	}
-
-	/**
-	 * @return a {@link CheckoutEntry} with parsed information about a branch
-	 *         switch, or null if the entry is not a checkout
-	 */
-	public CheckoutEntry parseCheckout() {
-		return refLogEntry.parseCheckout();
+		return reflogEntry.getWho();
 	}
 	
+	public String getMessage() {
+		return message;
+	}
+
+	public String getComment() {
+		return reflogEntry.getComment();
+	}
 }

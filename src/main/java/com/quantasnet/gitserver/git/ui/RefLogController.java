@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.quantasnet.gitserver.git.model.RefLog;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
+
 @RequestMapping("/repo/{repoOwner}/{repoName}/reflog")
 @Controller
 public class RefLogController {
@@ -21,7 +22,7 @@ public class RefLogController {
 		repo.execute(db -> {
 			model.addAttribute("logs", Git.wrap(db).reflog().setRef(db.getBranch()).call()
 					.stream()
-					.map(reflog -> { return new RefLog(reflog, repo); })
+					.map(reflog -> { return new RefLog(reflog, repo, db); })
 					.collect(Collectors.toList()));
 		});
 		
