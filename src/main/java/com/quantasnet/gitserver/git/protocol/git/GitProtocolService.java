@@ -11,7 +11,6 @@ import java.net.Socket;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.transport.PacketLineIn;
-import org.eclipse.jgit.transport.ReceivePack;
 import org.eclipse.jgit.transport.UploadPack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePack;
 import com.quantasnet.gitserver.git.repo.FilesystemRepositoryService;
+import com.quantasnet.gitserver.git.repo.GitRepository;
 
 @Component
 public class GitProtocolService {
@@ -119,7 +119,7 @@ public class GitProtocolService {
 						} else if (Constants.GIT_RECEIVE_PACK.equals(requestedMethod)) {
 							if (gitRepo.isAnonWrite()) {
 								gitRepo.execute(db -> {
-									new ReceivePack(db).receive(input, output, null);
+									new GitServerReceivePack(db, gitRepo, null).receive(input, output, null);
 								});
 							}
 						}
