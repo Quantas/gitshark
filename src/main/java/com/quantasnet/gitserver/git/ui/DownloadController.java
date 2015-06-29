@@ -1,0 +1,107 @@
+package com.quantasnet.gitserver.git.ui;
+
+import java.io.ByteArrayOutputStream;
+
+import org.apache.commons.compress.archivers.ArchiveOutputStream;
+import org.eclipse.jgit.api.ArchiveCommand;
+import org.eclipse.jgit.api.ArchiveCommand.Format;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.archive.Tbz2Format;
+import org.eclipse.jgit.archive.TgzFormat;
+import org.eclipse.jgit.archive.ZipFormat;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.quantasnet.gitserver.git.repo.GitRepository;
+
+@RequestMapping("/repo/{repoOwner}/{repoName}/download")
+@Controller
+public class DownloadController {
+
+	private enum Formats {
+		ZIP("zip", ZipFormat.class),
+		TARGZ("tar.gz", TgzFormat.class),
+		TARBZ2("tar.bz2", Tbz2Format.class);
+
+		private static final Formats[] VALUES = values();
+		
+		private String extension;
+		private Class<?> format;
+		
+		Formats(final String extension, final Class<?> format) {
+			this.extension = extension;
+			this.format = format;
+		}
+		
+		public static Formats getForExtension(final String ext) {
+			for (final Formats format : VALUES) {
+				if (format.extension.equals(ext)) {
+					return format;
+				}
+			}
+			
+			return null;
+		}
+		
+		@SuppressWarnings("unchecked")
+		public Format<ArchiveOutputStream> newInstance() throws Exception {
+			return (Format<ArchiveOutputStream>) format.newInstance();
+		}
+	}
+	
+	@RequestMapping(value = "/{branch}", method = RequestMethod.GET)
+	public ResponseEntity<byte[]> downloadBranch(final GitRepository repo, @PathVariable final String branch, @RequestParam(required = false, defaultValue = "zip") final String format) throws Exception {
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		
+		final Formats formats = Formats.getForExtension(format);
+		
+		final StringBuilder commitId = new StringBuilder();
+		
+		repo.execute(db -> {
+			RevCommit commit = null;
+			try (final RevWalk revWalk = new RevWalk(db)) {
+				commit = revWalk.parseCommit(db.getRef(branch).getObjectId());
+				commitId.append(commit.getId().getName().substring(0, 7));
+			}
+
+			ArchiveCommand.registerFormat(formats.extension, formats.newInstance());
+			
+			Git.wrap(db).archive()
+		    .setTree(db.resolve(branch))
+		    .setFormat(format)
+		    .setOutputStream(out)
+		    .call();
+			
+			ArchiveCommand.unregisterFormat(formats.extension);
+		});
+		
+		final byte[] zipfile = out.toByteArray();
+		
+		final HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+	    headers.set("Content-Disposition", "attachment; filename=" + buildFileName(repo, commitId.toString(), format));
+	    headers.setContentLength(zipfile.length);
+
+	    return new ResponseEntity<byte[]>(zipfile, headers, HttpStatus.OK);
+	}
+	
+	private String buildFileName(final GitRepository repo, final String commitId, final String format) {
+		return new StringBuilder(repo.getOwner())
+			.append('-')
+			.append(repo.getDisplayName())
+			.append('-')
+			.append(commitId)
+			.append('.')
+			.append(format)
+			.toString();
+	}
+}
