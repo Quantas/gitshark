@@ -15,7 +15,6 @@ public abstract class BaseCommit {
 	protected final RevCommit commit;
 	private final String commitUrl;
 	private final List<Parent> parents;
-	private final String dateTimeString;
 	
 	protected abstract PersonIdent getCommitter();
 	
@@ -23,7 +22,6 @@ public abstract class BaseCommit {
 		this.commit = commit;
 		this.commitUrl = buildCommitUrl(repo);
 		this.parents = buildParents(repo);
-		this.dateTimeString = buildDateTimeString();
 	}
 	
 	private String buildCommitUrl(final GitRepository repo) {
@@ -48,11 +46,7 @@ public abstract class BaseCommit {
 		return parents;
 	}
 	
-	private String buildDateTimeString() {
-		if (null == commit) {
-			return "";
-		}
-		
+	public String getDateTimeString() {
 		return new DateTime(getCommitter().getWhen().getTime()).toString("yyyy-MM-dd'T'HH:mm:ssZ");
 	}
 	
@@ -92,9 +86,5 @@ public abstract class BaseCommit {
 	
 	public boolean isMerge() {
 		return parents.size() > 1;
-	}
-	
-	public String getDateTimeString() {
-		return dateTimeString;
 	}
 }

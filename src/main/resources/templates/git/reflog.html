@@ -25,8 +25,13 @@
 	   			<td>
 	   				<time class="timeago" th:attr="datetime=${log.dateTimeString}"></time>
 	   			</td>
-	   			<td th:text="${log.message}">
-	   				Comment
+	   			<td>
+	   				<span th:each="commit : ${log.commits}">
+	   					<a th:href="@{/repo/} + ${commit.commitUrl}" th:text="${commit.shortId}"></a>
+	   					&nbsp;-&nbsp;
+	   					<span th:text="${commit.commit.shortMessage}"></span>
+	   					<br />
+	   				</span>
 				</td>
 	   		</tr>
 	   	</table>

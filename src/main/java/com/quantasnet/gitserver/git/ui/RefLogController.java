@@ -18,14 +18,14 @@ public class RefLogController {
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	public String branches(final GitRepository repo, final Model model) throws Exception {
-		
-		repo.execute(db -> {
-			model.addAttribute("logs", Git.wrap(db).reflog().setRef(db.getBranch()).call()
-					.stream()
-					.map(reflog -> { return new RefLog(reflog, repo, db); })
-					.collect(Collectors.toList()));
-		});
-		
+		if (repo.hasCommits()) {
+			repo.execute(db -> {
+				model.addAttribute("logs", Git.wrap(db).reflog().setRef(db.getBranch()).call()
+						.stream()
+						.map(reflog -> { return new RefLog(reflog, repo, db); })
+						.collect(Collectors.toList()));
+			});
+		}
 		return "git/reflog";
 	}
 	

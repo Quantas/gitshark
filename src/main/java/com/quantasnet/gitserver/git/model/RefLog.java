@@ -16,17 +16,17 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 public class RefLog extends BaseCommit {
 
 	private final ReflogEntry reflogEntry;
-	private final String message;
+	private final List<Commit> commits;
 	
 	public RefLog(final ReflogEntry reflogEntry, final GitRepository repo, final Repository db) {
 		super(null, repo);
 		this.reflogEntry = reflogEntry;
-		this.message = generateMessage(reflogEntry, db);
+		this.commits = generateCommits(reflogEntry, db, repo);
 	}
 
-	private String generateMessage(final ReflogEntry reflogEntry, final Repository db) {
+	private List<Commit> generateCommits(final ReflogEntry reflogEntry, final Repository db, final GitRepository repo) {
 		
-		final StringBuilder output = new StringBuilder();
+		final List<Commit> commits = new ArrayList<>();
 		
 		try (final RevWalk revWalk = new RevWalk(db)) {
 			
@@ -35,28 +35,18 @@ public class RefLog extends BaseCommit {
 			
 			revWalk.markStart(revWalk.parseCommit(newId));
 			
-			final List<RevCommit> commits = new ArrayList<>();
-			
 			for (final RevCommit commit : revWalk) {
 				if (commit.getId().equals(oldId)) {
 					break;
 				}
 				
-				commits.add(commit);
+				commits.add(new Commit(commit, repo));
 			}
-			
-			commits.forEach(commit -> {
-				output
-					.append("commit=")
-					.append(commit.getId().getName())
-					.append(", ");
-			});
 		} catch(final IOException io) {
 			
 		}
 		
-		return output.toString();
-		
+		return commits;
 	}
 	
 	@Override
@@ -64,10 +54,10 @@ public class RefLog extends BaseCommit {
 		return reflogEntry.getWho();
 	}
 	
-	public String getMessage() {
-		return message;
+	public List<Commit> getCommits() {
+		return commits;
 	}
-
+	
 	public String getComment() {
 		return reflogEntry.getComment();
 	}
