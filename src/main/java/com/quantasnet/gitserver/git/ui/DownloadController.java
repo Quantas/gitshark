@@ -26,37 +26,6 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 @RequestMapping("/repo/{repoOwner}/{repoName}/download")
 @Controller
 public class DownloadController {
-
-	private enum Formats {
-		ZIP("zip", ZipFormat.class),
-		TARGZ("tar.gz", TgzFormat.class),
-		TARBZ2("tar.bz2", Tbz2Format.class);
-
-		private static final Formats[] VALUES = values();
-		
-		private String extension;
-		private Class<?> format;
-		
-		Formats(final String extension, final Class<?> format) {
-			this.extension = extension;
-			this.format = format;
-		}
-		
-		public static Formats getForExtension(final String ext) {
-			for (final Formats format : VALUES) {
-				if (format.extension.equals(ext)) {
-					return format;
-				}
-			}
-			
-			return null;
-		}
-		
-		@SuppressWarnings("unchecked")
-		public Format<ArchiveOutputStream> newInstance() throws Exception {
-			return (Format<ArchiveOutputStream>) format.newInstance();
-		}
-	}
 	
 	@RequestMapping(value = "/{branch}", method = RequestMethod.GET)
 	public ResponseEntity<byte[]> downloadBranch(final GitRepository repo, @PathVariable final String branch, @RequestParam(required = false, defaultValue = "zip") final String format) throws Exception {
@@ -88,7 +57,7 @@ public class DownloadController {
 		
 		final HttpHeaders headers = new HttpHeaders();
 	    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-	    headers.set("Content-Disposition", "attachment; filename=" + buildFileName(repo, commitId.toString(), format));
+	    headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + buildFileName(repo, commitId.toString(), format));
 	    headers.setContentLength(zipfile.length);
 
 	    return new ResponseEntity<byte[]>(zipfile, headers, HttpStatus.OK);
@@ -103,5 +72,36 @@ public class DownloadController {
 			.append('.')
 			.append(format)
 			.toString();
+	}
+	
+	private enum Formats {
+		ZIP("zip", ZipFormat.class),
+		TARGZ("tar.gz", TgzFormat.class),
+		TARBZ2("tar.bz2", Tbz2Format.class);
+
+		private static final Formats[] VALUES = values();
+		
+		private String extension;
+		private Class<?> format;
+		
+		Formats(final String extension, final Class<?> format) {
+			this.extension = extension;
+			this.format = format;
+		}
+		
+		public static Formats getForExtension(final String ext) {
+			for (final Formats format : VALUES) {
+				if (format.extension.equals(ext)) {
+					return format;
+				}
+			}
+			
+			return null;
+		}
+		
+		@SuppressWarnings("unchecked")
+		public Format<ArchiveOutputStream> newInstance() throws Exception {
+			return (Format<ArchiveOutputStream>) format.newInstance();
+		}
 	}
 }

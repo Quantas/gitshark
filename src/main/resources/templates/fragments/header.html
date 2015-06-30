@@ -66,6 +66,12 @@
                     	<a th:href="@{/repo/} + ${repo.interfaceBaseUrl}"><i class="fa fa-fw fa-home"></i>&nbsp;Summary</a>
                     </li>
                     <li>
+						<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree'"><i class="fa fa-fw fa-sitemap"></i>&nbsp;Source</a>
+					</li>
+					<li>
+						<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/reflog'"><i class="fa fa-fw fa-tasks"></i>&nbsp;Activity</a>
+					</li>
+                    <li>
 						<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/commits'"><i class="fa fa-fw fa-list-ul"></i>&nbsp;Commits</a>
 					</li>
 					<li>
@@ -73,12 +79,6 @@
 					</li>
 					<li>
 						<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tag'"><i class="fa fa-fw fa-tag"></i>&nbsp;Tags</a>
-					</li>
-					<li>
-						<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree'"><i class="fa fa-fw fa-sitemap"></i>&nbsp;Tree</a>
-					</li>
-					<li>
-						<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/reflog'"><i class="fa fa-fw fa-tasks"></i>&nbsp;Reflog</a>
 					</li>
 					<li>
 						<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/settings'"><i class="fa fa-fw fa-cogs"></i>&nbsp;Settings</a>

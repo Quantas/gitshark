@@ -69,6 +69,6 @@ public class TreeController {
 		if (file) {
 			return "git/file";
 		}
-		return "git/repo";
+		return "git/tree";
 	}
 }

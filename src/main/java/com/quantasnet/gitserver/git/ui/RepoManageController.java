@@ -23,7 +23,7 @@ public class RepoManageController {
 	@RequestMapping
 	public String myRepos(@AuthenticationPrincipal final User user, final Model model) {
 		model.addAttribute("repos", repoService.getRepositories(user.getUsername()));
-		return "git/list";
+		return "git/repos";
 	}
 	
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
