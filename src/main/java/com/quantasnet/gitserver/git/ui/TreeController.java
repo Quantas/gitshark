@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.model.Breadcrumb;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.RepoFile;
@@ -48,14 +46,11 @@ public class TreeController {
 		
 		repo.execute(db -> {
 			if (repo.hasCommits()) {
-				try {
-					final RevCommit commit = Git.wrap(db).log().add(db.resolve(branch)).setMaxCount(1).call().iterator().next();
-					model.addAttribute("lastCommit", new Commit(commit, repo));
-				} catch (final Exception e) {
-					
-				}
+				repoUtils.addRefsToModel(model, db);
 				
-				model.addAttribute("branches", db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet());
+				final RevCommit commit = repoUtils.getRefHeadCommit(branch, db);
+				model.addAttribute("lastCommit", new Commit(commit, repo));
+				
 				if (file) {
 					model.addAttribute("file", repoUtils.getFileToDisplay(repo, db, branch, path));
 				} else {

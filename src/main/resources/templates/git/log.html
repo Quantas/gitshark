@@ -5,6 +5,7 @@
       layout:decorator="layouts/default"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
+	<script type="text/javascript" th:src="@{/js/branchchange-commit.js}"></script>
 </head>
 <body>
 <div layout:fragment="content">
@@ -16,6 +17,10 @@
 			<h3 class="panel-title">
 				<span style="font-weight: bold;">Commits</span>
 			</h3>
+		</div>
+		<div class="panel-heading">
+			<span layout:include="git/fragments/branchpicker :: branchpicker">
+			</span>
 		</div>
     	<table class="table table-hover">
 	   		<tr th:each="commit : ${commits}" th:class="${commit.merge ? 'merged' : ''}">

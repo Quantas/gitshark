@@ -2,12 +2,12 @@ package com.quantasnet.gitserver.git.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
@@ -16,14 +16,21 @@ import org.eclipse.jgit.errors.LargeObjectException;
 import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.revwalk.filter.MaxCountRevFilter;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.treewalk.filter.AndTreeFilter;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
+import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
 import org.springframework.web.servlet.HandlerMapping;
 
+import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
@@ -118,7 +125,7 @@ public class RepositoryUtilities {
 		return files;
 	}
 
-	public RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final String branch, final TreeWalk treeWalk, final boolean customPath, final String pathString, 
+	public RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final String ref, final TreeWalk treeWalk, final boolean customPath, final String pathString, 
 			final boolean directory, final ObjectId objectId) throws GitAPIException, NoHeadException {
 		
 		final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
@@ -128,18 +135,43 @@ public class RepositoryUtilities {
 		
 		// We only need commit information if this isn't a directory
 		if (!directory) {
-			try (final Git git = new Git(db)) {
-				commit = git.log().add(db.resolve(branch)).addPath(pathString).setMaxCount(1).call().iterator().next();
+			try (final RevWalk walk = new RevWalk(db)) {
+				walk.setTreeFilter(AndTreeFilter.create(
+						PathFilterGroup.create(Arrays.asList(PathFilter.create(pathString))), 
+						TreeFilter.ANY_DIFF));
+				walk.setRevFilter(MaxCountRevFilter.create(1));
+				walk.markStart(getRefHeadCommit(ref, db));
+				
+				commit = walk.iterator().next();
 			} catch (final RevisionSyntaxException | IOException e) {
 				// Something horrible has probably happened, but we don't care really
 			}
 		}
 		
-		return new RepoFile(repo, name, parent, directory, branch, objectId.getName(), commit);
+		return new RepoFile(repo, name, parent, directory, ref, objectId.getName(), commit);
 	}
 	
 	public String getFileContents(final Repository db, final ObjectId objectId) throws LargeObjectException, MissingObjectException, IOException {
 		return new String(db.newObjectReader().open(objectId).getBytes());
+	}
+	
+	public RevCommit getRefHeadCommit(final String refString, final Repository db) throws IOException {
+		final Ref branchRef = db.getRefDatabase().getRefs(Constants.REFS_HEADS).get(refString);
+		final Ref tagRef = db.getRefDatabase().getRefs(Constants.REFS_TAGS).get(refString);		
+		final Ref ref = branchRef != null ? branchRef : tagRef != null ? tagRef : null;
+		
+		try (final RevWalk revWalk = new RevWalk(db)) {
+			final Ref peeled = db.peel(ref);
+		    return revWalk.parseCommit(peeled.getObjectId());
+		} catch (final Exception e) {
+			// Something horrible has probably happened, but we don't care really
+		}
+		return null;
+	}
+	
+	public void addRefsToModel(final Model model, final Repository db) throws IOException {
+		model.addAttribute("tags", db.getRefDatabase().getRefs(Constants.REFS_TAGS).keySet());
+		model.addAttribute("branches", db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet());
 	}
 	
 	private RepoFile buildBackwardsNavigationFile(final GitRepository repo, final String pathString, final String branch) {

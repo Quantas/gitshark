@@ -36,40 +36,6 @@
                 });
             });
         </script>
-        <script>
-      		//<![CDATA[
-	        function getParameterByName(name) {
-	            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-	            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-	                results = regex.exec(location.search);
-	            return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-	        }
-	        // ]]>
-        
-			var ogBranch;
-			
-			$(document).ready(function() {
-				ogBranch = $('#branchDropdown').val();
-				$('#branchDropdown').on('change', function() {
-					var path = window.location.pathname;
-					var isFile = getParameterByName('file');
-					
-					if (path.endsWith('/tree')) {
-						var newPath = path + '/' + this.value;
-						if (isFile === 'true') {
-							newPath += '?file=true';
-						}
-						window.location.href = newPath;
-					} else {
-						var newPath = path.replace('/tree/' + ogBranch, '/tree/' + this.value);
-						if (isFile === 'true') {
-							newPath += '?file=true';
-						}
-						window.location.href = newPath;
-					}
-				});
-			});
-		</script>
     </head>
     <body>
     	<div id="wrapper">

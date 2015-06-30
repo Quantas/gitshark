@@ -26,10 +26,12 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.EmptyTreeIterator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.model.Commit;
@@ -43,45 +45,62 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 @Controller
 public class CommitsController {
 
+	@Autowired
+	private RepositoryUtilities repoUtils;
+	
 	@RequestMapping("/commits")
-	public String showLog(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, final Model model) throws Exception {
+	public String showLog(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, @RequestParam(required = false) final String selected, final Model model) throws Exception {
 		repo.execute(db -> {
 			if (repo.hasCommits()) {
 				
-				final Set<String> branches = db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet();
+				repoUtils.addRefsToModel(model, db);
 				
 				final Map<ObjectId, String> branchHeads = new HashMap<>();
 				
-				for (final String branch : branches) {
-					final RevCommit commit = Git.wrap(db).log().add(db.resolve(branch)).setMaxCount(1).call().iterator().next();
-					branchHeads.put(commit.getId(), branch);
+				RevCommit selectedCommit = null;
+				
+				if (null == selected) {
+					final Set<String> branches = db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet();
+					
+					for (final String branch : branches) {
+						final RevCommit commit = Git.wrap(db).log().add(db.resolve(branch)).setMaxCount(1).call().iterator().next();
+						branchHeads.put(commit.getId(), branch);
+					}
+				} else {
+					selectedCommit = repoUtils.getRefHeadCommit(selected, db);
+					branchHeads.put(selectedCommit.getId(), selected);
+					model.addAttribute("branch", selected);
 				}
 				
 				final int maxCount = 20;
 				final List<Commit> commits = new ArrayList<>();
 				
 				try (final RevWalk revWalk = new RevWalk(db)) {
-					final List<RevCommit> headCommits = new ArrayList<>();
-					final Map<String, Ref> refs = db.getRefDatabase().getRefs(ALL);
-					for (Ref ref : refs.values()) {
-						if(!ref.isPeeled()) {
-							ref = db.peel(ref);
+					if (null == selectedCommit) {
+						final List<RevCommit> headCommits = new ArrayList<>();
+						final Map<String, Ref> refs = db.getRefDatabase().getRefs(ALL);
+						for (Ref ref : refs.values()) {
+							if(!ref.isPeeled()) {
+								ref = db.peel(ref);
+							}
+							
+							ObjectId objectId = ref.getPeeledObjectId();
+							if (null == objectId) {
+								objectId = ref.getObjectId();
+							}
+							RevCommit commit = null;
+							try {
+								commit = revWalk.parseCommit(objectId);
+							} catch (MissingObjectException | IncorrectObjectTypeException e) {
+							}
+							if (commit != null) {
+								headCommits.add(commit);
+							}
 						}
-						
-						ObjectId objectId = ref.getPeeledObjectId();
-						if (null == objectId) {
-							objectId = ref.getObjectId();
-						}
-						RevCommit commit = null;
-						try {
-							commit = revWalk.parseCommit(objectId);
-						} catch (MissingObjectException | IncorrectObjectTypeException e) {
-						}
-						if (commit != null) {
-							headCommits.add(commit);
-						}
+						revWalk.markStart(headCommits);
+					} else {
+						revWalk.markStart(selectedCommit);
 					}
-					revWalk.markStart(headCommits);
 					
 					for (final RevCommit rev : revWalk) {
 						commits.add(new Commit(rev, repo, branchHeads.get(rev.getId())));
