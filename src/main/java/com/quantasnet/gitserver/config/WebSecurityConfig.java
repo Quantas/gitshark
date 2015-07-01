@@ -46,7 +46,7 @@ public class WebSecurityConfig {
 		@Override
 		protected void configure(final HttpSecurity http) throws Exception {
 			http
-				.regexMatcher("(\\/repo\\/)(.*)(\\.git)(.*)")
+				.regexMatcher("(\\/repo\\/)(.*)(?=.*\\.git(?!ignore))(.*)")
 				.authorizeRequests()
 					.anyRequest().authenticated()
 				.and()
