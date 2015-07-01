@@ -5,6 +5,13 @@ function getParameterByName(name) {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
+if (!String.prototype.endsWith) {
+	String.prototype.endsWith = function(pattern) {
+		var d = this.length - pattern.length;
+		return d >= 0 && this.lastIndexOf(pattern) === d;
+	};
+}
+
 var ogBranch;
 $(document).ready(function() {
 	ogBranch = $('#branchDropdown').val();
