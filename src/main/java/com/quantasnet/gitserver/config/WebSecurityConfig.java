@@ -24,7 +24,9 @@ import com.quantasnet.gitserver.security.GitServerUserDetailsService;
 
 @Configuration
 public class WebSecurityConfig {
-
+	
+	static final String GIT_HTTP_REGEX = "(\\/repo\\/)(.*)(?=.*\\.git(?!ignore))(.*)"; 
+	
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -46,7 +48,7 @@ public class WebSecurityConfig {
 		@Override
 		protected void configure(final HttpSecurity http) throws Exception {
 			http
-				.regexMatcher("(\\/repo\\/)(.*)(?=.*\\.git(?!ignore))(.*)")
+				.regexMatcher(GIT_HTTP_REGEX)
 				.authorizeRequests()
 					.anyRequest().authenticated()
 				.and()
