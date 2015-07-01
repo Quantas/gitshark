@@ -114,7 +114,7 @@ public class RepositoryUtilities {
 					
 					// if we wanted just a single file, get it's contents for display and get out of here
 					if (file) {
-						repoFile.setFileContents(getFileContents(db, objectId));
+						repoFile.setFileContentsRaw(getFileContents(db, objectId));
 						break;
 					}
 				}
@@ -151,8 +151,8 @@ public class RepositoryUtilities {
 		return new RepoFile(repo, name, parent, directory, ref, objectId.getName(), commit);
 	}
 	
-	public String getFileContents(final Repository db, final ObjectId objectId) throws LargeObjectException, MissingObjectException, IOException {
-		return new String(db.newObjectReader().open(objectId).getBytes());
+	public byte[] getFileContents(final Repository db, final ObjectId objectId) throws LargeObjectException, MissingObjectException, IOException {
+		return db.newObjectReader().open(objectId).getBytes();
 	}
 	
 	public RevCommit getRefHeadCommit(final String refString, final Repository db) throws IOException {

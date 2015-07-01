@@ -21,7 +21,7 @@ public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 	private final String objectId;
 	private final String url;
 	
-	private String fileContents;
+	private byte[] fileContentsRaw;
 
 	public RepoFile(final GitRepository repo, final String name, final String parent, final boolean directory, final String branch, final String objectId, final RevCommit commit) {
 		this(repo, name, name, parent, directory, branch, objectId, commit);
@@ -86,12 +86,16 @@ public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 		return url;
 	}
 	
-	public void setFileContents(String fileContents) {
-		this.fileContents = fileContents;
+	public void setFileContentsRaw(byte[] fileContentsRaw) {
+		this.fileContentsRaw = fileContentsRaw;
+	}
+	
+	public byte[] getFileContentsRaw() {
+		return fileContentsRaw;
 	}
 	
 	public String getFileContents() {
-		return fileContents;
+		return new String(fileContentsRaw);
 	}
 	
 	@Override

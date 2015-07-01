@@ -1,17 +1,23 @@
 package com.quantasnet.gitserver.git.ui;
 
+import java.io.ByteArrayInputStream;
+import java.util.Base64;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.tika.Tika;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.google.common.collect.ImmutableSet;
 import com.quantasnet.gitserver.git.model.Breadcrumb;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.RepoFile;
@@ -21,6 +27,12 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 @Controller
 public class TreeController {
 
+	private static final Set<MediaType> ADDITIONAL_TYPES = new ImmutableSet.Builder<MediaType>()
+			.add(MediaType.APPLICATION_XML)
+			.add(MediaType.APPLICATION_JSON)
+			.add(MediaType.APPLICATION_XHTML_XML)
+			.build();
+	
 	@Autowired
 	private RepositoryUtilities repoUtils;
 	
@@ -52,7 +64,20 @@ public class TreeController {
 				model.addAttribute("lastCommit", new Commit(commit, repo));
 				
 				if (file) {
-					model.addAttribute("file", repoUtils.getFileToDisplay(repo, db, branch, path));
+					final RepoFile repoFile = repoUtils.getFileToDisplay(repo, db, branch, path);
+					
+					final Tika tika = new Tika();
+					final String mediaType = tika.detect(new ByteArrayInputStream(repoFile.getFileContentsRaw()));
+					final MediaType type = MediaType.parseMediaType(mediaType);
+					
+					if (type.getType().equals("image")) {
+						model.addAttribute("mediaType", mediaType);
+						model.addAttribute("base64contents", Base64.getEncoder().encodeToString(repoFile.getFileContentsRaw()));
+					} else if (!type.getType().equals("text") && !ADDITIONAL_TYPES.contains(type)) {
+						model.addAttribute("rawError", "Cannot display file.");
+					}
+					
+					model.addAttribute("file", repoFile);
 				} else {
 					final List<RepoFile> files = repoUtils.getFiles(repo, db, branch, path, false);
 					model.addAttribute("readme", readmeService.resolveReadMeFile(repo, db, files));

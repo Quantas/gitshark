@@ -26,7 +26,7 @@ public class ReadmeFileService {
 			for (final RepoFile file : files) {
 				final String fileName = file.getName();
 				if (fileName.equalsIgnoreCase("readme.md") || fileName.equalsIgnoreCase("readme.markdown")) {
-					final String markdown = repoUtils.getFileContents(db, ObjectId.fromString(file.getObjectId()));
+					final String markdown = new String(repoUtils.getFileContents(db, ObjectId.fromString(file.getObjectId())));
 					return renderMarkdown(markdown);
 				}
 			}

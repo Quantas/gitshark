@@ -73,7 +73,9 @@
   			<div th:if="${file == null}">
     			<h1>File not found!</h1>
     		</div>
-  			<pre class="file" th:if="${file != null}" th:text="${file.fileContents}"></pre>
+    		<img th:if="${mediaType != null}" style="max-width: 100%" th:src="'data:' + ${mediaType} + ';base64,' + ${base64contents}" />
+    		<div class="alert alert-danger" th:if="${rawError != null}" th:text="${rawError}"></div>
+  			<pre class="file" th:if="${file != null and mediaType == null and rawError == null}" th:text="${file.fileContents}"></pre>
 		</div>
 	</div>
 </div>
