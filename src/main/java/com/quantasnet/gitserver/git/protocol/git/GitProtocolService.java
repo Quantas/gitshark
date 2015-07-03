@@ -44,10 +44,12 @@ public class GitProtocolService {
 	
 	private ServerSocket serverSocket;
 	
+	private Thread serviceThread;
+	
 	public void start() throws IOException {
 		serverSocket = new ServerSocket(GIT_PORT, BACKLOG);
 		
-		new Thread("GitProtocolService-Accept") {
+		serviceThread = new Thread("GitProtocolService-Accept") {
 			@Override
 			public void run() {
 				LOG.info("GitProtocolService is running on {}", serverSocket.getLocalSocketAddress());
@@ -58,26 +60,24 @@ public class GitProtocolService {
 					} catch (final InterruptedIOException e) {
 						// nothing
 					} catch (final IOException e) {
+						LOG.info("Stopping GitProtocolService...");
 						break;
 					}
 				}
-				
-				try {
-					serverSocket.close();
-				} catch (final IOException e) {
-					// Don't really care about errors here
-				}
 			};
-		}.start();
+		};
+		
+		serviceThread.start();
 	}
 	
 	public void stop() {
-		LOG.info("Stopping GitProtocolService...");
 		isRunning = false;
+		
 		try {
 			serverSocket.close();
+			serviceThread.join();
 			LOG.info("GitProtocolService stopped");
-		} catch (final IOException e) {
+		} catch (final Exception e) {
 			
 		}
 	}
