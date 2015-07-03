@@ -4,11 +4,14 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +48,11 @@ public class FilesystemRepositoryService {
 		// throw new RepositoryAccessDeniedException();
 	}
 	
+	public List<String> getOwners() {
+		return Arrays.asList(new File(folderUtil.getReposRoot()).listFiles())
+				.stream().map(File::getName).collect(Collectors.toList());
+	}
+	
 	public List<GitRepository> getRepositories(final String owner) {
 		final File rootFolder = folderUtil.getOwnerRootDir(owner);
 		final List<GitRepository> repos = new ArrayList<>();
@@ -68,7 +76,9 @@ public class FilesystemRepositoryService {
 		
 		try {
 			final Git repo = Git.init().setGitDir(newRepo).setBare(true).call();
-			repo.getRepository().getConfig().setBoolean("core", null, "logAllRefUpdates", true);
+			final StoredConfig config = repo.getRepository().getConfig();
+			config.setBoolean("core", null, "logAllRefUpdates", true);
+			config.save();
 		} catch (IllegalStateException | GitAPIException e) {
 			throw new RuntimeException(e);
 		}
