@@ -29,6 +29,9 @@
 					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/commit/' + ${ref.commit.id.name}" th:text="${ref.shortId}">commit</a>
 				</td>
 				<td>
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/' + ${ref.commit.id.name}">tree</a>
+				</td>
+				<td>
 					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/download/' + ${ref.name} + '?format=zip'">zip</a>
 					&nbsp;|&nbsp;
 					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/download/' + ${ref.name} + '?format=tar.gz'">tar.gz</a>
