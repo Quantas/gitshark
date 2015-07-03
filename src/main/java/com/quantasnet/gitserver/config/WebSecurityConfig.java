@@ -80,10 +80,10 @@ public class WebSecurityConfig {
 		private PasswordEncoder passwordEncoder;
 	    
 		@Override
-		public void configure(WebSecurity web) throws Exception {
+		public void configure(final WebSecurity web) throws Exception {
 			web
 				.ignoring()
-					.antMatchers("/webjars/**", "/js/**");
+					.antMatchers("/webjars/**", "/js/**", "/css/**");
 		}
 		
 		@Override
@@ -101,8 +101,12 @@ public class WebSecurityConfig {
 	            .and()
 	                .logout()
 	                .permitAll()
-               .and()
-               .csrf().disable()
+                .and()
+               		.csrf()
+           		.and()
+               		.headers()
+               			.cacheControl().disable()	// set by Filter
+           		.and()
 	                .requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env))
 	            .and()
 	                .sessionManagement().sessionFixation().changeSessionId()
