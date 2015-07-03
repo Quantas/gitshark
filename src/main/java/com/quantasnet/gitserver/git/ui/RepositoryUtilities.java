@@ -31,6 +31,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.servlet.HandlerMapping;
 
 import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.exception.CommitNotFoundException;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
@@ -57,7 +58,7 @@ public class RepositoryUtilities {
 		return path;
 	}
 	
-	public RepoFile getFileToDisplay(final GitRepository repo, final Repository db, final String branch, final String path) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException, GitAPIException {
+	public RepoFile getFileToDisplay(final GitRepository repo, final Repository db, final String branch, final String path) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException, GitAPIException, CommitNotFoundException {
 		final List<RepoFile> files = getFiles(repo, db, branch, path, true);
 		if (!files.isEmpty()) {
 			return files.get(0);
@@ -66,7 +67,7 @@ public class RepositoryUtilities {
 		return null;
 	}
 	
-	public List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String branch, final String path, final boolean file) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException, GitAPIException {
+	public List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String branch, final String path, final boolean file) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException, GitAPIException, CommitNotFoundException {
 		final List<RepoFile> files = new ArrayList<>();
 		
 		try (final RevWalk revWalk = new RevWalk(db); final TreeWalk treeWalk = new TreeWalk(db)) {
@@ -126,7 +127,7 @@ public class RepositoryUtilities {
 	}
 
 	public RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final String ref, final TreeWalk treeWalk, final boolean customPath, final String pathString, 
-			final boolean directory, final ObjectId objectId) throws GitAPIException, NoHeadException {
+			final boolean directory, final ObjectId objectId) throws GitAPIException, NoHeadException, CommitNotFoundException {
 		
 		final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
 		final String parent = pathString.substring(0, pathString.lastIndexOf("/") + 1);
@@ -155,10 +156,19 @@ public class RepositoryUtilities {
 		return db.newObjectReader().open(objectId).getBytes();
 	}
 	
-	public RevCommit getRefHeadCommit(final String refString, final Repository db) throws IOException {
+	public RevCommit getRefHeadCommit(final String refString, final Repository db) throws IOException, CommitNotFoundException {
 		final Ref branchRef = db.getRefDatabase().getRefs(Constants.REFS_HEADS).get(refString);
 		final Ref tagRef = db.getRefDatabase().getRefs(Constants.REFS_TAGS).get(refString);		
 		final Ref ref = branchRef != null ? branchRef : tagRef != null ? tagRef : null;
+
+		// must be a commit id and not a ref
+		if (null == ref) {
+			try (final RevWalk revWalk = new RevWalk(db)) {
+				return revWalk.parseCommit(ObjectId.fromString(refString));
+			} catch (final Exception e) {
+				throw new CommitNotFoundException(refString, e);
+			}
+		}
 		
 		try (final RevWalk revWalk = new RevWalk(db)) {
 			final Ref peeled = db.peel(ref);

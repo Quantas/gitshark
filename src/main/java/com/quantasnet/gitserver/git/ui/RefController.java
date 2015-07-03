@@ -1,6 +1,7 @@
 package com.quantasnet.gitserver.git.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,8 @@ public class RefController {
 			for (final String entry : branchRefs.keySet()) {
 				refs.add(new RefHolder(repoUtils.getRefHeadCommit(entry, db), repo, entry));
 			}
+			
+			Collections.sort(refs);
 			
 			model.addAttribute("refType", type.getName());
 			model.addAttribute("refTitle", StringUtils.capitalize(type.getName()));

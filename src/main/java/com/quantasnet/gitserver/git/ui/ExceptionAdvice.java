@@ -6,12 +6,13 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.quantasnet.gitserver.git.exception.CommitNotFoundException;
 import com.quantasnet.gitserver.git.exception.RepositoryNotFoundException;
 
 @ControllerAdvice("com.quantasnet.gitserver.git.ui")
 public class ExceptionAdvice {
 
-	@ExceptionHandler({ RepositoryNotFoundException.class, IncorrectObjectTypeException.class, IllegalArgumentException.class })
+	@ExceptionHandler({ RepositoryNotFoundException.class, IncorrectObjectTypeException.class, CommitNotFoundException.class, IllegalArgumentException.class })
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public String repoNotFound() {
 		return "forward:/404";
