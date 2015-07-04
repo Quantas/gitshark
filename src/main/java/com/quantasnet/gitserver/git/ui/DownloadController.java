@@ -55,7 +55,7 @@ public class DownloadController {
 			    .call();
 				
 				ArchiveCommand.unregisterFormat(formats.extension);
-			} catch (final GitAPIException | InstantiationException | IllegalAccessException e) {
+			} catch (final GitAPIException | ReflectiveOperationException e) {
 				throw new GitServerErrorException(e);
 			}
 		});
@@ -107,7 +107,7 @@ public class DownloadController {
 		}
 		
 		@SuppressWarnings("unchecked")
-		public Format<ArchiveOutputStream> newInstance() throws IllegalAccessException, InstantiationException {
+		public Format<ArchiveOutputStream> newInstance() throws ReflectiveOperationException {
 			return (Format<ArchiveOutputStream>) format.newInstance();
 		}
 	}

@@ -55,7 +55,7 @@ public class RepositoryUtilities {
 		return path;
 	}
 	
-	public RepoFile getFileToDisplay(final GitRepository repo, final Repository db, final String branch, final String path) throws GitServerException, CommitNotFoundException {
+	public RepoFile getFileToDisplay(final GitRepository repo, final Repository db, final String branch, final String path) throws GitServerException {
 		final List<RepoFile> files = getFiles(repo, db, branch, path, true);
 		if (!files.isEmpty()) {
 			return files.get(0);
@@ -64,7 +64,7 @@ public class RepositoryUtilities {
 		return null;
 	}
 	
-	public List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String branch, final String path, final boolean file) throws GitServerException, CommitNotFoundException {
+	public List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String branch, final String path, final boolean file) throws GitServerException {
 		final List<RepoFile> files = new ArrayList<>();
 		
 		try (final RevWalk revWalk = new RevWalk(db); final TreeWalk treeWalk = new TreeWalk(db)) {
@@ -107,7 +107,7 @@ public class RepositoryUtilities {
 				// If we found the path we were looking for, start lining up the files
 				if (alreadyInside) {
 					final ObjectId objectId = treeWalk.getObjectId(0);
-					final RepoFile repoFile = buildRepoFileObject(repo, db, path, branch, treeWalk, customPath, pathString, directory, objectId); 
+					final RepoFile repoFile = buildRepoFileObject(repo, db, path, branch, customPath, pathString, directory, objectId); 
 					files.add(repoFile);
 					
 					// if we wanted just a single file, get it's contents for display and get out of here
@@ -125,7 +125,7 @@ public class RepositoryUtilities {
 		return files;
 	}
 
-	public RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final String ref, final TreeWalk treeWalk, final boolean customPath, final String pathString, 
+	public RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final String ref, final boolean customPath, final String pathString, 
 			final boolean directory, final ObjectId objectId) throws GitAPIException, CommitNotFoundException {
 		
 		final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
