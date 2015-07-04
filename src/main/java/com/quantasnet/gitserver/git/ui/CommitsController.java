@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.eclipse.jgit.diff.DiffFormatter;
@@ -26,6 +27,8 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.EmptyTreeIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,6 +37,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.exception.GitServerErrorException;
+import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.Diff;
 import com.quantasnet.gitserver.git.repo.GitRepository;
@@ -45,14 +50,15 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 @Controller
 public class CommitsController {
 
+	private static final Logger LOG = LoggerFactory.getLogger(CommitsController.class);
+	
 	@Autowired
 	private RepositoryUtilities repoUtils;
 	
 	@RequestMapping("/commits")
-	public String showLog(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, @RequestParam(required = false) final String selected, final Model model) throws Exception {
+	public String showLog(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, @RequestParam(required = false) final String selected, final Model model) throws GitServerException {
 		repo.execute(db -> {
 			if (repo.hasCommits()) {
-				
 				repoUtils.addRefsToModel(model, db);
 				
 				final Map<ObjectId, String> branchHeads = new HashMap<>();
@@ -63,8 +69,12 @@ public class CommitsController {
 					final Set<String> branches = db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet();
 					
 					for (final String branch : branches) {
-						final RevCommit commit = Git.wrap(db).log().add(db.resolve(branch)).setMaxCount(1).call().iterator().next();
-						branchHeads.put(commit.getId(), branch);
+						try {
+							final RevCommit commit = Git.wrap(db).log().add(db.resolve(branch)).setMaxCount(1).call().iterator().next();
+							branchHeads.put(commit.getId(), branch);
+						} catch (final GitAPIException e) {
+							LOG.error("Error getting head commit for branch {}", branch);
+						}
 					}
 				} else {
 					selectedCommit = repoUtils.getRefHeadCommit(selected, db);
@@ -109,8 +119,6 @@ public class CommitsController {
 						}
 					}
 					model.addAttribute("commits", commits);
-				} catch (Exception e) {
-					
 				}
 			}
 		});
@@ -118,54 +126,59 @@ public class CommitsController {
 	}
 	
 	@RequestMapping(value = "/commit/{commitId}")
-	public String singleCommit(final GitRepository repo, @PathVariable final String commitId, final Model model) throws Exception {
+	public String singleCommit(final GitRepository repo, @PathVariable final String commitId, final Model model) throws GitServerException {
 		if (repo.hasCommits()) {
 			repo.execute(db -> {
-				final RevWalk revWalk = new RevWalk(db);
-				final RevCommit commit = revWalk.parseCommit(ObjectId.fromString(commitId));
-				RevCommit parent;
-				
-				if (commit.getParentCount() > 0) {
-					parent = revWalk.parseCommit(commit.getParent(0).getId());
-				} else {
-					parent = null;
-				}
-				
-				
-				final List<DiffEntry> diff = Git.wrap(db)
-						.diff()
-						.setOldTree(prepareTree(parent, db, revWalk))
-						.setNewTree(prepareTree(commit, db, revWalk))
-						.call();
-				
-				final List<Diff> diffs = new ArrayList<>();
-				
-				for (final DiffEntry entry : diff) {
-		            try (final ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
-		            		final DiffFormatter formatter = new DiffFormatter(baos)) {
-	            		formatter.setRepository(db);
-			            formatter.format(entry);
-			            
-			            final ChangeType changeType = entry.getChangeType();
-			            
-			            diffs.add(
-		            		new Diff(
-	            				baos.toString(), 
-	            				changeType == ChangeType.DELETE ? entry.getOldPath() : entry.getNewPath(), 
-	    						changeType)
-		            		);
-	            	}
-	            }
-	            
-	            model.addAttribute("diffs", diffs);
-	            model.addAttribute("commit", new Commit(commit, repo));
+				try {
+					final RevWalk revWalk = new RevWalk(db);
+					final RevCommit commit = revWalk.parseCommit(ObjectId.fromString(commitId));
+					RevCommit parent;
+					
+					if (commit.getParentCount() > 0) {
+						parent = revWalk.parseCommit(commit.getParent(0).getId());
+					} else {
+						parent = null;
+					}
+					
+					final List<DiffEntry> diff = Git.wrap(db)
+							.diff()
+							.setOldTree(prepareTree(parent, db, revWalk))
+							.setNewTree(prepareTree(commit, db, revWalk))
+							.call();
+					
+					final List<Diff> diffs = new ArrayList<>();
+					
+					for (final DiffEntry entry : diff) {
+			            try (final ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
+			            		final DiffFormatter formatter = new DiffFormatter(baos)) {
+		            		formatter.setRepository(db);
+				            formatter.format(entry);
+				            
+				            final ChangeType changeType = entry.getChangeType();
+				            
+				            diffs.add(
+			            		new Diff(
+		            				baos.toString(), 
+		            				changeType == ChangeType.DELETE ? entry.getOldPath() : entry.getNewPath(), 
+		    						changeType)
+			            		);
+		            	}
+		            }
+		            
+		            model.addAttribute("diffs", diffs);
+		            model.addAttribute("commit", new Commit(commit, repo));
+				} catch (final IllegalArgumentException e) {
+					throw new GitServerException(e);
+	            } catch (final GitAPIException e) {
+            		throw new GitServerErrorException(e);
+            	}
 			});
 		}
 		
 		return "git/commit";
 	}
 	
-	private AbstractTreeIterator prepareTree(final RevCommit commit, final Repository db, final RevWalk revWalk) throws MissingObjectException, IncorrectObjectTypeException, IOException {
+	private AbstractTreeIterator prepareTree(final RevCommit commit, final Repository db, final RevWalk revWalk) throws IncorrectObjectTypeException, IOException {
 		if (null == commit) {
 			return new EmptyTreeIterator();
 		} else {

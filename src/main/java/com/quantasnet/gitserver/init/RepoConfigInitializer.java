@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.exception.ServerInitializerException;
 import com.quantasnet.gitserver.git.repo.FilesystemRepositoryService;
 
@@ -31,7 +32,7 @@ public class RepoConfigInitializer implements Initializer {
 							db.getConfig().save();
 						}
 					});
-				} catch (final Exception e) {
+				} catch (final GitServerException e) {
 					LOG.error("There was a terrible error setting repo configs", e);
 				}
 			})

@@ -1,6 +1,7 @@
 package com.quantasnet.gitserver.git.protocol.http;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.exception.GitServerErrorException;
+import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePack;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.jgit.vendor.SmartOutputStream;
@@ -35,7 +38,7 @@ public class ReceivePackController {
 
 	@RequestMapping(value = "/info/refs", params = "service=" + Constants.GIT_RECEIVE_PACK, method = RequestMethod.GET, 
 			produces = Constants.GIT_RECEIVE_PACK_ADV)
-	public ResponseEntity<byte[]> receivePackAdv(final GitRepository repo, @AuthenticationPrincipal final User user, final HttpServletRequest req, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent) throws Exception {
+	public ResponseEntity<byte[]> receivePackAdv(final GitRepository repo, @AuthenticationPrincipal final User user, final HttpServletRequest req, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent) throws GitServerException {
 		final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		
 		repo.execute(db -> {
@@ -61,12 +64,16 @@ public class ReceivePackController {
 	@RequestMapping(value = "/" + Constants.GIT_RECEIVE_PACK, method = RequestMethod.POST, 
 			consumes = Constants.GIT_RECEIVE_PACK_REQUEST, 
 			produces = Constants.GIT_RECEIVE_PACK_RESULT)
-	public void receivePack(final GitRepository repo, @AuthenticationPrincipal final User user, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws Exception {
+	public void receivePack(final GitRepository repo, @AuthenticationPrincipal final User user, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws GitServerException {
 		
 		final int[] version = ClientVersionUtil.parseVersion(userAgent);
 		
 		if (ClientVersionUtil.hasChunkedEncodingRequestBug(version, req)) {
-			rsp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+			try {
+				rsp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+			} catch (final IOException e) {
+				throw new GitServerErrorException(e);
+			}
 			return;
 		}
 		

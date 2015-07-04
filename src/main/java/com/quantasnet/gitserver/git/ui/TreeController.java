@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.common.collect.ImmutableSet;
+import com.quantasnet.gitserver.git.exception.GitServerErrorException;
+import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.Breadcrumb;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.RepoFile;
@@ -40,16 +42,20 @@ public class TreeController {
 	private ReadmeFileService readmeService;
 	
 	@RequestMapping("/tree")
-	public String displayRepoTreeNoBranch(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, final Model model, final HttpServletRequest req) throws Exception {
+	public String displayRepoTreeNoBranch(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, final Model model, final HttpServletRequest req) throws GitServerException {
 		final StringBuilder builder = new StringBuilder();
 		repo.execute(db -> {
-			builder.append(db.getBranch());
+			try {
+				builder.append(db.getBranch());
+			} catch (final Exception e) {
+				throw new GitServerErrorException(e);
+			}
 		});
 		return displayRepoTree(repo, repoOwner, repoName, builder.toString(), false, model, req);
 	}
 	
 	@RequestMapping("/tree/{branch}/**")
-	public String displayRepoTree(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, @PathVariable final String branch, @RequestParam(required = false) final boolean file, final Model model, final HttpServletRequest req) throws Exception {
+	public String displayRepoTree(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, @PathVariable final String branch, @RequestParam(required = false) final boolean file, final Model model, final HttpServletRequest req) throws GitServerException {
 		final String repoPath = "/repo/" + repoOwner + '/' + repoName + "/tree/" + branch + '/';
 		final String path = repoUtils.resolvePath(req, repoPath, branch);
 		

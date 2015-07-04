@@ -1,6 +1,6 @@
 package com.quantasnet.gitserver.git.exception;
 
-public class CommitNotFoundException extends Exception {
+public class CommitNotFoundException extends GitServerException {
 
 	private static final long serialVersionUID = 1L;
 

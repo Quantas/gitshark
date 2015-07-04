@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}")
@@ -15,7 +16,7 @@ public class SummaryController {
 	private ReadmeFileService readmeService;
 	
 	@RequestMapping({ "", "/" })
-	public String summary(final GitRepository repo, final Model model) throws Exception {
+	public String summary(final GitRepository repo, final Model model) throws GitServerException {
 		repo.execute(db -> {
 			if (repo.hasCommits()) {
 				model.addAttribute("readme", readmeService.resolveReadMeFile(repo, db, db.getBranch()));

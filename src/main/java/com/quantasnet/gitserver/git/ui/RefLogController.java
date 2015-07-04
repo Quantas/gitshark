@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.RefLog;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
@@ -22,10 +23,9 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 public class RefLogController {
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
-	public String branches(final GitRepository repo, final Model model) throws Exception {
+	public String branches(final GitRepository repo, final Model model) throws GitServerException {
 		if (repo.hasCommits()) {
 			repo.execute(db -> {
-				
 				final Set<String> branches = db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet();
 				
 				final List<RefLog> logs = new ArrayList<>();
@@ -44,8 +44,7 @@ public class RefLogController {
 				});
 				
 				Collections.sort(logs);
-				
-				model.addAttribute("logs", logs); 
+				model.addAttribute("logs", logs);
 			});
 		}
 		return "git/reflog";

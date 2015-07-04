@@ -27,6 +27,8 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.exception.CommitNotFoundException;
+import com.quantasnet.gitserver.git.exception.GitServerErrorException;
+import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
@@ -53,7 +55,7 @@ public class RepositoryUtilities {
 		return path;
 	}
 	
-	public RepoFile getFileToDisplay(final GitRepository repo, final Repository db, final String branch, final String path) throws IOException, GitAPIException, CommitNotFoundException {
+	public RepoFile getFileToDisplay(final GitRepository repo, final Repository db, final String branch, final String path) throws GitServerException, CommitNotFoundException {
 		final List<RepoFile> files = getFiles(repo, db, branch, path, true);
 		if (!files.isEmpty()) {
 			return files.get(0);
@@ -62,7 +64,7 @@ public class RepositoryUtilities {
 		return null;
 	}
 	
-	public List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String branch, final String path, final boolean file) throws  IOException, GitAPIException, CommitNotFoundException {
+	public List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String branch, final String path, final boolean file) throws GitServerException, CommitNotFoundException {
 		final List<RepoFile> files = new ArrayList<>();
 		
 		try (final RevWalk revWalk = new RevWalk(db); final TreeWalk treeWalk = new TreeWalk(db)) {
@@ -115,6 +117,8 @@ public class RepositoryUtilities {
 					}
 				}
 			}
+		} catch (final IOException | GitAPIException e) {
+			throw new GitServerErrorException(e);
 		}
 		
 		Collections.sort(files);

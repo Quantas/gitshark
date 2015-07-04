@@ -6,6 +6,7 @@ import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.eclipse.jgit.api.ArchiveCommand;
 import org.eclipse.jgit.api.ArchiveCommand.Format;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.archive.Tbz2Format;
 import org.eclipse.jgit.archive.TgzFormat;
 import org.eclipse.jgit.archive.ZipFormat;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.quantasnet.gitserver.git.exception.GitServerErrorException;
+import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}/download")
@@ -28,7 +31,7 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 public class DownloadController {
 	
 	@RequestMapping(value = "/{branch}", method = RequestMethod.GET)
-	public ResponseEntity<byte[]> downloadBranch(final GitRepository repo, @PathVariable final String branch, @RequestParam(required = false, defaultValue = "zip") final String format) throws Exception {
+	public ResponseEntity<byte[]> downloadBranch(final GitRepository repo, @PathVariable final String branch, @RequestParam(required = false, defaultValue = "zip") final String format) throws GitServerException {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		
 		final Formats formats = Formats.getForExtension(format);
@@ -36,21 +39,25 @@ public class DownloadController {
 		final StringBuilder commitId = new StringBuilder();
 		
 		repo.execute(db -> {
-			RevCommit commit = null;
-			try (final RevWalk revWalk = new RevWalk(db)) {
-				commit = revWalk.parseCommit(db.getRef(branch).getObjectId());
-				commitId.append(commit.getId().getName().substring(0, 7));
+			try {
+				RevCommit commit = null;
+				try (final RevWalk revWalk = new RevWalk(db)) {
+					commit = revWalk.parseCommit(db.getRef(branch).getObjectId());
+					commitId.append(commit.getId().getName().substring(0, 7));
+				}
+	
+				ArchiveCommand.registerFormat(formats.extension, formats.newInstance());
+				
+				Git.wrap(db).archive()
+			    .setTree(db.resolve(branch))
+			    .setFormat(format)
+			    .setOutputStream(out)
+			    .call();
+				
+				ArchiveCommand.unregisterFormat(formats.extension);
+			} catch (final GitAPIException | InstantiationException | IllegalAccessException e) {
+				throw new GitServerErrorException(e);
 			}
-
-			ArchiveCommand.registerFormat(formats.extension, formats.newInstance());
-			
-			Git.wrap(db).archive()
-		    .setTree(db.resolve(branch))
-		    .setFormat(format)
-		    .setOutputStream(out)
-		    .call();
-			
-			ArchiveCommand.unregisterFormat(formats.extension);
 		});
 		
 		final byte[] zipfile = out.toByteArray();
@@ -100,7 +107,7 @@ public class DownloadController {
 		}
 		
 		@SuppressWarnings("unchecked")
-		public Format<ArchiveOutputStream> newInstance() throws Exception {
+		public Format<ArchiveOutputStream> newInstance() throws IllegalAccessException, InstantiationException {
 			return (Format<ArchiveOutputStream>) format.newInstance();
 		}
 	}

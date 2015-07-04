@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
 import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePack;
 import com.quantasnet.gitserver.git.repo.FilesystemRepositoryService;
 import com.quantasnet.gitserver.git.repo.GitRepository;
@@ -119,7 +121,7 @@ public class GitProtocolService {
 								gitRepo.execute(db -> new GitServerReceivePack(db, gitRepo, null).receive(input, output, null));
 							}
 						}
-					} catch (final Exception e) {
+					} catch (final RepositoryAccessDeniedException | GitServerException e) {
 						LOG.error("Probably failed...", e);
 					} finally {
 						IOUtils.closeQuietly(input);
