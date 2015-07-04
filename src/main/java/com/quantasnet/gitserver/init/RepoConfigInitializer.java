@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.quantasnet.gitserver.git.exception.ServerInitializerException;
 import com.quantasnet.gitserver.git.repo.FilesystemRepositoryService;
 
 @Component
@@ -16,7 +17,7 @@ public class RepoConfigInitializer implements Initializer {
 	private FilesystemRepositoryService service;
 	
 	@Override
-	public void init() throws Exception {
+	public void init() throws ServerInitializerException {
 		service.getOwners().forEach(owner -> {
 			service.getRepositories(owner).forEach(repo -> {
 				try {
