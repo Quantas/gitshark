@@ -36,7 +36,7 @@ public class RefLogController {
 					try {
 						logs.addAll(git.reflog().setRef(branch).call()
 							.stream()
-							.map(reflog -> { return new RefLog(reflog, repo, db, branch); })
+							.map(reflog -> new RefLog(reflog, repo, db, branch))
 							.collect(Collectors.toList()));
 					} catch (Exception e) {
 						// nothing here

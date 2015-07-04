@@ -18,10 +18,10 @@ public class ReadmeFileService {
 	private RepositoryUtilities repoUtils;
 	
 	public String resolveReadMeFile(final GitRepository repo, final Repository db, final String branch) throws Exception {
-		return resolveReadMeFile(repo, db, repoUtils.getFiles(repo, db, branch, "", false));
+		return resolveReadMeFile(db, repoUtils.getFiles(repo, db, branch, "", false));
 	}
 	
-	public String resolveReadMeFile(final GitRepository repo, final Repository db, final List<RepoFile> files) throws Exception {
+	public String resolveReadMeFile(final Repository db, final List<RepoFile> files) throws Exception {
 		if (!files.isEmpty()) {
 			for (final RepoFile file : files) {
 				final String fileName = file.getName();

@@ -16,13 +16,13 @@ public abstract class BaseCommit {
 	private final String commitUrl;
 	private final List<Parent> parents;
 	
-	protected abstract PersonIdent getCommitter();
-	
 	public BaseCommit(final RevCommit commit, final GitRepository repo) {
 		this.commit = commit;
 		this.commitUrl = buildCommitUrl(repo);
 		this.parents = buildParents(repo);
 	}
+	
+	protected abstract PersonIdent getCommitter();
 	
 	private String buildCommitUrl(final GitRepository repo) {
 		if (null == commit) {

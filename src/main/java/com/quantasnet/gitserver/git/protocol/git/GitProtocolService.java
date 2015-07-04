@@ -112,15 +112,11 @@ public class GitProtocolService {
 						
 						if (Constants.GIT_UPLOAD_PACK.equals(requestedMethod)) {
 							if (gitRepo.isAnonRead()) {
-								gitRepo.execute(db -> {
-									new UploadPack(db).upload(input, output, null);
-								});
+								gitRepo.execute(db -> new UploadPack(db).upload(input, output, null));
 							}
 						} else if (Constants.GIT_RECEIVE_PACK.equals(requestedMethod)) {
 							if (gitRepo.isAnonWrite()) {
-								gitRepo.execute(db -> {
-									new GitServerReceivePack(db, gitRepo, null).receive(input, output, null);
-								});
+								gitRepo.execute(db -> new GitServerReceivePack(db, gitRepo, null).receive(input, output, null));
 							}
 						}
 					} catch (final Exception e) {

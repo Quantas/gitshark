@@ -18,7 +18,7 @@ public class RepoConfigInitializer implements Initializer {
 	
 	@Override
 	public void init() throws ServerInitializerException {
-		service.getOwners().forEach(owner -> {
+		service.getOwners().forEach(owner -> 
 			service.getRepositories(owner).forEach(repo -> {
 				try {
 					repo.execute(db -> {
@@ -34,8 +34,8 @@ public class RepoConfigInitializer implements Initializer {
 				} catch (final Exception e) {
 					LOG.error("There was a terrible error setting repo configs", e);
 				}
-			});
-		});
+			})
+		);
 	}
 
 	@Override

@@ -9,11 +9,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.errors.AmbiguousObjectException;
-import org.eclipse.jgit.errors.IncorrectObjectTypeException;
-import org.eclipse.jgit.errors.LargeObjectException;
-import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
@@ -58,7 +53,7 @@ public class RepositoryUtilities {
 		return path;
 	}
 	
-	public RepoFile getFileToDisplay(final GitRepository repo, final Repository db, final String branch, final String path) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException, GitAPIException, CommitNotFoundException {
+	public RepoFile getFileToDisplay(final GitRepository repo, final Repository db, final String branch, final String path) throws IOException, GitAPIException, CommitNotFoundException {
 		final List<RepoFile> files = getFiles(repo, db, branch, path, true);
 		if (!files.isEmpty()) {
 			return files.get(0);
@@ -67,7 +62,7 @@ public class RepositoryUtilities {
 		return null;
 	}
 	
-	public List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String branch, final String path, final boolean file) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException, GitAPIException, CommitNotFoundException {
+	public List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String branch, final String path, final boolean file) throws  IOException, GitAPIException, CommitNotFoundException {
 		final List<RepoFile> files = new ArrayList<>();
 		
 		try (final RevWalk revWalk = new RevWalk(db); final TreeWalk treeWalk = new TreeWalk(db)) {
@@ -127,7 +122,7 @@ public class RepositoryUtilities {
 	}
 
 	public RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final String ref, final TreeWalk treeWalk, final boolean customPath, final String pathString, 
-			final boolean directory, final ObjectId objectId) throws GitAPIException, NoHeadException, CommitNotFoundException {
+			final boolean directory, final ObjectId objectId) throws GitAPIException, CommitNotFoundException {
 		
 		final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
 		final String parent = pathString.substring(0, pathString.lastIndexOf("/") + 1);
@@ -152,7 +147,7 @@ public class RepositoryUtilities {
 		return new RepoFile(repo, name, parent, directory, ref, objectId.getName(), commit);
 	}
 	
-	public byte[] getFileContents(final Repository db, final ObjectId objectId) throws LargeObjectException, MissingObjectException, IOException {
+	public byte[] getFileContents(final Repository db, final ObjectId objectId) throws IOException {
 		return db.newObjectReader().open(objectId).getBytes();
 	}
 	

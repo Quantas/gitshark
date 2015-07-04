@@ -80,7 +80,7 @@ public class TreeController {
 					model.addAttribute("file", repoFile);
 				} else {
 					final List<RepoFile> files = repoUtils.getFiles(repo, db, branch, path, false);
-					model.addAttribute("readme", readmeService.resolveReadMeFile(repo, db, files));
+					model.addAttribute("readme", readmeService.resolveReadMeFile(db, files));
 					model.addAttribute("files", files);
 				}
 			}

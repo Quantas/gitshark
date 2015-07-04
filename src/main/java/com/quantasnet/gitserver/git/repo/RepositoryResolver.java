@@ -43,9 +43,7 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 		mavContainer.addAttribute("repo", repo);
 		mavContainer.addAttribute("checkoutUrl", buildCheckoutUrl(request, userName, repo));
 		
-		repo.execute(db -> {
-			repo.setCommits(hasCommits(db));
-		});
+		repo.execute(db -> repo.setCommits(hasCommits(db)));
 		
 		return repo;
 	}
