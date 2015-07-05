@@ -37,8 +37,12 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         registry.addViewController("/503").setViewName("error/503");
     }
 	
-    // TODO: remove @Qualifier and inject by type
-    // See for details: https://github.com/spring-projects/spring-boot/issues/2774
+    /**
+     * See for details: https://github.com/spring-projects/spring-boot/issues/2774
+     *  
+     * @param springSecurityFilterChain
+     * @return
+     */
     @Bean
     public FilterRegistrationBean getSpringSecurityFilterChainBindedToError(
             @Qualifier("springSecurityFilterChain") Filter springSecurityFilterChain) {

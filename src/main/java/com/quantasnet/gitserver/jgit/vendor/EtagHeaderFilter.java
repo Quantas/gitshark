@@ -25,14 +25,14 @@ public class EtagHeaderFilter extends ShallowEtagHeaderFilter {
 	/** 
 	 * Checking for Servlet 3.0+ HttpServletResponse.getHeader(String)
 	 */
-	private static final boolean responseGetHeaderAvailable = ClassUtils.hasMethod(HttpServletResponse.class, "getHeader", String.class);
+	private static final boolean RESPONSE_GET_HEADER_AVAILABLE = ClassUtils.hasMethod(HttpServletResponse.class, "getHeader", String.class);
 	
 	@Override
 	protected boolean isEligibleForEtag(HttpServletRequest request, HttpServletResponse response, int responseStatusCode, InputStream inputStream) {
 
 		if (responseStatusCode >= 200 && responseStatusCode < 300 &&
 				SUPPORTED_METHODS.contains(request.getMethod())) {
-			String cacheControl = (responseGetHeaderAvailable ? response.getHeader(HEADER_CACHE_CONTROL) : null);
+			String cacheControl = RESPONSE_GET_HEADER_AVAILABLE ? response.getHeader(HEADER_CACHE_CONTROL) : null;
 			if (cacheControl == null || !cacheControl.contains(DIRECTIVE_NO_STORE)) {
 				return true;
 			}
