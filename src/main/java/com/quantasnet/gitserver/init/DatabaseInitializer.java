@@ -1,6 +1,7 @@
 package com.quantasnet.gitserver.init;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.quantasnet.gitserver.git.exception.ServerInitializerException;
@@ -10,6 +11,7 @@ import com.quantasnet.gitserver.user.RoleService;
 import com.quantasnet.gitserver.user.User;
 import com.quantasnet.gitserver.user.UserService;
 
+@Order(InitOrdering.DATABASE)
 @Component
 public class DatabaseInitializer implements Initializer {
 

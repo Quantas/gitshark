@@ -3,14 +3,16 @@ package com.quantasnet.gitserver.init;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.exception.ServerInitializerException;
 import com.quantasnet.gitserver.git.repo.FilesystemRepositoryService;
 
+@Order(InitOrdering.REPO_CONFIG)
 @Component
-public class RepoConfigInitializer implements Initializer {
+public class RepoConfigInitializer extends InitializerAdapter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RepoConfigInitializer.class);
 	
@@ -38,9 +40,4 @@ public class RepoConfigInitializer implements Initializer {
 			})
 		);
 	}
-
-	@Override
-	public void stop() {
-	}
-
 }

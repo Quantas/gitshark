@@ -19,9 +19,4 @@ public class GitServerFolderInitalizer extends FolderInitializer {
 		initializeDirectory(folderUtil.getRoot(), "Git Root");
 		initializeDirectory(folderUtil.getReposRoot(), "Git Repos");
 	}
-	
-	@Override
-	public void stop() {
-	}
-
 }

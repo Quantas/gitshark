@@ -28,6 +28,7 @@ public class ServerInitializer implements ApplicationListener<ContextRefreshedEv
 		} else {
 			try {
 				for (final Initializer init : initializers) {
+					LOG.info("Initializing - {}", init.getClass().getSimpleName());
 					init.init();
 				}
 				alreadyInit = true;

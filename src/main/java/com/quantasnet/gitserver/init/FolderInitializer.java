@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.quantasnet.gitserver.git.exception.ServerInitializerException;
 
-public abstract class FolderInitializer implements Initializer {
+public abstract class FolderInitializer extends InitializerAdapter {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
