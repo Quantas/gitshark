@@ -5,7 +5,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.quantasnet.gitserver.git.exception.ServerInitializerException;
-import com.quantasnet.gitserver.register.RegistrationForm;
+import com.quantasnet.gitserver.user.RegistrationForm;
 import com.quantasnet.gitserver.user.Role;
 import com.quantasnet.gitserver.user.RoleService;
 import com.quantasnet.gitserver.user.User;

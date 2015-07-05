@@ -6,7 +6,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Sets;
-import com.quantasnet.gitserver.register.RegistrationForm;
 
 @Service
 public class UserService {

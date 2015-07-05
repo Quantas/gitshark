@@ -1,4 +1,4 @@
-package com.quantasnet.gitserver.register;
+package com.quantasnet.gitserver.user;
 
 import javax.validation.Valid;
 
@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import com.quantasnet.gitserver.user.User;
-import com.quantasnet.gitserver.user.UserService;
 
 @Controller
 @RequestMapping("/register")
@@ -32,7 +29,7 @@ public class RegistrationController {
 			model.addAttribute(REGISTRATION_FORM, new RegistrationForm());
 		}
 		
-		return "register/form";
+		return "register";
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
