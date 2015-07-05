@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.exception.GitServerErrorException;
+import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
 import com.quantasnet.gitserver.git.exception.RepositoryNotFoundException;
 
@@ -70,7 +72,7 @@ public class FilesystemRepositoryService {
 		return repos;
 	}
 	
-	public GitRepository createRepo(final String name, final String owner) throws IOException {
+	public GitRepository createRepo(final String name, final String owner) throws GitServerException {
 		final File rootFolder = folderUtil.getOwnerRootDir(owner);
 		final File newRepo = new File(rootFolder, endsWithGit(name));
 		
@@ -79,8 +81,8 @@ public class FilesystemRepositoryService {
 			final StoredConfig config = repo.getRepository().getConfig();
 			config.setBoolean("core", null, "logAllRefUpdates", true);
 			config.save();
-		} catch (IllegalStateException | GitAPIException e) {
-			throw new RuntimeException(e);
+		} catch (final IOException | IllegalStateException | GitAPIException e) {
+			throw new GitServerErrorException(e);
 		}
 		
 		return new GitRepository(newRepo, owner, name, true, false); // TODO fix

@@ -14,12 +14,12 @@ public abstract class BaseCommit {
 
 	protected final RevCommit commit;
 	private final String commitUrl;
-	private final List<Parent> parents;
+	private final List<Parent> parents = new ArrayList<>();
 	
 	public BaseCommit(final RevCommit commit, final GitRepository repo) {
 		this.commit = commit;
 		this.commitUrl = buildCommitUrl(repo);
-		this.parents = buildParents(repo);
+		buildParents(repo);
 	}
 	
 	protected abstract PersonIdent getCommitter();
@@ -32,9 +32,7 @@ public abstract class BaseCommit {
 		return repo.getInterfaceBaseUrl() + "/commit/" + commit.getId().getName();
 	}
 	
-	private List<Parent> buildParents(final GitRepository repo) {
-		final List<Parent> parents = new ArrayList<>();
-		
+	private void buildParents(final GitRepository repo) {
 		if (null != commit) {
 			if (commit.getParentCount() > 0) {
 				for (final RevCommit parent : commit.getParents()) {
@@ -42,8 +40,6 @@ public abstract class BaseCommit {
 				}
 			}
 		}
-		
-		return parents;
 	}
 	
 	public String getDateTimeString() {

@@ -54,6 +54,6 @@ public class GitServerReceivePack extends ReceivePack implements PreReceiveHook,
 
 	@Override
 	public void onPostReceive(final ReceivePack rp, final Collection<ReceiveCommand> commands) {
-		
+		// nothing here yet
 	}
 }

@@ -83,6 +83,7 @@ public class UploadPackController {
 				out.close();
 
 			} catch (final ServiceMayNotContinueException e) {
+				LOG.error("Service May Not Continue", e);
 				if (e.isOutput()) {
 					ServletUtils.consumeRequestBody(req);
 					out.close();

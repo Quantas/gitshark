@@ -16,25 +16,26 @@ public class Diff {
 	
 	private static final Pattern HUNK_HEADER = Pattern.compile(HUNK_HEADER_REGEX);
 	
-	private final List<Hunk> hunks;
+	private final List<Hunk> hunks = new ArrayList<>();
 	private final String fileName;
 	private final ChangeType changeType;
 	
 	public Diff(final String diffString, final String fileName, final ChangeType changeType) {
-		this.hunks = filterDiffString(diffString);
+		filterDiffString(diffString);
 		this.fileName = fileName;
 		this.changeType = changeType;
 	}
 
-	private List<Hunk> filterDiffString(final String origString) {
+	private void filterDiffString(final String origString) {
 		final int index = origString.indexOf("@@");
 		if (index > -1) {
-			return splitHunks(origString.substring(index));
+			splitHunks(origString.substring(index));
+		} else {
+			splitHunks(origString);
 		}
-		return splitHunks(origString);
 	}
 	
-	private List<Hunk> splitHunks(final String diff) {
+	private void splitHunks(final String diff) {
 		final List<String> hunkContents = 
 				Arrays.asList(diff.split(HUNK_HEADER_REGEX))
 					.stream()
@@ -48,8 +49,6 @@ public class Diff {
 			hunkHeaders.add(matcher.group());
 		}
 		
-		final List<Hunk> hunks = new ArrayList<>();
-		
 		for (int i = 0; i < hunkContents.size(); i++) {
 			if (hunkHeaders.isEmpty()) {
 				hunks.add(new Hunk(null, "Empty File Added"));
@@ -57,8 +56,6 @@ public class Diff {
 				hunks.add(new Hunk(hunkHeaders.get(i), hunkContents.get(i)));
 			}
 		}
-		
-		return hunks;
 	}
 	
 	public int getAdditions() {
