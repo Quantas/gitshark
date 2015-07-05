@@ -1,7 +1,5 @@
 package com.quantasnet.gitserver.git.ui;
 
-import java.io.IOException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -10,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.repo.FilesystemRepositoryService;
 import com.quantasnet.gitserver.user.User;
 
@@ -32,7 +31,7 @@ public class RepoManageController {
 	}
 	
 	@RequestMapping(value = "/create/{repoName}", method = RequestMethod.POST)
-	public String createRepo(@AuthenticationPrincipal final User user, @PathVariable final String repoName) throws IOException {
+	public String createRepo(@AuthenticationPrincipal final User user, @PathVariable final String repoName) throws GitServerException {
 		repoService.createRepo(repoName, user.getUsername());
 		return "redirect:/repo/";
 	}
