@@ -9,9 +9,9 @@ import org.eclipse.jgit.transport.ReceiveCommand;
 import org.eclipse.jgit.transport.ReceivePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.User;
 
 import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.user.User;
 
 public class GitServerReceivePack extends ReceivePack implements PreReceiveHook, PostReceiveHook {
 

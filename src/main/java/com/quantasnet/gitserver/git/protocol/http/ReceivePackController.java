@@ -19,7 +19,6 @@ import org.eclipse.jgit.transport.RefAdvertiser.PacketLineOutRefAdvertiser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +30,7 @@ import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePack;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.jgit.vendor.SmartOutputStream;
+import com.quantasnet.gitserver.user.User;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}.git")
 @Controller

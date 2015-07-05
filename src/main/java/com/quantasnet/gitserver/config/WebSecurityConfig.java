@@ -93,6 +93,7 @@ public class WebSecurityConfig {
 	                .antMatchers("/admin/**").hasRole("ADMIN")
 	                .antMatchers("/management/**").hasRole("ADMIN")
 	                .antMatchers("/404", "/403", "/401", "/503").permitAll()
+	                .antMatchers("/register").anonymous()
 	                .anyRequest().authenticated()
 	            .and()
 	                .formLogin()
