@@ -40,6 +40,11 @@ public abstract class Constants {
 	
 	public static final String OS_USER_HOME = System.getProperty("user.home");
 	
+	
+	public static final String SUCCESS_STATUS = "successStatus";
+	
+	public static final String FAILURE_STATUS = "failureStatus";
+	
 	private Constants() {
 	}
 
