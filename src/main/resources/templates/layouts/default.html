@@ -36,7 +36,7 @@
         <![endif]-->
 
         <style th:if="${repo == null}">
-            #wrapper {
+            .wrapper {
                 padding-left: 0;
             }
         </style>
@@ -55,9 +55,9 @@
         </script>
     </head>
     <body>
-        <div id="wrapper">
+        <div class="wrapper">
             <div id="top" layout:include="fragments/header :: header">Header</div>
-            <div id="page-wrapper">
+            <div class="page-wrapper">
                 <div class="container-fluid">
                     <div th:if="${successStatus != null}" class="alert alert-dismissable alert-success">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>

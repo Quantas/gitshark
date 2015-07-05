@@ -1,19 +1,19 @@
-#wrapper {
+.wrapper {
     padding-left: 0;
 }
 
-#page-wrapper {
+.page-wrapper {
     width: 100%;
     padding: 0;
     background-color: #fff;
 }
 
 @media(min-width:768px) {
-    #wrapper {
+    .wrapper {
         padding-left: 125px;
     }
 
-    #page-wrapper {
+    .page-wrapper {
         padding: 10px;
     }
 }
