@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
 import org.springframework.boot.context.embedded.ErrorPage;
@@ -22,10 +23,8 @@ import com.quantasnet.gitserver.git.repo.RepositoryResolver;
 @Configuration
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
-	@Bean
-	public RepositoryResolver repositoryResolver() {
-		return new RepositoryResolver();
-	}
+	@Autowired
+	private RepositoryResolver repositoryResolver;
 	
 	@Override
     public void addViewControllers(final ViewControllerRegistry registry) {
@@ -65,7 +64,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 	@Override
 	public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> argumentResolvers) {
 		super.addArgumentResolvers(argumentResolvers);
-		argumentResolvers.add(repositoryResolver());
+		argumentResolvers.add(repositoryResolver);
 	}
 	
 }
