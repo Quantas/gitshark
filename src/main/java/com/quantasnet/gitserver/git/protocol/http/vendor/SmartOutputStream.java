@@ -41,7 +41,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.quantasnet.gitserver.jgit.vendor;
+package com.quantasnet.gitserver.git.protocol.http.vendor;
 
 import static org.eclipse.jgit.util.HttpSupport.ENCODING_GZIP;
 import static org.eclipse.jgit.util.HttpSupport.HDR_ACCEPT_ENCODING;

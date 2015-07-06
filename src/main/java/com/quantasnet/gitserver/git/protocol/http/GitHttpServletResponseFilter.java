@@ -1,4 +1,4 @@
-package com.quantasnet.gitserver.jgit;
+package com.quantasnet.gitserver.git.protocol.http;
 
 import java.io.IOException;
 
@@ -24,10 +24,12 @@ public class GitHttpServletResponseFilter implements Filter {
 
 	@Override
 	public void init(final FilterConfig filterConfig) throws ServletException {
+		// nothing here
 	}
 
 	@Override
 	public void destroy() {
+		// nothing here
 	}
 	
 	public static class GitHttpServletResponseWrapper extends HttpServletResponseWrapper {

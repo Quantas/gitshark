@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.protocol.http.vendor.SmartOutputStream;
 import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.jgit.vendor.SmartOutputStream;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}.git")
 @Controller

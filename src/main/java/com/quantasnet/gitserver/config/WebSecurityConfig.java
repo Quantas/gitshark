@@ -55,8 +55,11 @@ public class WebSecurityConfig {
 					.httpBasic()
 				.and()
 					.csrf().disable()
-					.headers().disable()
-            	.requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env))
+					.headers()
+						.defaultsDisabled()
+						.cacheControl().and()
+				.and()
+            		.requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env))
 	            .and()
 	                .sessionManagement().sessionFixation().changeSessionId();
 		}
@@ -106,7 +109,6 @@ public class WebSecurityConfig {
                		.csrf()
            		.and()
                		.headers()
-               			.cacheControl().disable()	// set by Filter
            		.and()
 	                .requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env))
 	            .and()
