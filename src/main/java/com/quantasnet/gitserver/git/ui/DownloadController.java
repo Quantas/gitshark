@@ -67,18 +67,11 @@ public class DownloadController {
 	    headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + buildFileName(repo, commitId.toString(), format));
 	    headers.setContentLength(zipfile.length);
 
-	    return new ResponseEntity<byte[]>(zipfile, headers, HttpStatus.OK);
+	    return new ResponseEntity<>(zipfile, headers, HttpStatus.OK);
 	}
 	
 	private String buildFileName(final GitRepository repo, final String commitId, final String format) {
-		return new StringBuilder(repo.getOwner())
-			.append('-')
-			.append(repo.getDisplayName())
-			.append('-')
-			.append(commitId)
-			.append('.')
-			.append(format)
-			.toString();
+		return repo.getOwner() + '-' + repo.getDisplayName() + '-' + commitId + '.' + format;
 	}
 	
 	private enum Formats {

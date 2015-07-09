@@ -13,7 +13,7 @@ public enum RefType {
 	final String title;
 	final String refs;
 	
-	private RefType(final String name, final String title, final String refs) {
+	RefType(final String name, final String title, final String refs) {
 		this.name = name;
 		this.title = title;
 		this.refs = refs;

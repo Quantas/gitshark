@@ -58,7 +58,7 @@ public class ReceivePackController {
 			}
 		});
 		
-		return new ResponseEntity<byte[]>(buf.toByteArray(), HttpStatus.OK);
+		return new ResponseEntity<>(buf.toByteArray(), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/" + Constants.GIT_RECEIVE_PACK, method = RequestMethod.POST, 
@@ -95,7 +95,6 @@ public class ReceivePackController {
 					rsp.reset();
 					GitSmartHttpTools.sendError(req, rsp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				}
-				return;
 			}
 		});
 	}

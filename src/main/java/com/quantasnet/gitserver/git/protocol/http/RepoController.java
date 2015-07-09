@@ -25,7 +25,7 @@ public class RepoController {
 	@RequestMapping(value = "/" + Constants.HEAD, method = RequestMethod.GET)
 	public ResponseEntity<byte[]> head(final GitRepository repo) throws IOException {
 		final byte[] head = IO.readFully(new File(repo.getFullRepoDirectory(), Constants.HEAD));
-		return new ResponseEntity<byte[]>(head, HttpStatus.OK);
+		return new ResponseEntity<>(head, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/info/refs", method = RequestMethod.GET, produces = Constants.TEXT_PLAIN)
@@ -52,7 +52,7 @@ public class RepoController {
 			adv.send(refs);
 		});
 		
-		return new ResponseEntity<String>(output.toString(), HttpStatus.OK);
+		return new ResponseEntity<>(output.toString(), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "", method = RequestMethod.GET)

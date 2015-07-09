@@ -28,12 +28,7 @@ public class FilesystemRepositoryService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FilesystemRepositoryService.class);
 	
-	private static final FileFilter GIT_ONLY_FILTER = new FileFilter() {
-		@Override
-		public boolean accept(File pathname) {
-			return pathname.getAbsolutePath().endsWith(Constants.DOT_GIT_SUFFIX);
-		}
-	};
+	private static final FileFilter GIT_ONLY_FILTER = pathname -> pathname.getAbsolutePath().endsWith(Constants.DOT_GIT_SUFFIX);
 	
 	@Autowired
 	private RepoFolderUtil folderUtil;

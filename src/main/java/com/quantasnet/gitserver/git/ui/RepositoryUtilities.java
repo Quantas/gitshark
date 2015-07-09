@@ -137,7 +137,7 @@ public class RepositoryUtilities {
 		if (!directory) {
 			try (final RevWalk walk = new RevWalk(db)) {
 				walk.setTreeFilter(AndTreeFilter.create(
-						PathFilterGroup.create(Arrays.asList(PathFilter.create(pathString))), 
+						PathFilterGroup.create(Collections.singletonList(PathFilter.create(pathString))),
 						TreeFilter.ANY_DIFF));
 				walk.setRevFilter(MaxCountRevFilter.create(1));
 				walk.markStart(getRefHeadCommit(ref, db));

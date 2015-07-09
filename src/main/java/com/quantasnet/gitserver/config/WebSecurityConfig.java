@@ -112,8 +112,6 @@ public class WebSecurityConfig {
            		.and()
 	                .requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env))
 	            .and()
-	                .sessionManagement().sessionFixation().changeSessionId()
-	            .and()
 	                .rememberMe().key(KEY).rememberMeServices(rememberMeServices());
 		}
 		

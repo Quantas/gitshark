@@ -49,19 +49,8 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 	}
 	
 	private String buildCheckoutUrl(final HttpServletRequest request, final String userName, final GitRepository repo) {
-		return new StringBuilder()
-			.append(request.getScheme())
-			.append("://")
-			.append(userName)
-			.append('@')
-			.append(request.getServerName())
-			.append(':')
-			.append(request.getServerPort())
-			.append("/repo/")
-			.append(repo.getOwner())
-			.append('/')
-			.append(repo.getName())
-			.toString();
+		return request.getScheme() + "://" + userName + '@' + request.getServerName() + ':' + request.getServerPort() + "/repo/"
+				+ repo.getOwner() + '/' + repo.getName();
 	}
 	
 	private boolean hasCommits(final Repository repository) {

@@ -57,7 +57,7 @@ public class UploadPackController {
 			}
 		});
 		
-		return new ResponseEntity<byte[]>(buf.toByteArray(), HttpStatus.OK);
+		return new ResponseEntity<>(buf.toByteArray(), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/" + Constants.GIT_UPLOAD_PACK, method = RequestMethod.POST, 
@@ -91,7 +91,6 @@ public class UploadPackController {
 					rsp.reset();
 					GitSmartHttpTools.sendError(req, rsp, HttpServletResponse.SC_FORBIDDEN, e.getMessage());
 				}
-				return;
 			} catch (final UploadPackInternalServerErrorException e) {
 				ServletUtils.consumeRequestBody(req);
 				IOUtils.closeQuietly(out);
@@ -102,7 +101,6 @@ public class UploadPackController {
 					rsp.reset();
 					GitSmartHttpTools.sendError(req, rsp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				}
-				return;
 			}
 		});
 	}
