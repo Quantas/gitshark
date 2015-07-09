@@ -1,19 +1,14 @@
 package com.quantasnet.gitserver.init;
 
+import com.quantasnet.gitserver.git.exception.ServerInitializerException;
+import com.quantasnet.gitserver.user.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.quantasnet.gitserver.git.exception.ServerInitializerException;
-import com.quantasnet.gitserver.user.RegistrationForm;
-import com.quantasnet.gitserver.user.Role;
-import com.quantasnet.gitserver.user.RoleService;
-import com.quantasnet.gitserver.user.User;
-import com.quantasnet.gitserver.user.UserService;
-
 @Order(InitOrdering.DATABASE)
 @Component
-public class DatabaseInitializer implements Initializer {
+public class DatabaseInitializer extends InitializerAdapter {
 
 	@Autowired
 	private RoleService roleService;
@@ -50,9 +45,4 @@ public class DatabaseInitializer implements Initializer {
 			userService.updateUser(adminUser);
 		}
 	}
-
-	@Override
-	public void stop() {
-	}
-
 }
