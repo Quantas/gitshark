@@ -21,9 +21,9 @@ public class ExceptionAdvice {
 		return "forward:/404";
 	}
 	
-	@ExceptionHandler({ GitServerErrorException.class })
+	@ExceptionHandler({ GitServerErrorException.class, Exception.class })
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public String serverError(final GitServerErrorException exception) {
+	public String serverError(final Exception exception) {
 		LOG.error("Error loading page", exception);
 		return "forward:/503";
 	}
