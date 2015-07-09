@@ -178,7 +178,7 @@ public class CommitsController {
 		return "git/commit";
 	}
 	
-	private AbstractTreeIterator prepareTree(final RevCommit commit, final Repository db, final RevWalk revWalk) throws IncorrectObjectTypeException, IOException {
+	private AbstractTreeIterator prepareTree(final RevCommit commit, final Repository db, final RevWalk revWalk) throws IOException {
 		if (null == commit) {
 			return new EmptyTreeIterator();
 		} else {
