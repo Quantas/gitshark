@@ -1,4 +1,4 @@
-package com.quantasnet.gitserver.git.ui;
+package com.quantasnet.gitserver.git.service;
 
 import java.io.IOException;
 import java.util.List;

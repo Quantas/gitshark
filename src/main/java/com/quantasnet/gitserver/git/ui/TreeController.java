@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.quantasnet.gitserver.git.service.ReadmeFileService;
+import com.quantasnet.gitserver.git.service.RepositoryUtilities;
 import org.apache.tika.Tika;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;

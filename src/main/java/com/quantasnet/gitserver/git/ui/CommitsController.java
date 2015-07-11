@@ -6,6 +6,7 @@ import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.git.service.CommitService;
 import com.quantasnet.gitserver.git.service.RepoCacheService;
+import com.quantasnet.gitserver.git.service.RepositoryUtilities;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;

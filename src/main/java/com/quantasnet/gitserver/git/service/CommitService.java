@@ -5,7 +5,6 @@ import com.quantasnet.gitserver.git.exception.CommitNotFoundException;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.Diff;
 import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.git.ui.RepositoryUtilities;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;

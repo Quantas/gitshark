@@ -1,8 +1,7 @@
-package com.quantasnet.gitserver.git.ui;
+package com.quantasnet.gitserver.git.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,7 +20,7 @@ import org.eclipse.jgit.treewalk.filter.AndTreeFilter;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
 import org.eclipse.jgit.treewalk.filter.TreeFilter;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -32,7 +31,7 @@ import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
-@Component
+@Service
 public class RepositoryUtilities {
 
 	public  String resolvePath(final HttpServletRequest req, final String repoPath, final String branch) {
