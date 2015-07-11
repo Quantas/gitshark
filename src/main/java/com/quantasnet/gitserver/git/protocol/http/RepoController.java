@@ -1,8 +1,9 @@
 package com.quantasnet.gitserver.git.protocol.http;
 
-import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.git.exception.GitServerException;
-import com.quantasnet.gitserver.git.repo.GitRepository;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.RefDatabase;
 import org.eclipse.jgit.transport.RefAdvertiser;
@@ -14,9 +15,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
+import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.repo.GitRepository;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}.git")
 @Controller

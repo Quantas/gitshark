@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePackFactory;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.transport.PacketLineIn;
 import org.eclipse.jgit.transport.UploadPack;
@@ -17,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
+import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePackFactory;
 import com.quantasnet.gitserver.git.repo.FilesystemRepositoryService;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 

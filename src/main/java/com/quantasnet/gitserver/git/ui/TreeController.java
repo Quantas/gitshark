@@ -7,8 +7,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.quantasnet.gitserver.git.service.ReadmeFileService;
-import com.quantasnet.gitserver.git.service.RepositoryUtilities;
 import org.apache.tika.Tika;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +24,8 @@ import com.quantasnet.gitserver.git.model.Breadcrumb;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.git.service.ReadmeFileService;
+import com.quantasnet.gitserver.git.service.RepositoryUtilities;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}")
 @Controller

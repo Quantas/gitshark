@@ -1,12 +1,11 @@
 package com.quantasnet.gitserver.git.protocol.http;
 
-import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
-import com.quantasnet.gitserver.git.protocol.http.vendor.SmartOutputStream;
-import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePackFactory;
-import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.user.User;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.eclipse.jgit.errors.CorruptObjectException;
 import org.eclipse.jgit.errors.UnpackException;
 import org.eclipse.jgit.http.server.ClientVersionUtil;
@@ -26,10 +25,13 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.exception.GitServerErrorException;
+import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.protocol.http.vendor.SmartOutputStream;
+import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePackFactory;
+import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.user.User;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}.git")
 @Controller

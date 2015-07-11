@@ -1,11 +1,12 @@
 package com.quantasnet.gitserver.git.protocol.hooks.post;
 
-import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.user.User;
+import java.util.Collection;
+
 import org.eclipse.jgit.transport.ReceiveCommand;
 import org.eclipse.jgit.transport.ReceivePack;
 
-import java.util.Collection;
+import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.user.User;
 
 /**
  * Created by andrewlandsverk on 7/11/15.

@@ -1,12 +1,5 @@
 package com.quantasnet.gitserver.git.ui;
 
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
-import com.quantasnet.gitserver.git.model.Commit;
-import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.git.service.CommitService;
-import com.quantasnet.gitserver.git.service.RepoCacheService;
-import com.quantasnet.gitserver.git.service.RepositoryUtilities;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -17,6 +10,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.quantasnet.gitserver.git.exception.GitServerErrorException;
+import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.model.Commit;
+import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.git.service.CommitService;
+import com.quantasnet.gitserver.git.service.RepoCacheService;
+import com.quantasnet.gitserver.git.service.RepositoryUtilities;
 
 /**
  * @author andrewlandsverk

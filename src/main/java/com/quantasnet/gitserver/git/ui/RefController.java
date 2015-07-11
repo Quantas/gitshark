@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.quantasnet.gitserver.git.service.RepositoryUtilities;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.lib.Ref;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.RefHolder;
 import com.quantasnet.gitserver.git.model.RefType;
 import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.git.service.RepositoryUtilities;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}")
 @Controller

@@ -1,10 +1,15 @@
 package com.quantasnet.gitserver.git.service;
 
-import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.git.exception.CommitNotFoundException;
-import com.quantasnet.gitserver.git.model.Commit;
-import com.quantasnet.gitserver.git.model.Diff;
-import com.quantasnet.gitserver.git.repo.GitRepository;
+import static org.eclipse.jgit.lib.RefDatabase.ALL;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -27,11 +32,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.*;
-
-import static org.eclipse.jgit.lib.RefDatabase.ALL;
+import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.exception.CommitNotFoundException;
+import com.quantasnet.gitserver.git.model.Commit;
+import com.quantasnet.gitserver.git.model.Diff;
+import com.quantasnet.gitserver.git.repo.GitRepository;
 
 /**
  * Created by andrewlandsverk on 7/10/15.
