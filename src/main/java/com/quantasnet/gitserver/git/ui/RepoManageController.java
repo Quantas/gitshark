@@ -66,7 +66,7 @@ public class RepoManageController {
 		return "redirect:/repo/" + user.getUserName() + '/' + repoForm.getRepoName();
 	}
 
-	private static class NewRepoForm {
+	static class NewRepoForm {
 
 		@Size(min = 1, max = 200, message = "Repository name must be shorter than 200 characters.")
 		@Pattern(regexp = "^[A-Za-z0-9-]+$", message = "Repository name must not contain special characters or whitespace.")

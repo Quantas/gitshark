@@ -13,6 +13,8 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
  */
 public class RefHolder extends BaseCommit implements Comparable<RefHolder> {
 
+	private static final long serialVersionUID = 1L;
+	
 	private final String name;
 	
 	public RefHolder(final RevCommit commit, final GitRepository repo, final String name) {

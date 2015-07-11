@@ -5,6 +5,8 @@ import java.util.Arrays;
 
 public class Hunk implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private final String header;
 	private final String contents;
 	

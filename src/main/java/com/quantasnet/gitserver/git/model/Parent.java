@@ -6,6 +6,8 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 
 public class Parent implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private final String id;
 	private final String url;
 	

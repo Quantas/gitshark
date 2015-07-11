@@ -6,7 +6,9 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
 public class Commit extends BaseCommit {
-
+	
+	private static final long serialVersionUID = 1L;
+	
 	private final String branchHead;
 	
 	public Commit(final RevCommit commit, final GitRepository repo) {

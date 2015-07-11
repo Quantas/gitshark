@@ -13,6 +13,8 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
  */
 public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 
+	private static final long serialVersionUID = 1L;
+	
 	private final String name;
 	private final String display;
 	private final String parent;

@@ -13,6 +13,8 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 
 public abstract class BaseCommit implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	protected final RevCommit commit;
 	private final String commitUrl;
 	private final List<Parent> parents = new ArrayList<>();
