@@ -16,7 +16,6 @@ import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.git.service.CommitService;
-import com.quantasnet.gitserver.git.service.RepoCacheService;
 import com.quantasnet.gitserver.git.service.RepositoryUtilities;
 
 /**
@@ -31,14 +30,6 @@ public class CommitsController {
 
 	@Autowired
 	private CommitService commitService;
-
-	@Autowired private RepoCacheService repoCacheService;
-
-	@RequestMapping("/clear")
-	public String clear(final GitRepository repo) {
-		repoCacheService.clearCache();
-		return "redirect:/repo";
-	}
 
 	@RequestMapping("/commits")
 	public String showLog(final GitRepository repo, @RequestParam(required = false) final String selected, final Model model) throws GitServerException {

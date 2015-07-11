@@ -23,5 +23,6 @@ public class CacheClearingPostReceiveHook implements GitServerPostReceiveHook {
     @Override
     public void onPostReceive(final ReceivePack rp, final Collection<ReceiveCommand> commands, final User user, final GitRepository repo) {
         repoCacheService.clearCache();
+        repoCacheService.clearCacheForRepo(repo);
     }
 }
