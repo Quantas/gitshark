@@ -1,5 +1,6 @@
 package com.quantasnet.gitserver.git.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import org.joda.time.DateTime;
 
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
-public abstract class BaseCommit {
+public abstract class BaseCommit implements Serializable {
 
 	protected final RevCommit commit;
 	private final String commitUrl;

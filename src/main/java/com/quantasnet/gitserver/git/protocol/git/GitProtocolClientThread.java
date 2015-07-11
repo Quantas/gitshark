@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePackFactory;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.transport.PacketLineIn;
 import org.eclipse.jgit.transport.UploadPack;
@@ -26,11 +27,13 @@ public class GitProtocolClientThread extends Thread {
 	
 	private final Socket socket;
 	private final FilesystemRepositoryService repositoryService;
+	private final GitServerReceivePackFactory receivePackFactory;
 	
-	public GitProtocolClientThread(final Socket socket, final FilesystemRepositoryService repositoryService) {
+	public GitProtocolClientThread(final Socket socket, final FilesystemRepositoryService repositoryService, final GitServerReceivePackFactory receivePackFactory) {
 		super("GitProtocolClient-" + socket.getRemoteSocketAddress().toString());
 		this.socket = socket;
 		this.repositoryService = repositoryService;
+		this.receivePackFactory = receivePackFactory;
 	}
 	
 	@Override
@@ -72,7 +75,7 @@ public class GitProtocolClientThread extends Thread {
 				}
 			} else if (Constants.GIT_RECEIVE_PACK.equals(requestedMethod)) {
 				if (gitRepo.isAnonWrite()) {
-					gitRepo.execute(db -> new GitServerReceivePack(db, gitRepo, null).receive(input, output, null));
+					gitRepo.execute(db -> receivePackFactory.createReceivePack(db, gitRepo, null).receive(input, output, null));
 				}
 			}
 		} catch (final RepositoryAccessDeniedException | GitServerException e) {

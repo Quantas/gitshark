@@ -1,5 +1,6 @@
 package com.quantasnet.gitserver.git.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.stream.Collectors;
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.springframework.util.StringUtils;
 
-public class Diff {
+public class Diff implements Serializable {
 
 	private static final String HUNK_HEADER_REGEX = "(?:@@ )([-+]\\d+),(\\d+) ([+-]\\d+),(\\d+)(?: @@)";
 	

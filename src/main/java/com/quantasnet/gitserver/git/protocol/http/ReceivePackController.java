@@ -1,11 +1,12 @@
 package com.quantasnet.gitserver.git.protocol.http;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.exception.GitServerErrorException;
+import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.protocol.http.vendor.SmartOutputStream;
+import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePackFactory;
+import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.user.User;
 import org.eclipse.jgit.errors.CorruptObjectException;
 import org.eclipse.jgit.errors.UnpackException;
 import org.eclipse.jgit.http.server.ClientVersionUtil;
@@ -16,6 +17,7 @@ import org.eclipse.jgit.transport.InternalHttpServerGlue;
 import org.eclipse.jgit.transport.PacketLineOut;
 import org.eclipse.jgit.transport.ReceivePack;
 import org.eclipse.jgit.transport.RefAdvertiser.PacketLineOutRefAdvertiser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,17 +26,17 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
-import com.quantasnet.gitserver.git.protocol.http.vendor.SmartOutputStream;
-import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePack;
-import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.user.User;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}.git")
 @Controller
 public class ReceivePackController {
+
+	@Autowired
+	private GitServerReceivePackFactory receivePackFactory;
 
 	@RequestMapping(value = "/info/refs", params = "service=" + Constants.GIT_RECEIVE_PACK, method = RequestMethod.GET, 
 			produces = Constants.GIT_RECEIVE_PACK_ADV)
@@ -42,7 +44,7 @@ public class ReceivePackController {
 		final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		
 		repo.execute(db -> {
-			final ReceivePack rp = new GitServerReceivePack(db, repo, user);
+			final ReceivePack rp = receivePackFactory.createReceivePack(db, repo, user);
 			// TODO replace email with user's email
 			rp.setRefLogIdent(new PersonIdent(user.getUsername(), user.getUsername() + "@" + req.getRemoteHost()));
 			InternalHttpServerGlue.setPeerUserAgent(rp, userAgent);
@@ -80,7 +82,7 @@ public class ReceivePackController {
 		final SmartOutputStream out = new SmartOutputStream(req, rsp, true);
 		
 		repo.execute(db -> {
-			final ReceivePack rp = new GitServerReceivePack(db, repo, user);
+			final ReceivePack rp = receivePackFactory.createReceivePack(db, repo, user);
 			try {
 				rp.setBiDirectionalPipe(false);
 				rp.setEchoCommandFailures(ClientVersionUtil.hasPushStatusBug(version));

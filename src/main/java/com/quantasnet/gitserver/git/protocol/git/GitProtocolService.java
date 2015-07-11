@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ServerSocket;
 
+import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePackFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class GitProtocolService {
 	
 	@Autowired
 	private FilesystemRepositoryService repositoryService;
+
+	@Autowired
+	private GitServerReceivePackFactory receivePackFactory;
 	
 	private boolean isRunning = true;
 	
@@ -45,7 +49,7 @@ public class GitProtocolService {
 				
 				while(isRunning) {
 					try {
-						new GitProtocolClientThread(serverSocket.accept(), repositoryService).start();
+						new GitProtocolClientThread(serverSocket.accept(), repositoryService, receivePackFactory).start();
 					} catch (final InterruptedIOException e) {
 						LOG.trace("InterruptedIOException while waiting for clients", e);
 					} catch (final IOException e) {

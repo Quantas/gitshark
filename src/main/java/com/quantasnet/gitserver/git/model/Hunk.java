@@ -1,8 +1,9 @@
 package com.quantasnet.gitserver.git.model;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class Hunk {
+public class Hunk implements Serializable {
 
 	private final String header;
 	private final String contents;

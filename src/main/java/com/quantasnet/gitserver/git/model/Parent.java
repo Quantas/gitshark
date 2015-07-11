@@ -2,7 +2,9 @@ package com.quantasnet.gitserver.git.model;
 
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
-public class Parent {
+import java.io.Serializable;
+
+public class Parent implements Serializable {
 
 	private final String id;
 	private final String url;

@@ -1,59 +1,45 @@
 package com.quantasnet.gitserver.git.protocol.packs;
 
-import java.util.Collection;
-
+import com.quantasnet.gitserver.git.protocol.hooks.post.GitServerPostReceiveHook;
+import com.quantasnet.gitserver.git.protocol.hooks.pre.GitServerPreReceiveHook;
+import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.user.User;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.PostReceiveHook;
 import org.eclipse.jgit.transport.PreReceiveHook;
 import org.eclipse.jgit.transport.ReceiveCommand;
 import org.eclipse.jgit.transport.ReceivePack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.user.User;
+import java.util.Collection;
+import java.util.List;
 
 public class GitServerReceivePack extends ReceivePack implements PreReceiveHook, PostReceiveHook {
 
-	private static final Logger LOG = LoggerFactory.getLogger("GitServerReceive");
-	
 	private final GitRepository repo;
 	private final User user;
+
+	private final List<GitServerPreReceiveHook> preReceiveHooks;
+	private final List<GitServerPostReceiveHook> postReceiveHooks;
 	
-	public GitServerReceivePack(final Repository into, final GitRepository repo, final User user) {
+	public GitServerReceivePack(final Repository into, final GitRepository repo, final User user,
+			final List<GitServerPreReceiveHook> preReceiveHooks, final List<GitServerPostReceiveHook> postReceiveHooks) {
 		super(into);
 		this.repo = repo;
 		this.user = user;
+		this.preReceiveHooks = preReceiveHooks;
+		this.postReceiveHooks = postReceiveHooks;
+
 		setPreReceiveHook(this);
 		setPostReceiveHook(this);
 	}
 	
 	@Override
 	public void onPreReceive(final ReceivePack rp, final Collection<ReceiveCommand> commands) {
-		final String username = user == null ? "anon" : user.getUsername();
-		
-		commands.forEach(command -> {
-			switch(command.getType()) {
-			case CREATE:
-				LOG.info("{} - CREATE {} by {}", repo.getFullDisplayName(), command.getNewId().getName(), username);
-				break;
-			case DELETE:
-				LOG.info("{} - DELETE {} by {}", repo.getFullDisplayName(), command.getOldId().getName(), username);
-				break;
-			case UPDATE:
-				LOG.info("{} - UPDATE Old={}, New={} by {}", repo.getFullDisplayName(), command.getOldId().getName(), command.getNewId().getName(), username);
-				break;
-			case UPDATE_NONFASTFORWARD:
-				LOG.info("{} - UPDATE NON FF Old={}, New={} by {}", repo.getFullDisplayName(), command.getOldId().getName(), command.getNewId().getName(), username);
-				break;
-			default:
-				break;
-			}
-		});
+		preReceiveHooks.forEach(receiveHook -> receiveHook.onPreReceive(rp, commands, user, repo));
 	}
 
 	@Override
 	public void onPostReceive(final ReceivePack rp, final Collection<ReceiveCommand> commands) {
-		// nothing here yet
+		postReceiveHooks.forEach(receiveHook -> receiveHook.onPostReceive(rp, commands, user, repo));
 	}
 }
