@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.StoredConfig;
@@ -81,6 +82,17 @@ public class FilesystemRepositoryService {
 		}
 		
 		return new GitRepository(newRepo, owner, name, true, false); // TODO fix
+	}
+	
+	public boolean deleteRepo(final GitRepository repo) {
+		// TODO check ownership/permissions here
+		try {
+			FileUtils.deleteDirectory(repo.getFullRepoDirectory());
+			return true;
+		} catch (final IOException e) {
+			LOG.error("Error deleting repo {}", repo.getFullRepoDirectory(), e);
+			return false;
+		}
 	}
 	
 	private String endsWithGit(final String name) {
