@@ -73,7 +73,7 @@ public class CommitService {
             branchHeads.put(selectedCommit.getId(), selected);
         }
 
-        final int maxCount = 20;
+        final int maxCount = 50;
         final List<Commit> commits = new ArrayList<>();
 
         try (final RevWalk revWalk = new RevWalk(db)) {
