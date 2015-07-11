@@ -60,7 +60,7 @@ public class CommitService {
                     final RevCommit commit = Git.wrap(db).log().add(db.resolve(branch)).setMaxCount(1).call().iterator().next();
                     branchHeads.put(commit.getId(), branch);
                 } catch (final GitAPIException e) {
-                    LOG.error("Error getting head commit for branch {}", branch);
+                    LOG.error("Error getting head commit for branch {}", branch, e);
                 }
             }
         } else {

@@ -1,9 +1,8 @@
 package com.quantasnet.gitserver.git.protocol.http;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-
+import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.repo.GitRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.RefDatabase;
 import org.eclipse.jgit.transport.RefAdvertiser;
@@ -15,8 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.git.repo.GitRepository;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}.git")
 @Controller
@@ -29,7 +29,7 @@ public class RepoController {
 	}
 	
 	@RequestMapping(value = "/info/refs", method = RequestMethod.GET, produces = Constants.TEXT_PLAIN)
-	public ResponseEntity<String> infoRefs(final GitRepository repo) throws Exception {
+	public ResponseEntity<String> infoRefs(final GitRepository repo) throws GitServerException {
 		final StringBuilder output = new StringBuilder();
 		
 		repo.execute(db -> {
@@ -41,6 +41,7 @@ public class RepoController {
 
 				@Override
 				protected void end() {
+					// nothing here
 				}
 			};
 			

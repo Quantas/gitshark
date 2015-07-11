@@ -29,7 +29,7 @@ public class ReadmeFileService {
 			if (!files.isEmpty()) {
 				for (final RepoFile file : files) {
 					final String fileName = file.getName();
-					if (fileName.equalsIgnoreCase("readme.md") || fileName.equalsIgnoreCase("readme.markdown")) {
+					if ("readme.md".equalsIgnoreCase(fileName) || "readme.markdown".equalsIgnoreCase(fileName)) {
 						final String markdown = new String(repoUtils.getFileContents(db, ObjectId.fromString(file.getObjectId())));
 						return renderMarkdown(markdown);
 					}
