@@ -38,6 +38,7 @@
 	   					<span th:text="${commit.commit.shortMessage}"></span>
 	   					<br />
 	   				</span>
+	   				<span th:if="${log.totalCommitCount gt 4}" th:text="${log.totalCommitCount} + ' total commits'"></span>
 				</td>
 	   		</tr>
 	   	</table>

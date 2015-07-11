@@ -21,20 +21,23 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
  */
 public class RefLog extends BaseCommit implements Comparable<RefLog> {
 
+	private static final long serialVersionUID = 1L;
+	
 	private final List<Commit> commits = new ArrayList<>();
+	private final long totalCommitCount;
 	private final String branch;
 	private final PersonIdent committer;
 	private final String comment;
 	
 	public RefLog(final ReflogEntry reflogEntry, final GitRepository repo, final Repository db, final String branch) throws IOException {
 		super(null, repo);
-		generateCommits(reflogEntry, db, repo);
+		this.totalCommitCount = generateCommits(reflogEntry, db, repo);
 		this.branch = branch;
 		this.committer = reflogEntry.getWho();
-		this.comment = reflogEntry.getComment();
+		this.comment = parseCommentString(reflogEntry.getComment());
 	}
 
-	private void generateCommits(final ReflogEntry reflogEntry, final Repository db, final GitRepository repo) throws IOException {
+	private long generateCommits(final ReflogEntry reflogEntry, final Repository db, final GitRepository repo) throws IOException {
 		try (final RevWalk revWalk = new RevWalk(db)) {
 			
 			final ObjectId newId = reflogEntry.getNewId();
@@ -42,14 +45,37 @@ public class RefLog extends BaseCommit implements Comparable<RefLog> {
 			
 			revWalk.markStart(revWalk.parseCommit(newId));
 			
+			long commitCount = 0;
+			
 			for (final RevCommit commit : revWalk) {
 				if (commit.getId().equals(oldId)) {
 					break;
 				}
 				
-				commits.add(new Commit(commit, repo));
+				if (commitCount < 4) {
+					commits.add(new Commit(commit, repo));
+				}
+				
+				commitCount++;
 			}
+			
+			return commitCount;
 		}
+	}
+	
+	private String parseCommentString(final String comment) {
+		final String branchFromOldBranch = "branch: Created from branch";
+		
+		if ("push: created".equals(comment)) {
+			return "Pushed New Branch " + branch;
+		} else if ("push: forced-update".equals(comment)) {
+			return "Pushed " + totalCommitCount + " commits to " + branch;
+		} else if (comment.startsWith(branchFromOldBranch)) {
+			final String oldBranch = comment.substring(branchFromOldBranch.length());
+			return "Created New Branch " + branch + " from " + oldBranch;
+		}
+		
+		return comment;
 	}
 	
 	@Override
@@ -69,6 +95,10 @@ public class RefLog extends BaseCommit implements Comparable<RefLog> {
 		return branch;
 	}
 
+	public long getTotalCommitCount() {
+		return totalCommitCount;
+	}
+	
 	@Override
 	public int compareTo(final RefLog right) {
 		return ComparisonChain.start()
