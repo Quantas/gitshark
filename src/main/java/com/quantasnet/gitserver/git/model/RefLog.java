@@ -21,15 +21,17 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
  */
 public class RefLog extends BaseCommit implements Comparable<RefLog> {
 
-	private final ReflogEntry reflogEntry;
 	private final List<Commit> commits = new ArrayList<>();
 	private final String branch;
+	private final PersonIdent committer;
+	private final String comment;
 	
 	public RefLog(final ReflogEntry reflogEntry, final GitRepository repo, final Repository db, final String branch) throws IOException {
 		super(null, repo);
-		this.reflogEntry = reflogEntry;
 		generateCommits(reflogEntry, db, repo);
 		this.branch = branch;
+		this.committer = reflogEntry.getWho();
+		this.comment = reflogEntry.getComment();
 	}
 
 	private void generateCommits(final ReflogEntry reflogEntry, final Repository db, final GitRepository repo) throws IOException {
@@ -52,7 +54,7 @@ public class RefLog extends BaseCommit implements Comparable<RefLog> {
 	
 	@Override
 	protected PersonIdent getCommitter() {
-		return reflogEntry.getWho();
+		return committer;
 	}
 	
 	public List<Commit> getCommits() {
@@ -60,7 +62,7 @@ public class RefLog extends BaseCommit implements Comparable<RefLog> {
 	}
 	
 	public String getComment() {
-		return reflogEntry.getComment();
+		return comment;
 	}
 	
 	public String getBranch() {

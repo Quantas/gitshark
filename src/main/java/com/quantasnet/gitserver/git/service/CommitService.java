@@ -47,6 +47,8 @@ public class CommitService {
 
     @Cacheable(cacheNames = RepoCacheService.ALL_COMMITS, key = "{ #repo.fullDisplayName, #selected }")
     public List<Commit> getCommits(final GitRepository repo, final String selected, final Repository db) throws IOException, CommitNotFoundException {
+        LOG.info("Cache Miss - {}, {}", repo.getFullDisplayName(), selected);
+
         final Map<ObjectId, String> branchHeads = new HashMap<>();
 
         RevCommit selectedCommit = null;
@@ -87,6 +89,7 @@ public class CommitService {
                     try {
                         commit = revWalk.parseCommit(objectId);
                     } catch (MissingObjectException | IncorrectObjectTypeException e) {
+                        LOG.trace("Exception while parsing what should have been a known objectid {}", objectId, e);
                     }
                     if (commit != null) {
                         headCommits.add(commit);
