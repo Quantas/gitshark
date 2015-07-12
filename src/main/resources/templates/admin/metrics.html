@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/default">
+<head>
+</head>
+<body>
+<div layout:fragment="content">
+	<div class="panel panel-default">
+	    <div class="panel-heading">
+	        <h1 class="panel-title">
+	        	<span style="font-weight: bold;">Runtime Metrics</span>
+	        </h1>
+	    </div>
+	    <div class="panel-body">
+			<div class="row">
+			    <div class="col-md-4">
+			        <b>Memory</b>
+			        <p><span>Total Memory</span><span th:text="'(' + ${#numbers.formatInteger(gauges['jvm.memory.total.used'].value / 1000000, 0)} + 'M / ' + ${#numbers.formatInteger(gauges['jvm.memory.total.max'].value / 1000000, 0)} + 'M)'"></span></p>
+			        <div class="progress">
+			            <div class="progress-bar progress-bar-success" role="progressbar"
+			                 th:style="'width: ' + ${gauges['jvm.memory.total.used'].value} * 100 / ${gauges['jvm.memory.total.max'].value} + '%'">
+			                <span th:text="${#numbers.formatInteger(gauges['jvm.memory.total.used'].value * 100 / gauges['jvm.memory.total.max'].value, 0)} + '%'"></span>
+			            </div>
+			        </div>
+			        <p><span>Heap Memory</span><span th:text="'(' + ${#numbers.formatInteger(gauges['jvm.memory.heap.used'].value / 1000000, 0)} + 'MB / ' + ${#numbers.formatInteger(gauges['jvm.memory.heap.max'].value / 1000000, 0)} + 'MB)'"></span></p>
+			        <div class="progress">
+			            <div class="progress-bar progress-bar-success" role="progressbar"
+			                 th:style="'width: ' + ${gauges['jvm.memory.heap.usage'].value} * 100 + '%'">
+			                <span th:text="${#numbers.formatInteger(gauges['jvm.memory.heap.usage'].value * 100, 0)} + '%'"></span>
+			            </div>
+			        </div>
+			        <p><span>Non-Heap Memory</span><span th:text="'(' + ${#numbers.formatInteger(gauges['jvm.memory.non-heap.used'].value / 1000000, 0)} + 'MB / ' + ${#numbers.formatInteger(gauges['jvm.memory.non-heap.committed'].value / 1000000, 0)} + 'MB)'"></span></p>
+			        <div class="progress">
+			            <div class="progress-bar progress-bar-success" role="progressbar"
+			                 th:style="'width: ' + ${gauges['jvm.memory.non-heap.committed'].value} / 1000000 + '%'">
+			                <span th:text="${#numbers.formatInteger(gauges['jvm.memory.non-heap.used'].value * 100 / gauges['jvm.memory.non-heap.committed'].value, 0)} + '%'"></span>
+			            </div>
+			        </div>
+			    </div>
+			    <div class="col-md-4">
+			        <strong>Threads </strong><span th:text="'(Total: ' + ${gauges['jvm.threads.count'].value} + ')'"></span>
+			        <p><span>Runnable </span><span th:text="${gauges['jvm.threads.runnable.count'].value}"></span></p>
+			        <div class="progress">
+			            <div class="progress-bar progress-bar-success" role="progressbar"
+			                 th:style="'width: ' + ${gauges['jvm.threads.runnable.count'].value} * 100 / ${gauges['jvm.threads.count'].value} + '%'">
+			                <span th:text="${#numbers.formatInteger(gauges['jvm.threads.runnable.count'].value * 100 / gauges['jvm.threads.count'].value, 0)} + '%'"></span>
+			            </div>
+			        </div>
+			        <p><span>Timed Waiting </span><span th:text="${gauges['jvm.threads.timed_waiting.count'].value}"></span></p>
+			        <div class="progress">
+			            <div class="progress-bar progress-bar-warning" role="progressbar"
+			                 th:style="'width: ' + ${gauges['jvm.threads.timed_waiting.count'].value} * 100 / ${gauges['jvm.threads.count'].value} + '%'">
+			                <span th:text="${#numbers.formatInteger(gauges['jvm.threads.timed_waiting.count'].value * 100 / gauges['jvm.threads.count'].value, 0)} + '%'"></span>
+			            </div>
+			        </div>
+			        <p><span>Waiting </span><span th:text="${gauges['jvm.threads.waiting.count'].value}"></span></p>
+			        <div class="progress">
+			            <div class="progress-bar progress-bar-warning" role="progressbar"
+			                 th:style="'width: ' + ${gauges['jvm.threads.waiting.count'].value} * 100 / ${gauges['jvm.threads.count'].value} + '%'">
+			                <span th:text="${#numbers.formatInteger(gauges['jvm.threads.waiting.count'].value * 100 / gauges['jvm.threads.count'].value, 0)} + '%'"></span>
+			            </div>
+			        </div>
+			        <p><span>Blocked </span><span th:text="${gauges['jvm.threads.blocked.count'].value}"></span></p>
+			        <div class="progress">
+			            <div class="progress-bar progress-bar-danger" role="progressbar"
+			                 th:style="'width: ' + ${gauges['jvm.threads.blocked.count'].value} * 100 / ${gauges['jvm.threads.count'].value} + '%'">
+			                <span th:text="${#numbers.formatInteger(gauges['jvm.threads.blocked.count'].value * 100 / gauges['jvm.threads.count'].value, 0)} + '%'"></span>
+			            </div>
+			        </div>
+			    </div>
+			    <div class="col-md-4">
+			        <strong>Garbage Collection</strong>
+			        <div class="row">
+			            <div class="col-md-9">Mark Sweep count</div>
+			            <div class="col-md-3 text-right" th:text="${gauges['jvm.gc.PS-MarkSweep.count'].value}"></div>
+			        </div>
+			        <div class="row">
+			            <div class="col-md-9">Mark Sweep time</div>
+			            <div class="col-md-3 text-right" th:text="${gauges['jvm.gc.PS-MarkSweep.time'].value} + 'ms'"></div>
+			        </div>
+			        <div class="row">
+			            <div class="col-md-9">Scavenge count</div>
+			            <div class="col-md-3 text-right" th:text="${gauges['jvm.gc.PS-Scavenge.count'].value}"></div>
+			        </div>
+			        <div class="row">
+			            <div class="col-md-9">Scavenge time</div>
+			            <div class="col-md-3 text-right" th:text="${gauges['jvm.gc.PS-Scavenge.time'].value} + 'ms'"></div>
+			        </div>
+			        <br />
+			        <br />
+			        <strong>JVM Information</strong>
+			        <div class="row">
+			        	<div class="col-md-9">Uptime</div>
+			        	<div class="col-md-3 text-right"></div>
+			        </div>
+			        <div class="row">
+			        	<div class="col-md-9">Version</div>
+			        	<div class="col-md-3 text-right"></div>
+			        </div>
+			    </div>
+			</div>
+	    </div>
+	</div>
+	
+	<div class="panel panel-default">
+	    <div class="panel-heading">
+	        <h1 class="panel-title">
+	        	<span style="font-weight: bold;">HTTP Metrics</span>
+	        </h1>
+	    </div>
+	    <div class="panel-body">
+	    	<p><span>Active requests</span> <strong th:text="${counters['com.codahale.metrics.servlet.InstrumentedFilter.activeRequests'].count}"></strong>
+	    	&nbsp;-&nbsp;<span>Total requests</span> <strong th:text="${timers['com.codahale.metrics.servlet.InstrumentedFilter.requests'].count}"></strong></p>
+			<div class="table-responsive">
+			    <table class="table table-striped">
+			        <thead>
+			        <tr>
+			            <th>Code</th>
+			            <th>Count</th>
+			            <th class="text-right">Mean</th>
+			            <th class="text-right"><span>Average</span> (1 min)</th>
+			            <th class="text-right"><span>Average</span> (5 min)</th>
+			            <th class="text-right"><span>Average</span> (15 min)</th>
+			        </tr>
+			        </thead>
+			        <tbody>
+			        <tr>
+			            <td>OK</td>
+			            <td>
+			                <div class="progress">
+			                    <div class="progress-bar progress-bar-success" role="progressbar"
+			                         th:style="'width: ' + ${#numbers.formatInteger(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.ok'].count * 100 / timers['com.codahale.metrics.servlet.InstrumentedFilter.requests'].count, 0)} + '%'">
+			                        <span th:text="${meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.ok'].count}"></span>
+			                    </div>
+		                    </div>
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.ok'].meanRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.ok'].oneMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.ok'].fiveMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right"  th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.ok'].fifteenMinuteRate, 1, 2)}">
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>Not Found</td>
+			            <td>
+			                <div class="progress">
+			                    <div class="progress-bar progress-bar-success" role="progressbar"
+			                         th:style="'width: ' + ${#numbers.formatInteger(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.notFound'].count * 100 / timers['com.codahale.metrics.servlet.InstrumentedFilter.requests'].count, 0)} + '%'">
+			                        <span th:text="${meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.notFound'].count}"></span>
+			                    </div>
+		                    </div>
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.notFound'].meanRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.notFound'].oneMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.notFound'].fiveMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right"  th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.notFound'].fifteenMinuteRate, 1, 2)}">
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>Server Error</td>
+			            <td>
+			                <div class="progress">
+			                    <div class="progress-bar progress-bar-success" role="progressbar"
+			                         th:style="'width: ' + ${#numbers.formatInteger(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.serverError'].count * 100 / timers['com.codahale.metrics.servlet.InstrumentedFilter.requests'].count, 0)} + '%'">
+			                        <span th:text="${meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.serverError'].count}"></span>
+			                    </div>
+		                    </div>
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.serverError'].meanRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.serverError'].oneMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.serverError'].fiveMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right"  th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.serverError'].fifteenMinuteRate, 1, 2)}">
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>Bad Request</td>
+			            <td>
+			                <div class="progress">
+			                    <div class="progress-bar progress-bar-success" role="progressbar"
+			                         th:style="'width: ' + ${#numbers.formatInteger(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.badRequest'].count * 100 / timers['com.codahale.metrics.servlet.InstrumentedFilter.requests'].count, 0)} + '%'">
+			                        <span th:text="${meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.badRequest'].count}"></span>
+			                    </div>
+		                    </div>
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.badRequest'].meanRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.badRequest'].oneMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.badRequest'].fiveMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right"  th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.badRequest'].fifteenMinuteRate, 1, 2)}">
+			            </td>
+			        </tr>
+		        	</tbody>
+		        </table>
+	        </div>
+	    </div>
+    </div>
+    
+    <div class="panel panel-default">
+	    <div class="panel-heading">
+	        <h1 class="panel-title">
+	        	<span style="font-weight: bold;">Cache Metrics</span>
+	        </h1>
+	    </div>
+	    <div class="panel-body">
+	    	<div class="table-responsive">
+			    <table class="table table-striped">
+			        <thead>
+			        <tr>
+			            <th>Cache</th>
+			            <th class="text-right">Size</th>
+			        </tr>
+			        </thead>
+			        <tbody>
+			        <tr th:each="cache : ${caches}">
+			            <td th:text="${cache.name}"></td>
+			            <td class="text-right" th:text="${cache.value}"></td>
+			        </tr>
+			        </tbody>
+			    </table>
+			</div>
+	    </div>
+	    
+    </div>
+</div>
+</body>
+</html>
