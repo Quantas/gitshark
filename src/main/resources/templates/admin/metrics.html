@@ -4,6 +4,19 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorator="layouts/default">
 <head>
+	<script type="text/javascript" th:src="@{/webjars/datatables/1.10.7/js/jquery.dataTables.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/datatables.bootstrap.min.js}"></script>
+
+	<link rel="stylesheet" th:href="@{/css/datatables.bootstrap.min.css}" />
+
+	<script>
+		$(document).ready( function () {
+			$('#loggerTable').DataTable({
+				/* Disable initial sort */
+				"aaSorting": []
+			});
+		});
+	</script>
 </head>
 <body>
 <div layout:fragment="content">
@@ -73,31 +86,43 @@
 			    <div class="col-md-4">
 			        <strong>Garbage Collection</strong>
 			        <div class="row">
-			            <div class="col-md-9">Mark Sweep count</div>
-			            <div class="col-md-3 text-right" th:text="${gauges['jvm.gc.PS-MarkSweep.count'].value}"></div>
+			            <div class="col-md-5">Mark Sweep count</div>
+			            <div class="col-md-7 text-right" th:text="${gauges['jvm.gc.PS-MarkSweep.count'].value}"></div>
 			        </div>
 			        <div class="row">
-			            <div class="col-md-9">Mark Sweep time</div>
-			            <div class="col-md-3 text-right" th:text="${gauges['jvm.gc.PS-MarkSweep.time'].value} + 'ms'"></div>
+			            <div class="col-md-5">Mark Sweep time</div>
+			            <div class="col-md-7 text-right" th:text="${gauges['jvm.gc.PS-MarkSweep.time'].value} + 'ms'"></div>
 			        </div>
 			        <div class="row">
-			            <div class="col-md-9">Scavenge count</div>
-			            <div class="col-md-3 text-right" th:text="${gauges['jvm.gc.PS-Scavenge.count'].value}"></div>
+			            <div class="col-md-5">Scavenge count</div>
+			            <div class="col-md-7 text-right" th:text="${gauges['jvm.gc.PS-Scavenge.count'].value}"></div>
 			        </div>
 			        <div class="row">
-			            <div class="col-md-9">Scavenge time</div>
-			            <div class="col-md-3 text-right" th:text="${gauges['jvm.gc.PS-Scavenge.time'].value} + 'ms'"></div>
+			            <div class="col-md-5">Scavenge time</div>
+			            <div class="col-md-7 text-right" th:text="${gauges['jvm.gc.PS-Scavenge.time'].value} + 'ms'"></div>
 			        </div>
 			        <br />
 			        <br />
 			        <strong>JVM Information</strong>
 			        <div class="row">
-			        	<div class="col-md-9">Uptime</div>
-			        	<div class="col-md-3 text-right"></div>
+			        	<div class="col-md-5">Uptime</div>
+			        	<div class="col-md-7 text-right" th:text="${jvm['uptime']}"></div>
 			        </div>
+					<div class="row">
+						<div class="col-md-5">Start</div>
+						<div class="col-md-7 text-right" th:text="${jvm['start']}"></div>
+					</div>
+					<div class="row">
+						<div class="col-md-5">VM Name</div>
+						<div class="col-md-7 text-right" th:text="${jvm['name']}"></div>
+					</div>
+					<div class="row">
+						<div class="col-md-5">VM Spec Vendor</div>
+						<div class="col-md-7 text-right" th:text="${jvm['spec.vendor']}"></div>
+					</div>
 			        <div class="row">
-			        	<div class="col-md-9">Version</div>
-			        	<div class="col-md-3 text-right"></div>
+			        	<div class="col-md-5">VM Spec Version</div>
+			        	<div class="col-md-7 text-right" th:text="${jvm['spec.version']}"></div>
 			        </div>
 			    </div>
 			</div>
@@ -232,8 +257,39 @@
 			    </table>
 			</div>
 	    </div>
-	    
     </div>
+
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h1 class="panel-title">
+				<span style="font-weight: bold;">Loggers</span>
+			</h1>
+		</div>
+		<div class="panel-body">
+			<div class="table-responsive">
+				<table id="loggerTable" class="table table-striped">
+					<thead>
+					<tr>
+						<th>Name</th>
+						<th>Level</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr th:each="logger : ${loggers}">
+						<td th:text="${logger.name}"></td>
+						<td>
+							<span class="label label-primary" th:if="${logger.effectiveLevel.levelStr} eq 'INFO'">INFO</span>
+							<span class="label label-danger" th:if="${logger.effectiveLevel.levelStr} eq 'ERROR'">ERROR</span>
+							<span class="label label-warning" th:if="${logger.effectiveLevel.levelStr} eq 'WARN'">WARN</span>
+							<span class="label label-success" th:if="${logger.effectiveLevel.levelStr} eq 'DEBUG'">DEBUG</span>
+							<span class="label label-default" th:if="${logger.effectiveLevel.levelStr} eq 'TRACE'">TRACE</span>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 </div>
 </body>
 </html>
