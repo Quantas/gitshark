@@ -46,7 +46,7 @@ public class ReceivePackController {
 
 	@RequestMapping(value = "/info/refs", params = "service=" + Constants.GIT_RECEIVE_PACK, method = RequestMethod.GET, 
 			produces = Constants.GIT_RECEIVE_PACK_ADV)
-	public ResponseEntity<byte[]> receivePackAdv(final GitRepository repo, @AuthenticationPrincipal final User user, final HttpServletRequest req, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent) throws GitServerException {
+	public ResponseEntity<byte[]> receivePackAdv(final GitRepository repo, @AuthenticationPrincipal final User user, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent) throws GitServerException {
 		final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		
 		repo.execute(db -> {
