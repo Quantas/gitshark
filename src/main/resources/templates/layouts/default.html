@@ -35,7 +35,7 @@
           <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
         <![endif]-->
 
-        <style th:if="${repo == null}">
+        <style th:if="${repo == null and admin == null}">
             .wrapper {
                 padding-left: 0;
             }

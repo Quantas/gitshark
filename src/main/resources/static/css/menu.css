@@ -10,7 +10,7 @@
 
 @media(min-width:768px) {
     .wrapper {
-        padding-left: 125px;
+        padding-left: 130px;
     }
 
     .page-wrapper {
@@ -22,9 +22,9 @@
     .side-nav {
         position: fixed;
         top: 45px;
-        left: 125px;
-        width: 125px;
-        margin-left: -125px;
+        left: 130px;
+        width: 130px;
+        margin-left: -130px;
         border: none;
         border-radius: 0;
         overflow-y: auto;
@@ -35,7 +35,7 @@
     }
 
     .side-nav>li>a {
-        width: 125px;
+        width: 130px;
     }
 
     .side-nav li a:hover,

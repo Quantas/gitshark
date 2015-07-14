@@ -29,18 +29,9 @@
 	                    <a th:href="@{/login}"><i class="fa fa-sign-in fa-fw"></i>&nbsp;&nbsp;Login/Sign Up</a>
 	                </li>
 	                <li class="dropdown" sec:authorize="hasRole('ROLE_ADMIN')">
-	                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+	                    <a th:href="@{/admin}">
 	                        <i class="fa fa-rocket fa-fw"></i>&nbsp;&nbsp;Admin
-	                        <b class="caret"></b>
 	                    </a>
-	                    <ul class="dropdown-menu">
-	                        <li>
-	                            <a th:href="@{/admin/system}"><i class="fa fa-home fa-fw"></i>&nbsp;&nbsp;Home</a>
-	                        </li>
-	                        <li>
-	                            <a th:href="@{/admin/metrics}"><i class="fa fa-bar-chart fa-fw"></i>&nbsp;&nbsp;Metrics</a>
-	                        </li>
-	                    </ul>
 	                </li>
 	                <li class="dropdown" sec:authorize="isAuthenticated()">
 	                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -85,6 +76,19 @@
 					</li>
                 </ul>
             </div>
+			<div class="collapse navbar-collapse navbar-ex1-collapse" th:if="${admin}">
+				<ul class="nav navbar-nav side-nav">
+					<li>
+						<a th:href="@{/admin}"><i class="fa fa-fw fa-rocket"></i>&nbsp;Dashboard</a>
+					</li>
+					<li>
+						<a th:href="@{/admin/metrics}"><i class="fa fa-fw fa-bar-chart"></i>&nbsp;Metrics</a>
+					</li>
+					<li>
+						<a th:href="@{/admin/loggers}"><i class="fa fa-fw fa-file-text-o"></i>&nbsp;Loggers</a>
+					</li>
+				</ul>
+			</div>
         </div>
     </nav>
 
