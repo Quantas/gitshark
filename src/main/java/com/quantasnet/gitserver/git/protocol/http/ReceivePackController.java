@@ -16,6 +16,8 @@ import org.eclipse.jgit.transport.InternalHttpServerGlue;
 import org.eclipse.jgit.transport.PacketLineOut;
 import org.eclipse.jgit.transport.ReceivePack;
 import org.eclipse.jgit.transport.RefAdvertiser.PacketLineOutRefAdvertiser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +39,8 @@ import com.quantasnet.gitserver.user.User;
 @Controller
 public class ReceivePackController {
 
+	private static final Logger LOG = LoggerFactory.getLogger(ReceivePackController.class);
+
 	@Autowired
 	private GitServerReceivePackFactory receivePackFactory;
 
@@ -47,8 +51,7 @@ public class ReceivePackController {
 		
 		repo.execute(db -> {
 			final ReceivePack rp = receivePackFactory.createReceivePack(db, repo, user);
-			// TODO replace email with user's email
-			rp.setRefLogIdent(new PersonIdent(user.getUsername(), user.getUsername() + "@" + req.getRemoteHost()));
+			rp.setRefLogIdent(new PersonIdent(user.getUsername(), user.getEmail()));
 			InternalHttpServerGlue.setPeerUserAgent(rp, userAgent);
 			
 			final PacketLineOut packetOut = new PacketLineOut(buf);
@@ -92,9 +95,11 @@ public class ReceivePackController {
 				rp.receive(ServletUtils.getInputStream(req), out, null);
 				out.close();
 			} catch (final CorruptObjectException | UnpackException e) {
+				LOG.error("Error receiving push", e);
 				ServletUtils.consumeRequestBody(req);
 				out.close();
 			} catch (final Throwable e) {
+				LOG.error("Really bad error receiving push", e);
 				if (!rsp.isCommitted()) {
 					rsp.reset();
 					GitSmartHttpTools.sendError(req, rsp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

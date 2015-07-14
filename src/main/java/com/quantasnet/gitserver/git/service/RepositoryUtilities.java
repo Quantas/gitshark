@@ -20,6 +20,8 @@ import org.eclipse.jgit.treewalk.filter.AndTreeFilter;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
 import org.eclipse.jgit.treewalk.filter.TreeFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.HandlerMapping;
@@ -33,6 +35,8 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 
 @Service
 public class RepositoryUtilities {
+
+	private static final Logger LOG = LoggerFactory.getLogger(RepositoryUtilities.class);
 
 	public  String resolvePath(final HttpServletRequest req, final String repoPath, final String branch) {
 		String path = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
@@ -143,6 +147,7 @@ public class RepositoryUtilities {
 				
 				commit = walk.iterator().next();
 			} catch (final RevisionSyntaxException | IOException e) {
+				LOG.trace("Error building RepoFile", e);
 				// Something horrible has probably happened, but we don't care really
 			}
 		}
@@ -172,6 +177,7 @@ public class RepositoryUtilities {
 			final Ref peeled = db.peel(ref);
 		    return revWalk.parseCommit(peeled.getObjectId());
 		} catch (final Exception e) {
+			LOG.trace("This should never happen ;)", e);
 			// Something horrible has probably happened, but we don't care really
 		}
 		return null;

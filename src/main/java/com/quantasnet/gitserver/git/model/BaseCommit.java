@@ -36,11 +36,9 @@ public abstract class BaseCommit implements Serializable {
 	}
 	
 	private void buildParents(final GitRepository repo) {
-		if (null != commit) {
-			if (commit.getParentCount() > 0) {
-				for (final RevCommit parent : commit.getParents()) {
-					parents.add(new Parent(parent.getId().getName(), repo));
-				}
+		if (null != commit && commit.getParentCount() > 0) {
+			for (final RevCommit parent : commit.getParents()) {
+				parents.add(new Parent(parent.getId().getName(), repo));
 			}
 		}
 	}
