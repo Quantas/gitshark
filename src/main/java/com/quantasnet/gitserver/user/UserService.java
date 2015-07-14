@@ -1,5 +1,7 @@
 package com.quantasnet.gitserver.user;
 
+import java.util.List;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +32,11 @@ public class UserService {
     public long count() {
     	return userRepository.count();
     }
-    
+
+	public List<User> getAll() {
+		return userRepository.findAll();
+	}
+
     public User registerNewUser(final RegistrationForm form) {
     	final User user = new User();
     	user.setUserName(form.getUserName());

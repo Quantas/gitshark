@@ -79,13 +79,16 @@
 			<div class="collapse navbar-collapse navbar-ex1-collapse" th:if="${admin}">
 				<ul class="nav navbar-nav side-nav">
 					<li>
-						<a th:href="@{/admin}"><i class="fa fa-fw fa-rocket"></i>&nbsp;Dashboard</a>
+						<a th:href="@{/admin}"><i class="fa fa-fw fa-tachometer"></i>&nbsp;Dashboard</a>
 					</li>
 					<li>
 						<a th:href="@{/admin/metrics}"><i class="fa fa-fw fa-bar-chart"></i>&nbsp;Metrics</a>
 					</li>
 					<li>
 						<a th:href="@{/admin/loggers}"><i class="fa fa-fw fa-file-text-o"></i>&nbsp;Loggers</a>
+					</li>
+					<li>
+						<a th:href="@{/admin/users}"><i class="fa fa-fw fa-users"></i>&nbsp;Users</a>
 					</li>
 				</ul>
 			</div>
