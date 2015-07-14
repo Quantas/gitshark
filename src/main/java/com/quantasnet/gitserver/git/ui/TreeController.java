@@ -78,10 +78,10 @@ public class TreeController {
 					final String mediaType = tika.detect(new ByteArrayInputStream(repoFile.getFileContentsRaw()));
 					final MediaType type = MediaType.parseMediaType(mediaType);
 					
-					if (type.getType().equals("image")) {
+					if ("image".equals(type.getType())) {
 						model.addAttribute("mediaType", mediaType);
 						model.addAttribute("base64contents", Base64.getEncoder().encodeToString(repoFile.getFileContentsRaw()));
-					} else if (!type.getType().equals("text") && !ADDITIONAL_TYPES.contains(type)) {
+					} else if (!"text".equals(type.getType()) && !ADDITIONAL_TYPES.contains(type)) {
 						model.addAttribute("rawError", "Cannot display file.");
 					}
 					

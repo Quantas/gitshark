@@ -26,7 +26,7 @@
 			</div>
 			<div th:if="${lastCommit != null}">
 				<div class="pull-left">
-					<img th:src="${lastCommit.gravatarUrl} + '&amp;s=25'"></img>
+					<img th:src="${lastCommit.gravatarUrl} + '&amp;s=25'" th:alt="${lastCommit.committerName} + ' Avatar'"></img>
 					&nbsp;&nbsp;
 					<span th:text="${lastCommit.committerName}"></span>
 					&nbsp;-&nbsp;

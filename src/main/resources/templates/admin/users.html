@@ -45,7 +45,7 @@
                 <tbody>
                 <tr th:each="user : ${users}">
                     <td style="width: 30px;">
-                        <img th:src="${user.imageUrl}" style="width: 25px;" />
+                        <img th:src="${user.imageUrl} + '&amp;s=25'" th:alt="${user.userName} + ' Avatar'" />
                     </td>
                     <td th:text="${user.userName}">
                     </td>
