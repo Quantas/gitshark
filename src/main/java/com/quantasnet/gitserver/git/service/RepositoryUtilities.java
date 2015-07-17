@@ -1,5 +1,6 @@
 package com.quantasnet.gitserver.git.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +23,7 @@ import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
 import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.HandlerMapping;
@@ -32,6 +34,7 @@ import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.git.repo.RepositoryActionWithReturn;
 
 @Service
 public class RepositoryUtilities {
@@ -57,7 +60,18 @@ public class RepositoryUtilities {
 		
 		return path;
 	}
-	
+
+	@Cacheable(cacheNames = "hasCommits", key = "#repo.fullDisplayName")
+	public boolean hasCommits(final GitRepository repo) throws GitServerException {
+		return repo.executeWithReturn(db -> {
+			if (db != null && db.getDirectory().exists()) {
+				return (new File(db.getDirectory(), "objects").list().length > 2)
+						|| (new File(db.getDirectory(), "objects/pack").list().length > 0);
+			}
+			return false;
+		});
+	}
+
 	public RepoFile getFileToDisplay(final GitRepository repo, final Repository db, final String branch, final String path) throws GitServerException {
 		final List<RepoFile> files = getFiles(repo, db, branch, path, true);
 		if (!files.isEmpty()) {

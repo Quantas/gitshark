@@ -77,7 +77,7 @@ public class GitProtocolClientThread extends Thread {
 					gitRepo.execute(db -> receivePackFactory.createReceivePack(db, gitRepo, null).receive(input, output, null));
 				}
 			}
-		} catch (final RepositoryAccessDeniedException | GitServerException e) {
+		} catch (final GitServerException e) {
 			LOG.error("Probably failed...", e);
 		} finally {
 			IOUtils.closeQuietly(input);

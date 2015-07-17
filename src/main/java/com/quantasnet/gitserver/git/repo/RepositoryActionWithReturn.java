@@ -7,18 +7,19 @@ import org.eclipse.jgit.lib.Repository;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 
 /**
- * To be used in conjunction with {@link GitRepository#execute(RepositoryAction)} to
- * perform an action against a JGit Repository.
+ * To be used in conjunction with {@link GitRepository#executeWithReturn(RepositoryActionWithReturn)}
+ * to perform an action against a JGit Repository.
  */
 @FunctionalInterface
-public interface RepositoryAction {
+public interface RepositoryActionWithReturn<T> {
 
 	/**
 	 * Perform an action against a JGit Repository.
 	 *
 	 * @param repo
+	 * @return T
 	 * @throws GitServerException
 	 * @throws IOException
 	 */
-	void doAction(Repository repo) throws GitServerException, IOException;
+	T doAction(Repository repo) throws GitServerException, IOException;
 }

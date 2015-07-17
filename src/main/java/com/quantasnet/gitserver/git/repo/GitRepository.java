@@ -50,6 +50,14 @@ public class GitRepository implements Comparable<GitRepository> {
 			throw new GitServerErrorException(e);
 		}
 	}
+
+	public <T> T executeWithReturn(final RepositoryActionWithReturn<T> repoAction) throws GitServerException {
+		try (final Repository db = Git.open(getFullRepoDirectory()).getRepository()) {
+			return repoAction.doAction(db);
+		} catch (final IOException e) {
+			throw new GitServerErrorException(e);
+		}
+	}
 	
 	public File getFullRepoDirectory() {
 		return fullRepoDirectory;

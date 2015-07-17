@@ -20,7 +20,9 @@ public class RepoCacheService {
     public static final String ALL_READMES = "allReadmes";
     
     public static final String COMMIT = "commit";
+
     public static final String README = "readme";
+    public static final String HAS_COMMITS = "hasCommits";
 
     @Caching(evict = {
         @CacheEvict(cacheNames = { ALL_COMMITS, ALL_READMES }, allEntries = true)
@@ -30,7 +32,7 @@ public class RepoCacheService {
     }
 
     @Caching(evict = {
-        @CacheEvict(cacheNames = { README }, key = "#repo.fullDisplayName")
+        @CacheEvict(cacheNames = { README, HAS_COMMITS }, key = "#repo.fullDisplayName")
     })
     public void clearCacheForRepo(final GitRepository repo) {
         LOG.info("Wiping caches for repo {}", repo.getFullDisplayName());

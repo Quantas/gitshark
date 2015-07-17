@@ -23,6 +23,7 @@ import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
 import com.quantasnet.gitserver.git.exception.RepositoryNotFoundException;
+import com.quantasnet.gitserver.git.service.RepositoryUtilities;
 
 @Service
 public class FilesystemRepositoryService {
@@ -33,12 +34,17 @@ public class FilesystemRepositoryService {
 	
 	@Autowired
 	private RepoFolderUtil folderUtil;
+
+	@Autowired
+	private RepositoryUtilities repoUtilities;
 	
-	public GitRepository getRepository(final String userName, final String owner, final String repoName) throws RepositoryNotFoundException, RepositoryAccessDeniedException {
+	public GitRepository getRepository(final String userName, final String owner, final String repoName) throws GitServerException {
 		// if (owner.equals(userName)) {
 			final File gitFolder = folderUtil.getRepoDir(owner, endsWithGit(repoName));
 			if (gitFolder.exists() && gitFolder.isDirectory()) {
-				return new GitRepository(gitFolder, owner, gitFolder.getName(), true, false); // TODO fix
+				final GitRepository repo = new GitRepository(gitFolder, owner, gitFolder.getName(), true, false); // TODO fix
+				repo.setCommits(repoUtilities.hasCommits(repo));
+				return repo;
 			}
 			throw new RepositoryNotFoundException(gitFolder.getName());
 		// }
