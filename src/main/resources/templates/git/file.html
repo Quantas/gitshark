@@ -70,8 +70,11 @@
 			</div>
 		</div>
   		<div class="panel-body">
-  			<div th:if="${file == null}">
-    			<h1>File not found!</h1>
+  			<div th:if="${file == null}" class="container" style="text-align: center;">
+				<h4>
+					<li class="fa fa-fw fa-code-fork"></li>
+					This file did not exist at this point in time.
+				</h4>
     		</div>
     		<img th:if="${mediaType != null}" style="max-width: 100%" th:src="'data:' + ${mediaType} + ';base64,' + ${base64contents}" />
     		<div class="alert alert-danger" th:if="${rawError != null}" th:text="${rawError}"></div>

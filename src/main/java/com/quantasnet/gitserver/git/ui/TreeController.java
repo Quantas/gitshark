@@ -73,19 +73,21 @@ public class TreeController {
 				
 				if (file) {
 					final RepoFile repoFile = repoUtils.getFileToDisplay(repo, db, branch, path);
-					
-					final Tika tika = new Tika();
-					final String mediaType = tika.detect(new ByteArrayInputStream(repoFile.getFileContentsRaw()));
-					final MediaType type = MediaType.parseMediaType(mediaType);
-					
-					if ("image".equals(type.getType())) {
-						model.addAttribute("mediaType", mediaType);
-						model.addAttribute("base64contents", Base64.getEncoder().encodeToString(repoFile.getFileContentsRaw()));
-					} else if (!"text".equals(type.getType()) && !ADDITIONAL_TYPES.contains(type)) {
-						model.addAttribute("rawError", "Cannot display file.");
+
+					if (null != repoFile) {
+						final Tika tika = new Tika();
+						final String mediaType = tika.detect(new ByteArrayInputStream(repoFile.getFileContentsRaw()));
+						final MediaType type = MediaType.parseMediaType(mediaType);
+
+						if ("image".equals(type.getType())) {
+							model.addAttribute("mediaType", mediaType);
+							model.addAttribute("base64contents", Base64.getEncoder().encodeToString(repoFile.getFileContentsRaw()));
+						} else if (!"text".equals(type.getType()) && !ADDITIONAL_TYPES.contains(type)) {
+							model.addAttribute("rawError", "Cannot display file.");
+						}
+
+						model.addAttribute("file", repoFile);
 					}
-					
-					model.addAttribute("file", repoFile);
 				} else {
 					final List<RepoFile> files = repoUtils.getFiles(repo, db, branch, path, false);
 
