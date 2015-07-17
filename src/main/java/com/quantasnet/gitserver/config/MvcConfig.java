@@ -18,7 +18,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import com.quantasnet.gitserver.git.repo.RepositoryResolver;
+import com.quantasnet.gitserver.git.service.RepositoryResolver;
 
 @Configuration
 public class MvcConfig extends WebMvcConfigurerAdapter {
