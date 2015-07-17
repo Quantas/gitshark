@@ -13,13 +13,16 @@ if (!String.prototype.endsWith) {
 }
 
 var ogBranch;
+
 $(document).ready(function() {
-	ogBranch = $('#branchDropdown').val();
-	$('#branchDropdown').on('change', function() {
+	var $dropdown = $('#branchDropdown');
+	ogBranch = $dropdown.val();
+
+	$dropdown.on('change', function() {
 		if (this.value !== "") {
 			var path = window.location.pathname;
 			var isFile = getParameterByName('file');
-			
+
 			if (path.endsWith('/tree')) {
 				var newPath = path + '/' + this.value;
 				if (isFile === 'true') {
@@ -27,11 +30,11 @@ $(document).ready(function() {
 				}
 				window.location.href = newPath;
 			} else {
-				var newPath = path.replace('/tree/' + ogBranch, '/tree/' + this.value);
+				var newPathWithBranch = path.replace('/tree/' + ogBranch, '/tree/' + this.value);
 				if (isFile === 'true') {
-					newPath += '?file=true';
+					newPathWithBranch += '?file=true';
 				}
-				window.location.href = newPath;
+				window.location.href = newPathWithBranch;
 			}
 		}
 	});
