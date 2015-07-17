@@ -34,7 +34,6 @@ import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.git.repo.RepositoryActionWithReturn;
 
 @Service
 public class RepositoryUtilities {
