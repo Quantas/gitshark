@@ -27,8 +27,8 @@
 			</span>
 		</div>
 		<div class="panel-heading" th:if="${!#strings.isEmpty(commit.messageBody)}">
-			<span class="panel-title" th:text="${commit.messageBody}">
-			</span>
+			<pre class="commitMessage" th:text="${commit.messageBody}">
+			</pre>
 		</div>
   		<div class="panel-body">
 			<span class="pull-left">

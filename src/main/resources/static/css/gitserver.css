@@ -6,6 +6,10 @@
 	margin: 0;
 }
 
+.commitMessage {
+	border: none;
+}
+
 table,.label,.navbar,pre {
 	font-size: 15px;
 }
