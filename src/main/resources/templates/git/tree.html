@@ -38,7 +38,13 @@
 				<div class="clearfix"></div>
 			</div>
 		</div>
-		<table class="table table-hover">
+		<span th:if="${#lists.isEmpty(files)}" class="container" style="text-align: center;">
+			<h4>
+				<li class="fa fa-fw fa-code-fork"></li>
+				This directory did not exist at this point in time.
+			</h4>
+		</span>
+		<table th:if="${!#lists.isEmpty(files)}" class="table table-hover">
 	   		<tr th:each="file : ${files}">
 	   			<td>
 	   				<i th:if="${file.directory}" class="fa fa-fw fa-folder"></i>
