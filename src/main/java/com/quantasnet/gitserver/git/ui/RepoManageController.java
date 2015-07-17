@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.exception.GitServerException;
-import com.quantasnet.gitserver.git.repo.FilesystemRepositoryService;
+import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.user.User;
 

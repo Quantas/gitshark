@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.git.repo.FilesystemRepositoryService;
+import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}/settings")

@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePackFactory;
-import com.quantasnet.gitserver.git.repo.FilesystemRepositoryService;
+import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
 
 @Component
 public class GitProtocolService {

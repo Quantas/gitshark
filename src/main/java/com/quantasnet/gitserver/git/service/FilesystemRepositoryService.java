@@ -1,4 +1,4 @@
-package com.quantasnet.gitserver.git.repo;
+package com.quantasnet.gitserver.git.service;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -21,9 +21,9 @@ import org.springframework.stereotype.Service;
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
-import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
 import com.quantasnet.gitserver.git.exception.RepositoryNotFoundException;
-import com.quantasnet.gitserver.git.service.RepositoryUtilities;
+import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.git.repo.RepoFolderUtil;
 
 @Service
 public class FilesystemRepositoryService {
