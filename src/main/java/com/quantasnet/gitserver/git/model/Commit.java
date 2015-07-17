@@ -24,7 +24,12 @@ public class Commit extends BaseCommit {
 	protected PersonIdent getCommitter() {
 		return commit.getCommitterIdent();
 	}
-	
+
+	@Override
+	protected PersonIdent getAuthor() {
+		return commit.getAuthorIdent();
+	}
+
 	public String getBranchHead() {
 		return branchHead;
 	}

@@ -44,7 +44,12 @@ public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 	protected PersonIdent getCommitter() {
 		return commit.getCommitterIdent();
 	}
-	
+
+	@Override
+	protected PersonIdent getAuthor() {
+		return commit.getAuthorIdent();
+	}
+
 	private String generateUrl(final GitRepository repo) {
 		final StringBuilder builder = new StringBuilder();
 		

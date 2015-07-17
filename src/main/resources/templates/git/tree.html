@@ -26,9 +26,9 @@
 			</div>
 			<div th:if="${lastCommit != null}">
 				<div class="pull-left">
-					<img th:src="${lastCommit.gravatarUrl} + '&amp;s=25'" th:alt="${lastCommit.committerName} + ' Avatar'"></img>
+					<img th:src="${lastCommit.gravatarUrl} + '&amp;s=25'" th:alt="${lastCommit.authorName} + ' Avatar'" />
 					&nbsp;&nbsp;
-					<span th:text="${lastCommit.committerName}"></span>
+					<span th:text="${lastCommit.authorName}"></span>
 					&nbsp;-&nbsp;
 					<a th:href="@{/repo/} + ${lastCommit.commitUrl}" th:text="${lastCommit.commit.shortMessage}"></a>
 				</div>

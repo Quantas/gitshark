@@ -26,6 +26,7 @@ public abstract class BaseCommit implements Serializable {
 	}
 	
 	protected abstract PersonIdent getCommitter();
+	protected abstract PersonIdent getAuthor();
 	
 	private String buildCommitUrl(final GitRepository repo) {
 		if (null == commit) {
@@ -47,16 +48,16 @@ public abstract class BaseCommit implements Serializable {
 		return new DateTime(getCommitter().getWhen().getTime()).toString("yyyy-MM-dd'T'HH:mm:ssZ");
 	}
 	
-	public String getCommitterName() {
-		return getCommitter().getName();
+	public String getAuthorName() {
+		return getAuthor().getName();
 	}
 	
-	public String getCommitterEmail() {
-		return getCommitter().getEmailAddress();
+	public String getAuthorEmail() {
+		return getAuthor().getEmailAddress();
 	}
 	
 	public String getGravatarUrl() {
-		final String email = getCommitter().getEmailAddress();
+		final String email = getAuthor().getEmailAddress();
 		final String theEmail = null == email ? "" : email;
 		return "//www.gravatar.com/avatar/" + DigestUtils.md5Hex(theEmail.trim().toLowerCase()) + "?d=identicon&rating=g";
 	}
@@ -64,7 +65,12 @@ public abstract class BaseCommit implements Serializable {
 	public RevCommit getCommit() {
 		return commit;
 	}
-	
+
+	public String getMessageBody() {
+		final String header = commit.getShortMessage();
+		return commit.getFullMessage().substring(header.length() + 1);
+	}
+
 	public String getId() {
 		return commit.getId().getName();
 	}

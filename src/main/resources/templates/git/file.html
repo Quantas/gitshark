@@ -15,55 +15,39 @@
 			});
 		});
 	</script>
-	<style>
-		table.committerInfo td,th {
-			padding: 3px;
-		}
-	</style>
 </head>
 <body>
 <div layout:fragment="content">
     <div layout:include="git/fragments/header :: header">
     	Git Header here
     </div>
-   	<div class="panel panel-default" th:if="${file != null and file.commit != null}">
+	<div class="panel panel-default" th:if="${file != null and file.commit != null}">
 		<div class="panel-heading">
-			<h3 class="panel-title">
-				<span style="font-weight: bold;">Commit Information</span>
-			</h3>
+			<span class="panel-title">
+				<span style="font-weight: bold;" th:text="${file.commit.shortMessage}"></span>
+			</span>
 		</div>
-  		<div class="panel-body">
-  			<table class="committerInfo">
-    			<tr>
-    				<th>Commit ID</th>
-    				<td>
-    					<a th:href="@{/repo/} + ${file.commitUrl}" th:text="${file.commit.id.name}"></a><br />
-    				</td>
-    			</tr>
-    			<tr>
-    				<th>Parent(s)</th>
-    				<td>
-    					<span th:each="parent : ${file.parents}">
-    						<a th:href="@{/repo/} + ${parent.url}" th:text="${parent.id}"></a>
-    					</span>
-    				</td>
-    			</tr>
-    			<tr>
-    				<th>Committer</th>
-    				<td th:text="${file.commit.committerIdent.name} + ' &lt;' + ${file.commit.committerIdent.emailAddress} + '&gt; ' + ${file.commit.committerIdent.when}"></td>
-    			</tr>
-    			<tr>
-    				<th>Author</th>
-    				<td th:text="${file.commit.authorIdent.name} + ' &lt;' + ${file.commit.authorIdent.emailAddress} + '&gt; ' + ${file.commit.authorIdent.when}"></td>
-    			</tr>
-    			<tr>
-    				<th>Message</th>
-    				<td><pre th:text="${file.commit.fullMessage}"></pre></td>
-    			</tr>
-    		</table>
+		<div class="panel-heading" th:if="${!#strings.isEmpty(file.messageBody)}">
+			<span class="panel-title" th:text="${file.messageBody}">
+			</span>
+		</div>
+		<div class="panel-body">
+			<span class="pull-left">
+				<img th:src="${file.gravatarUrl} + '&amp;s=25'" th:alt="${file.authorName} + ' Avatar'" />
+				&nbsp;
+				<span th:text="${file.authorName} + ' - ' + ${file.commit.authorIdent.when}"></span>
+			</span>
+			<span class="pull-right">
+				Parent(s):&nbsp;
+				<span th:if="${!#lists.isEmpty(file.parents)}" th:each="parent : ${file.parents}">
+					<a th:href="@{/repo/} + ${parent.url}" th:text="${parent.shortId}"></a>&nbsp;
+				</span>
+				Commit:&nbsp;
+				<span th:text="${file.shortId}"></span>
+			</span>
 		</div>
 	</div>
-  	   	<div class="panel panel-default">
+	<div class="panel panel-default">
 		<div class="panel-heading">
 			<div class="panel-title" style="font-weight: bold;" layout:include="git/fragments/breadcrumbs :: breadcrumbs">
 			breadcrumbs

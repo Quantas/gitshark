@@ -14,11 +14,6 @@
 			});
 		});
 	</script>
-	<style>
-		table.committerInfo td,th {
-			padding: 3px;
-		}
-	</style>
 </head>
 <body>
 <div layout:fragment="content">
@@ -27,38 +22,28 @@
     </div>
    	<div class="panel panel-default" th:if="${commit != null}">
 		<div class="panel-heading">
-			<h3 class="panel-title">
-				<span style="font-weight: bold;">Commit Information</span>
-			</h3>
+			<span class="panel-title">
+				<span style="font-weight: bold;" th:text="${commit.commit.shortMessage}"></span>
+			</span>
+		</div>
+		<div class="panel-heading" th:if="${!#strings.isEmpty(commit.messageBody)}">
+			<span class="panel-title" th:text="${commit.messageBody}">
+			</span>
 		</div>
   		<div class="panel-body">
-  			<table class="committerInfo">
-    			<tr>
-    				<th>Commit ID</th>
-    				<td th:text="${commit.id}">
-    				</td>
-    			</tr>
-    			<tr>
-    				<th>Parent(s)</th>
-    				<td>
-    					<span th:each="parent : ${commit.parents}">
-    						<a th:href="@{/repo/} + ${parent.url}" th:text="${parent.id}"></a><br />
-    					</span>
-    				</td>
-    			</tr>
-    			<tr>
-    				<th>Committer</th>
-    				<td th:text="${commit.commit.committerIdent.name} + ' &lt;' + ${commit.commit.committerIdent.emailAddress} + '&gt; ' + ${commit.commit.committerIdent.when}"></td>
-    			</tr>
-    			<tr>
-    				<th>Author</th>
-    				<td th:text="${commit.commit.authorIdent.name} + ' &lt;' + ${commit.commit.authorIdent.emailAddress} + '&gt; ' + ${commit.commit.authorIdent.when}"></td>
-    			</tr>
-    			<tr>
-    				<th>Message</th>
-    				<td><pre th:text="${commit.commit.fullMessage}"></pre></td>
-    			</tr>
-    		</table>
+			<span class="pull-left">
+				<img th:src="${commit.gravatarUrl} + '&amp;s=25'" th:alt="${commit.authorName} + ' Avatar'" />
+				&nbsp;
+				<span th:text="${commit.authorName} + ' - ' + ${commit.commit.authorIdent.when}"></span>
+			</span>
+			<span class="pull-right">
+				Parent(s):&nbsp;
+				<span th:if="${!#lists.isEmpty(commit.parents)}" th:each="parent : ${commit.parents}">
+					<a th:href="@{/repo/} + ${parent.url}" th:text="${parent.shortId}"></a>&nbsp;
+				</span>
+				Commit:&nbsp;
+				<span th:text="${commit.shortId}"></span>
+			</span>
 		</div>
 	</div>
    	<div class="panel panel-default" th:if="${diffs == null}">
