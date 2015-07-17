@@ -26,10 +26,6 @@
 	   				<time class="timeago" th:attr="datetime=${log.dateTimeString}"></time>
 	   			</td>
 	   			<td th:text="${log.comment}">
-	   			
-	   			</td>
-	   			<td th:text="${log.branch}">
-	   				Branch
 	   			</td>
 	   			<td>
 	   				<span th:each="commit : ${log.commits}">

@@ -69,7 +69,7 @@ public class RefLog extends BaseCommit implements Comparable<RefLog> {
 		if ("push: created".equals(comment)) {
 			return "Pushed New Branch " + branch;
 		} else if ("push: forced-update".equals(comment)) {
-			return "Pushed " + totalCommitCount + " commits to " + branch;
+			return "Pushed " + totalCommitCount + " commit" + (totalCommitCount > 1 ? "s" : "") + " to " + branch;
 		} else if (comment.startsWith(branchFromOldBranch)) {
 			final String oldBranch = comment.substring(branchFromOldBranch.length());
 			return "Created New Branch " + branch + " from " + oldBranch;
