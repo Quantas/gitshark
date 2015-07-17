@@ -3,14 +3,12 @@ package com.quantasnet.gitserver.git.protocol.git;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Component;
-
-import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePackFactory;
-import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
 
 @Component
 public class GitProtocolService {
@@ -26,12 +24,6 @@ public class GitProtocolService {
 	 * Max length of waiting queue
 	 */
 	private static final int BACKLOG = 5;
-	
-	@Autowired
-	private FilesystemRepositoryService repositoryService;
-
-	@Autowired
-	private GitServerReceivePackFactory receivePackFactory;
 	
 	private boolean isRunning = true;
 	
@@ -49,7 +41,8 @@ public class GitProtocolService {
 				
 				while(isRunning) {
 					try {
-						new GitProtocolClientThread(serverSocket.accept(), repositoryService, receivePackFactory).start();
+						final Socket clientSocket = serverSocket.accept();
+						createThread().setup(clientSocket).start();
 					} catch (final InterruptedIOException e) {
 						LOG.trace("InterruptedIOException while waiting for clients", e);
 					} catch (final IOException e) {
@@ -74,5 +67,10 @@ public class GitProtocolService {
 		} catch (final Exception e) {
 			LOG.error("Error stopping GitProtocolService", e);
 		}
+	}
+	
+	@Lookup
+	public GitProtocolClientThread createThread() {
+		throw new UnsupportedOperationException("This method should have been replaced by Spring");
 	}
 }

@@ -12,31 +12,43 @@ import org.eclipse.jgit.transport.PacketLineIn;
 import org.eclipse.jgit.transport.UploadPack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
 import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePackFactory;
-import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
 import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
 
+@Scope("prototype")
+@Component
 public class GitProtocolClientThread extends Thread {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GitProtocolClientThread.class);
 	
-	private final Socket socket;
-	private final FilesystemRepositoryService repositoryService;
-	private final GitServerReceivePackFactory receivePackFactory;
+	@Autowired
+	private FilesystemRepositoryService repositoryService;
 	
-	public GitProtocolClientThread(final Socket socket, final FilesystemRepositoryService repositoryService, final GitServerReceivePackFactory receivePackFactory) {
-		super("GitProtocolClient-" + socket.getRemoteSocketAddress().toString());
+	@Autowired
+	private GitServerReceivePackFactory receivePackFactory;
+
+	private Socket socket;
+	
+	public GitProtocolClientThread setup(final Socket socket) {
+		setName("GitProtocolClient-" + socket.getRemoteSocketAddress().toString());
 		this.socket = socket;
-		this.repositoryService = repositoryService;
-		this.receivePackFactory = receivePackFactory;
+		return this;
 	}
 	
 	@Override
 	public void run() {
+		if (null == socket) {
+			throw new IllegalStateException("Socket must be populated, was setup(Socket) called??");
+		}
+		
 		try {
 			LOG.info("Accepted connection from {}", socket.getRemoteSocketAddress());
 			
@@ -71,10 +83,14 @@ public class GitProtocolClientThread extends Thread {
 			if (Constants.GIT_UPLOAD_PACK.equals(requestedMethod)) {
 				if (gitRepo.isAnonRead()) {
 					gitRepo.execute(db -> new UploadPack(db).upload(input, output, null));
+				} else {
+					throw new RepositoryAccessDeniedException();
 				}
 			} else if (Constants.GIT_RECEIVE_PACK.equals(requestedMethod)) {
 				if (gitRepo.isAnonWrite()) {
 					gitRepo.execute(db -> receivePackFactory.createReceivePack(db, gitRepo, null).receive(input, output, null));
+				} else {
+					throw new RepositoryAccessDeniedException();
 				}
 			}
 		} catch (final RepositoryAccessDeniedException | GitServerException e) {
