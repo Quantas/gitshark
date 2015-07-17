@@ -55,6 +55,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jgit.util.TemporaryBuffer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Buffers a response, trying to gzip it if the user agent supports that.
@@ -67,6 +69,8 @@ import org.eclipse.jgit.util.TemporaryBuffer;
  * is one such servlet.
  */
 public class SmartOutputStream extends TemporaryBuffer {
+
+	private static final Logger LOG = LoggerFactory.getLogger(SmartOutputStream.class);
 	private static final int LIMIT = 32 * 1024;
 
 	private final HttpServletRequest req;
@@ -95,6 +99,7 @@ public class SmartOutputStream extends TemporaryBuffer {
 		return out;
 	}
 
+	@Override
 	public void close() throws IOException {
 		super.close();
 
@@ -107,20 +112,18 @@ public class SmartOutputStream extends TemporaryBuffer {
 			if (256 < out.length() && acceptsGzipEncoding(req)) {
 				TemporaryBuffer gzbuf = new TemporaryBuffer.Heap(LIMIT);
 				try {
-					GZIPOutputStream gzip = new GZIPOutputStream(gzbuf);
-					try {
+					try(final GZIPOutputStream gzip = new GZIPOutputStream(gzbuf)) {
 						out.writeTo(gzip, null);
-					} finally {
-						gzip.close();
 					}
 					if (gzbuf.length() < out.length()) {
 						out = gzbuf;
 						rsp.setHeader(HDR_CONTENT_ENCODING, ENCODING_GZIP);
 					}
-				} catch (IOException err) {
+				} catch (final IOException err) {
 					// Most likely caused by overflowing the buffer, meaning
 					// its larger if it were compressed. Discard compressed
 					// copy and use the original.
+					LOG.trace("Overflow error in gzip output", err);
 				}
 			}
 
@@ -128,12 +131,9 @@ public class SmartOutputStream extends TemporaryBuffer {
 			// hardcoded LIMIT constant above assures us we wouldn't store
 			// more than 2 GiB of content in memory.
 			rsp.setContentLength((int) out.length());
-			final OutputStream os = rsp.getOutputStream();
-			try {
+			try(final OutputStream os = rsp.getOutputStream()) {
 				out.writeTo(os, null);
 				os.flush();
-			} finally {
-				os.close();
 			}
 		}
 	}
@@ -143,16 +143,18 @@ public class SmartOutputStream extends TemporaryBuffer {
 	}
 
 	static boolean acceptsGzipEncoding(String accepts) {
-		if (accepts == null)
+		if (accepts == null) {
 			return false;
+		}
 
 		int b = 0;
 		while (b < accepts.length()) {
 			int comma = accepts.indexOf(',', b);
 			int e = 0 <= comma ? comma : accepts.length();
 			String term = accepts.substring(b, e).trim();
-			if (term.equals(ENCODING_GZIP))
+			if (term.equals(ENCODING_GZIP)) {
 				return true;
+			}
 			b = e + 1;
 		}
 		return false;
