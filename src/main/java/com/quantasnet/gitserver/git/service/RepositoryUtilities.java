@@ -60,6 +60,10 @@ public class RepositoryUtilities {
 		return path;
 	}
 
+	public boolean isPathRoot(final String path) {
+		return "".equals(path);
+	}
+
 	@Cacheable(cacheNames = "hasCommits", key = "#repo.fullDisplayName")
 	public boolean hasCommits(final GitRepository repo) throws GitServerException {
 		return repo.executeWithReturn(db -> {
