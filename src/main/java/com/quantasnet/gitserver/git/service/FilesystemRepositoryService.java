@@ -4,10 +4,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
@@ -21,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
 import com.quantasnet.gitserver.git.exception.RepositoryNotFoundException;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.git.repo.RepoFolderUtil;
@@ -38,26 +37,19 @@ public class FilesystemRepositoryService {
 	@Autowired
 	private RepositoryUtilities repoUtilities;
 	
-	public GitRepository getRepository(final String userName, final String owner, final String repoName) throws GitServerException {
-		// if (owner.equals(userName)) {
+	public GitRepository getRepository(final String userName, final String owner, final String repoName) throws GitServerException, RepositoryAccessDeniedException {
+		if (owner.equals(userName)) {
 			final File gitFolder = folderUtil.getRepoDir(owner, endsWithGit(repoName));
 			if (gitFolder.exists() && gitFolder.isDirectory()) {
-				final GitRepository repo = new GitRepository(gitFolder, owner, gitFolder.getName(), true, false); // TODO fix
-				repo.setCommits(repoUtilities.hasCommits(repo));
-				return repo;
+				return buildRepo(gitFolder, owner, gitFolder.getName());
 			}
 			throw new RepositoryNotFoundException(gitFolder.getName());
-		// }
+		}
 		
-		// throw new RepositoryAccessDeniedException();
+		throw new RepositoryAccessDeniedException();
 	}
 	
-	public List<String> getOwners() {
-		return Arrays.asList(new File(folderUtil.getReposRoot()).listFiles())
-				.stream().map(File::getName).collect(Collectors.toList());
-	}
-	
-	public List<GitRepository> getRepositories(final String owner) {
+	public List<GitRepository> getRepositories(final String owner) throws GitServerException {
 		final File rootFolder = folderUtil.getOwnerRootDir(owner);
 		final List<GitRepository> repos = new ArrayList<>();
 		LOG.debug("ROOT={}", rootFolder);
@@ -65,7 +57,7 @@ public class FilesystemRepositoryService {
 			// get all the child folders
 			for (final File child : rootFolder.listFiles(GIT_ONLY_FILTER)) {
 				LOG.debug("CHILD={}", child);
-				repos.add(new GitRepository(child, owner, child.getName(), true, false)); // TODO fix
+				repos.add(buildRepo(child, owner, child.getName()));
 			}
 		}
 		
@@ -87,7 +79,7 @@ public class FilesystemRepositoryService {
 			throw new GitServerErrorException(e);
 		}
 		
-		return new GitRepository(newRepo, owner, name, true, false); // TODO fix
+		return buildRepo(newRepo, owner, name);
 	}
 	
 	public boolean deleteRepo(final GitRepository repo) {
@@ -100,7 +92,14 @@ public class FilesystemRepositoryService {
 			return false;
 		}
 	}
-	
+
+	private GitRepository buildRepo(final File dir, final String owner, final String name) throws GitServerException {
+		// TODO get correct anon settings
+		final GitRepository repo = new GitRepository(dir, owner, name, false, false);
+		repo.setCommits(repoUtilities.hasCommits(repo));
+		return repo;
+	}
+
 	private String endsWithGit(final String name) {
 		if (!name.endsWith(Constants.DOT_GIT_SUFFIX)) {
 			return name + Constants.DOT_GIT_SUFFIX;

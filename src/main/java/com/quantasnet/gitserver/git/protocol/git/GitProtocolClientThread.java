@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
 import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePackFactory;
 import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
 import com.quantasnet.gitserver.git.repo.GitRepository;
@@ -76,7 +77,7 @@ public class GitProtocolClientThread extends Thread {
 					gitRepo.execute(db -> receivePackFactory.createReceivePack(db, gitRepo, null).receive(input, output, null));
 				}
 			}
-		} catch (final GitServerException e) {
+		} catch (final RepositoryAccessDeniedException | GitServerException e) {
 			LOG.error("Probably failed...", e);
 		} finally {
 			IOUtils.closeQuietly(input);
