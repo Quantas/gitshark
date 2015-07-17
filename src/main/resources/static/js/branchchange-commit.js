@@ -6,7 +6,7 @@ function getCommitsRoot() {
 var ogBranch;
 $(document).ready(function () {
     var $dropdown = $('#branchDropdown');
-    
+
     ogBranch = $dropdown.val();
 
     $dropdown.on('change', function () {
