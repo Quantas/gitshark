@@ -138,9 +138,9 @@
 			<version>${org.webjars.highlightjs.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.webjars</groupId>
-		    <artifactId>modernizr</artifactId>
-		    <version>${org.webjars.modernizr.version}</version>
+			<groupId>org.webjars</groupId>
+			<artifactId>modernizr</artifactId>
+			<version>${org.webjars.modernizr.version}</version>
 		</dependency>
 
 		<dependency>
