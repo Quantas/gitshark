@@ -10,7 +10,13 @@ import com.google.common.html.HtmlEscapers;
 public class Hunk implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
+	private static final String NEW_LINE = "\\n";
+	private static final String TAB = "\\t";
+
+	private static final String ADD = "+";
+	private static final String REMOVE = "-";
+
 	private final String header;
 	private final String contents;
 	
@@ -24,10 +30,10 @@ public class Hunk implements Serializable {
 	}
 
 	private void calculateChanges(final String contents) {
-		Arrays.asList(contents.split("\\n")).forEach(s -> {
-			if (s.startsWith("+")) {
+		Arrays.asList(contents.split(NEW_LINE)).forEach(s -> {
+			if (s.startsWith(ADD)) {
 				additions++;
-			} else if (s.startsWith("-")) {
+			} else if (s.startsWith(REMOVE)) {
 				removals++;
 			}
 		});
@@ -42,8 +48,7 @@ public class Hunk implements Serializable {
 	}
 
 	public List<HunkLine> getContentsLines() {
-		return Arrays.stream(
-			contents.split("\n"))
+		return Arrays.stream(contents.replaceFirst(NEW_LINE, "").split(NEW_LINE))
 			.map(this::buildLine)
 			.collect(Collectors.toList());
 	}
@@ -57,8 +62,8 @@ public class Hunk implements Serializable {
 	}
 
 	private HunkLine buildLine(final String line) {
-		final boolean add = line.startsWith("+");
-		final boolean delete = line.startsWith("-");
+		final boolean add = line.startsWith(ADD);
+		final boolean delete = line.startsWith(REMOVE);
 
 		String newLine = line;
 		if (add || delete) {
@@ -66,7 +71,7 @@ public class Hunk implements Serializable {
 		}
 
 		newLine = HtmlEscapers.htmlEscaper().escape(newLine)
-			.replaceAll("\\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+			.replaceAll(TAB, "&nbsp;&nbsp;&nbsp;&nbsp;");
 
 		return new HunkLine(add, delete, newLine);
 	}
