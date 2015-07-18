@@ -46,9 +46,9 @@
 		<org.webjars.bootswatch.version>3.3.1+2</org.webjars.bootswatch.version>
 		<org.webjars.fontawesome.version>4.2.0</org.webjars.fontawesome.version>
 		<org.webjars.datatables.version>1.10.7</org.webjars.datatables.version>
-		<org.webjars.highlightjs.version>8.4-4</org.webjars.highlightjs.version>
 		<org.webjars.jquery.version>2.1.3</org.webjars.jquery.version>
 		<org.webjars.modernizr.version>2.8.3</org.webjars.modernizr.version>
+		<org.webjars.prettify.version>4-Mar-2013</org.webjars.prettify.version>
 	</properties>
 
 	<dependencies>
@@ -134,8 +134,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
-			<artifactId>highlightjs</artifactId>
-			<version>${org.webjars.highlightjs.version}</version>
+			<artifactId>prettify</artifactId>
+			<version>${org.webjars.prettify.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>

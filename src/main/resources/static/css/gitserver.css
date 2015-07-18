@@ -18,6 +18,10 @@
 	border: 0;
 }
 
+code {
+	background-color: inherit;
+}
+
 table,.label,.navbar,pre {
 	font-size: 15px;
 }

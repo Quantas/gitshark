@@ -4,6 +4,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorator="layouts/default">
 <head>
+	<script th:src="@{/webjars/prettify/4-Mar-2013/run_prettify.js}"></script>
 </head>
 <body>
 <div layout:fragment="content">
@@ -65,7 +66,7 @@
 						<td th:if="${line.add}">+</td>
 						<td th:if="${line.delete}">-</td>
 						<td th:if="${!line.add and !line.delete}">&nbsp;</td>
-						<td th:utext="${line.text}"></td>
+						<td><code th:utext="${line.text}" class="prettyprint"></code></td>
 					</tr>
 				</tbody>
 			</table>

@@ -2,19 +2,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorator="layouts/default"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+      layout:decorator="layouts/default">
 <head>
-	<script type="text/javascript" th:src="@{/webjars/highlightjs/8.4-4/highlight.min.js}"></script>
-	<link rel="stylesheet" th:href="@{/webjars/highlightjs/8.4-4/styles/github.min.css}" />
+	<script th:src="@{/webjars/prettify/4-Mar-2013/run_prettify.js}"></script>
 	<script type="text/javascript" th:src="@{/js/branchchange.js}"></script>
-	<script>
-		$(document).ready(function() {
-			$('pre.file').each(function(i, block) {
-			  hljs.highlightBlock(block);
-			});
-		});
-	</script>
 </head>
 <body>
 <div layout:fragment="content">
@@ -62,7 +53,7 @@
     		</div>
     		<img th:if="${mediaType != null}" style="max-width: 100%" th:src="'data:' + ${mediaType} + ';base64,' + ${base64contents}" />
     		<div class="alert alert-danger" th:if="${rawError != null}" th:text="${rawError}"></div>
-  			<pre class="file" th:if="${file != null and mediaType == null and rawError == null}" th:text="${file.fileContents}"></pre>
+  			<pre class="prettyprint" th:if="${file != null and mediaType == null and rawError == null}" th:text="${file.fileContents}"></pre>
 		</div>
 	</div>
 </div>
