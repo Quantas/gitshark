@@ -2,18 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorator="layouts/default"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+      layout:decorator="layouts/default">
 <head>
-	<script type="text/javascript" th:src="@{/webjars/highlightjs/8.4-4/highlight.min.js}"></script>
-	<link rel="stylesheet" th:href="@{/webjars/highlightjs/8.4-4/styles/github.min.css}" />
-	<script>
-		$(document).ready(function() {
-			$('pre.file').each(function(i, block) {
-			  hljs.highlightBlock(block);
-			});
-		});
-	</script>
 </head>
 <body>
 <div layout:fragment="content">
@@ -54,21 +44,31 @@
 	<div th:if="${diffs != null}" th:each="diff : ${diffs}">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title">
-					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/master/' + ${diff.fileName} + '?file=true'" th:text="${diff.fileName} + ' - ' + ${diff.changeType}"></a>
+				<h3 class="panel-title" style="font-weight: bold">
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/master/' + ${diff.fileName} + '?file=true'" th:text="${diff.fileName}"></a>
 					&nbsp;&nbsp;
 					<span class="pull-right">
+						<span th:text="${diff.changeType}"></span>
 						<span class="label label-success" th:text="'+ ' + ${diff.additions}"></span>
 						<span class="label label-danger" th:text="'- ' + ${diff.deletions}"></span>
 					</span>
 				</h3>
 			</div>
-	  		<div class="panel-body">
-	  			<div th:each="hunk : ${diff.hunks}">
-	  				<span th:text="${hunk.header}"></span>
-	  				<pre class="file diff" th:text="${hunk.contents}"></pre>
-	  			</div>
-			</div>
+			<table class="table table-hover hunk-table" th:each="hunk : ${diff.hunks}">
+				<thead>
+					<tr class="label-primary">
+						<td colspan="2" th:text="${hunk.header}"></td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="line : ${hunk.contentsLines}" th:class="${line.add ? 'label-success' : line.delete ? 'label-danger' : ''}">
+						<td th:if="${line.add}">+</td>
+						<td th:if="${line.delete}">-</td>
+						<td th:if="${!line.add and !line.delete}">&nbsp;</td>
+						<td th:utext="${line.text}"></td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
 </div>

@@ -10,6 +10,14 @@
 	border: none;
 }
 
+.hunk-table>thead>tr>td, .hunk-table>tbody>tr>td, .hunk-table>tfoot>tr>td {
+	line-height: 1.0;
+}
+
+.hunk-table>tbody>tr>td {
+	border: 0;
+}
+
 table,.label,.navbar,pre {
 	font-size: 15px;
 }
