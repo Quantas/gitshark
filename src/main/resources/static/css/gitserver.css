@@ -18,6 +18,18 @@
 	border: 0;
 }
 
+.hunk-header {
+	background-color: #f4f7fb;
+}
+
+.deletion {
+	background-color: #ffecec;
+}
+
+.addition {
+	background-color: #eaffea;
+}
+
 code {
 	background-color: inherit;
 }
