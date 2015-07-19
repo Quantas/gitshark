@@ -52,7 +52,7 @@ public class RefLogService {
 		return logs;
 	}
 
-	private RefLog buildRefLog(GitRepository repo, Repository db, String branch, ReflogEntry reflog) {
+	private RefLog buildRefLog(final GitRepository repo, final Repository db, final String branch, final ReflogEntry reflog) {
 		try {
 			return new RefLog(reflog, repo, db, branch);
 		} catch (final IOException e) {
