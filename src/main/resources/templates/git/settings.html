@@ -19,7 +19,11 @@
 		</div>
 		<div class="panel-body">
 			Repo Size: <span th:text="${size}"></span>
-			<br /><br />
+			<hr />
+			<form th:action="@{/repo/} + ${repo.interfaceBaseUrl} + '/settings/gc'" method="POST">
+				<button name="submit" type="submit" class="btn btn-warning btn-md">Garbage Collection</button>
+			</form>
+			<hr />
 			<form th:action="@{/repo/} + ${repo.interfaceBaseUrl} + '/settings/delete'" method="POST">
 				<button name="submit" type="submit" class="btn btn-danger btn-md">Delete Repository</button>
 			</form>
