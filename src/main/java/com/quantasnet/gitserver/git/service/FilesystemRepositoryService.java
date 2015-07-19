@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
@@ -14,8 +15,10 @@ import org.eclipse.jgit.lib.StoredConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import com.google.common.io.Files;
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
@@ -81,7 +84,13 @@ public class FilesystemRepositoryService {
 		
 		return buildRepo(newRepo, owner, name);
 	}
-	
+
+	@Cacheable(cacheNames = RepoCacheService.REPO_SIZE, key = "#repo.fullDisplayName")
+	public long repoSize(final GitRepository repo) {
+		final Iterable<File> files = Files.fileTreeTraverser().breadthFirstTraversal(repo.getFullRepoDirectory());
+		return StreamSupport.stream(files.spliterator(), false).mapToLong(File::length).sum();
+	}
+
 	public boolean deleteRepo(final GitRepository repo) {
 		// TODO check ownership/permissions here
 		try {

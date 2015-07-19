@@ -22,13 +22,14 @@ public class RepoCacheService {
 
     public static final String README = "readme";
     public static final String HAS_COMMITS = "hasCommits";
+    public static final String REPO_SIZE = "repoSize";
 
     @CacheEvict(cacheNames = { ALL_COMMITS, ALL_READMES }, allEntries = true)
     public void clearCache() {
         LOG.info("Wiping caches");
     }
 
-    @CacheEvict(cacheNames = { README, HAS_COMMITS }, key = "#repo.fullDisplayName")
+    @CacheEvict(cacheNames = { README, HAS_COMMITS, REPO_SIZE }, key = "#repo.fullDisplayName")
     public void clearCacheForRepo(final GitRepository repo) {
         LOG.info("Wiping caches for repo {}", repo.getFullDisplayName());
     }
