@@ -5,6 +5,17 @@
       layout:decorator="layouts/default">
 <head>
 	<script th:src="@{/webjars/prettify/4-Mar-2013/run_prettify.js}"></script>
+	<script>
+		$(document).ready(function() {
+			$('.fileLink').click(function(e) {
+				var name = $(this).data('filename');
+				$('html, body').animate({
+					scrollTop: $('a[name=' + name + ']').offset().top - 60
+				}, 0);
+				e.preventDefault();
+			});
+		});
+	</script>
 </head>
 <body>
 <div layout:fragment="content">
@@ -37,16 +48,37 @@
 			</span>
 		</div>
 	</div>
+
    	<div class="panel panel-default" th:if="${diffs == null}">
   		<div class="panel-body">
    			<h1>Commit not found!</h1>
 		</div>
 	</div>
-	<div th:if="${diffs != null}" th:each="diff : ${diffs}">
+
+	<div class="panel panel-default" th:if="${diffs != null}">
+		<div class="panel-heading">
+			<h3 class="panel-title" style="font-weight: bold">
+				Files in this commit
+			</h3>
+		</div>
+		<table class="table table-hover">
+			<tr th:each="diff,iterStat : ${diffs}">
+				<td>
+					<a href="#" class="fileLink" th:attr="data-filename='file' + ${iterStat.index}" th:text="${diff.fileName}"></a>
+				</td>
+				<td>
+					<span style="width: 75px;" class="label label-danger pull-right" th:text="'- ' + ${diff.deletions}"></span>
+					<span style="width: 75px;" class="label label-success pull-right" th:text="'+ ' + ${diff.additions}"></span>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<div th:if="${diffs != null}" th:each="diff,iterStat : ${diffs}">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title" style="font-weight: bold">
-					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/master/' + ${diff.fileName} + '?file=true'" th:text="${diff.fileName}"></a>
+					<a th:name="'file' + ${iterStat.index}" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/master/' + ${diff.fileName} + '?file=true'" th:text="${diff.fileName}"></a>
 					&nbsp;&nbsp;
 					<span class="pull-right">
 						<span th:text="${diff.changeType}"></span>
