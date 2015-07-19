@@ -68,6 +68,10 @@ public abstract class BaseCommit implements Serializable {
 
 	public String getMessageBody() {
 		final String header = commit.getShortMessage();
+		if (commit.getFullMessage().length() <= header.length()) {
+			return null;
+		}
+
 		return commit.getFullMessage().substring(header.length() + 1);
 	}
 
@@ -76,7 +80,7 @@ public abstract class BaseCommit implements Serializable {
 	}
 	
 	public String getShortId() {
-		return commit.getId().getName().substring(0, 7);
+		return commit.getId().getName().substring(0, 8);
 	}
 	
 	public String getCommitUrl() {

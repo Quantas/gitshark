@@ -44,7 +44,7 @@
 					<a th:href="@{/repo/} + ${parent.url}" th:text="${parent.shortId}"></a>&nbsp;
 				</span>
 				Commit:&nbsp;
-				<span th:text="${commit.shortId}"></span>
+				<a th:href="@{/repo/} + ${commit.commitUrl}" th:text="${commit.shortId}"></a>
 			</span>
 		</div>
 	</div>

@@ -38,6 +38,10 @@ public class Hunk implements Serializable {
 	}
 
 	private int determineStartLine(final String header) {
+		if (null == header) {
+			return 1;
+		}
+
 		final Matcher matcher = HEADER_PATTERN.matcher(header);
 		if (matcher.find()) {
 			return Math.abs(Integer.valueOf(matcher.group(1)));
