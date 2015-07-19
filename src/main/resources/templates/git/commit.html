@@ -58,11 +58,13 @@
 			<table class="table table-hover hunk-table" th:each="hunk : ${diff.hunks}">
 				<thead>
 					<tr class="hunk-header">
-						<td colspan="2" th:text="${hunk.header}"></td>
+						<td colspan="4" th:text="${hunk.header}"></td>
 					</tr>
 				</thead>
 				<tbody>
 					<tr th:each="line : ${hunk.contentsLines}" th:class="${line.add ? 'addition' : line.delete ? 'deletion' : ''}">
+						<td th:text="${line.leftNumber}" class="diff-line-num"></td>
+						<td th:text="${line.rightNumber}" class="diff-line-num"></td>
 						<td th:if="${line.add}">+</td>
 						<td th:if="${line.delete}">-</td>
 						<td th:if="${!line.add and !line.delete}">&nbsp;</td>

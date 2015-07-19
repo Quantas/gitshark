@@ -15,7 +15,7 @@ public class Diff implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final String HUNK_HEADER_REGEX = "(?:@@ )([-+]\\d+),(\\d+) ([+-]\\d+),(\\d+)(?: @@)";
+	static final String HUNK_HEADER_REGEX = "(?:@@ )([-+]\\d+),(\\d+) ([+-]\\d+),(\\d+)(?: @@)";
 	
 	private static final Pattern HUNK_HEADER = Pattern.compile(HUNK_HEADER_REGEX);
 	
@@ -40,8 +40,7 @@ public class Diff implements Serializable {
 	
 	private void splitHunks(final String diff) {
 		final List<String> hunkContents = 
-				Arrays.asList(diff.split(HUNK_HEADER_REGEX))
-					.stream()
+				Arrays.stream(diff.split(HUNK_HEADER_REGEX))
 					.filter(s -> !StringUtils.isEmpty(s.trim()))
 					.collect(Collectors.toList());
 		
