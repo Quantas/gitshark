@@ -13,6 +13,8 @@ public class Hunk implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final String END_OF_FILE = "\\ No newline at end of file";
+
 	private static final String NEW_LINE = "\\n";
 	private static final String TAB = "\\t";
 
@@ -85,6 +87,9 @@ public class Hunk implements Serializable {
 					currentLineLeft++;
 					rightNull = true;
 				}
+			} else if (END_OF_FILE.equals(line)) {
+				leftNull = true;
+				rightNull = true;
 			} else {
 				currentLineLeft++;
 				currentLineRight++;
