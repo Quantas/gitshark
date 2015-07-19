@@ -91,7 +91,7 @@ public class Hunk implements Serializable {
 					currentLineLeft++;
 					rightNull = true;
 				}
-			} else if (END_OF_FILE.equals(line)) {
+			} else if (END_OF_FILE.equals(line) || Diff.EMPTY_HUNK_HEADER.equals(line)) {
 				leftNull = true;
 				rightNull = true;
 			} else {

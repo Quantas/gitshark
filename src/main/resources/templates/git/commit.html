@@ -88,7 +88,7 @@
 				</h3>
 			</div>
 			<table class="table table-hover hunk-table" th:each="hunk : ${diff.hunks}">
-				<thead>
+				<thead th:if="${hunk.header != null}">
 					<tr class="hunk-header">
 						<td colspan="4" th:text="${hunk.header}"></td>
 					</tr>

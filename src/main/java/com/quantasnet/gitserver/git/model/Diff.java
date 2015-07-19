@@ -14,8 +14,9 @@ import org.springframework.util.StringUtils;
 public class Diff implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	static final String HUNK_HEADER_REGEX = "(?:@@ )([-+]\\d+),(\\d+) ([+-]\\d+),(\\d+)(?: @@)";
+	static final String EMPTY_HUNK_HEADER = "Empty File Added";
 	
 	private static final Pattern HUNK_HEADER = Pattern.compile(HUNK_HEADER_REGEX);
 	
@@ -53,7 +54,7 @@ public class Diff implements Serializable {
 		
 		for (int i = 0; i < hunkContents.size(); i++) {
 			if (hunkHeaders.isEmpty()) {
-				hunks.add(new Hunk(null, "Empty File Added"));
+				hunks.add(new Hunk(null, EMPTY_HUNK_HEADER));
 			} else {
 				hunks.add(new Hunk(hunkHeaders.get(i), hunkContents.get(i)));
 			}
