@@ -50,7 +50,7 @@
                     </div>
                     <p><span>Timed Waiting </span><span th:text="${gauges['jvm.threads.timed_waiting.count'].value}"></span></p>
                     <div class="progress">
-                        <div class="progress-bar progress-bar-warning" role="progressbar"
+                        <div class="progress-bar progress-bar-info" role="progressbar"
                              th:style="'width: ' + ${gauges['jvm.threads.timed_waiting.count'].value} * 100 / ${gauges['jvm.threads.count'].value} + '%'">
                             <span th:text="${#numbers.formatInteger(gauges['jvm.threads.timed_waiting.count'].value * 100 / gauges['jvm.threads.count'].value, 0)} + '%'"></span>
                         </div>
