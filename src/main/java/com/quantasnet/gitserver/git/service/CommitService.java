@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -54,15 +55,11 @@ public class CommitService {
     @Cacheable(cacheNames = RepoCacheService.COMMIT_COUNT, key = "{ #repo.fullDisplayName }")
     public long commitCount(final GitRepository repo) throws GitServerException {
         return repo.executeWithReturn(db -> {
-            long count = 0;
             try {
-                for (final RevCommit commit : Git.wrap(db).log().call()) {
-                    count++;
-                }
+                return StreamSupport.stream(Git.wrap(db).log().call().spliterator(), false).count();
             } catch (final GitAPIException e) {
                 throw new GitServerErrorException(e);
             }
-            return count;
         });
     }
 
