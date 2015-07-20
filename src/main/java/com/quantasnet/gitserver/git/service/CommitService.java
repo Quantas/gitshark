@@ -47,131 +47,131 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 @Service
 public class CommitService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CommitService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CommitService.class);
 
-    @Autowired
-    private RepositoryUtilities repoUtils;
+	@Autowired
+	private RepositoryUtilities repoUtils;
 
-    @Cacheable(cacheNames = RepoCacheService.COMMIT_COUNT, key = "{ #repo.fullDisplayName }")
-    public long commitCount(final GitRepository repo) throws GitServerException {
-        return repo.executeWithReturn(db -> {
-            try {
-                return StreamSupport.stream(Git.wrap(db).log().call().spliterator(), false).count();
-            } catch (final GitAPIException e) {
-                throw new GitServerErrorException(e);
-            }
-        });
-    }
+	@Cacheable(cacheNames = RepoCacheService.COMMIT_COUNT, key = "{ #repo.fullDisplayName }")
+	public long commitCount(final GitRepository repo) throws GitServerException {
+		return repo.executeWithReturn(db -> {
+			try {
+				return StreamSupport.stream(Git.wrap(db).log().call().spliterator(), false).count();
+			} catch (final GitAPIException e) {
+				throw new GitServerErrorException(e);
+			}
+		});
+	}
 
-    @Cacheable(cacheNames = RepoCacheService.ALL_COMMITS, key = "{ #repo.fullDisplayName, #selected }")
-    public List<Commit> getCommits(final GitRepository repo, final String selected, final Repository db) throws IOException, CommitNotFoundException {
-        LOG.info("Cache Miss - {}, {}", repo.getFullDisplayName(), selected);
+	@Cacheable(cacheNames = RepoCacheService.ALL_COMMITS, key = "{ #repo.fullDisplayName, #selected }")
+	public List<Commit> getCommits(final GitRepository repo, final String selected, final Repository db) throws IOException, CommitNotFoundException {
+		LOG.info("Cache Miss - {}, {}", repo.getFullDisplayName(), selected);
 
-        final Map<ObjectId, String> branchHeads = new HashMap<>();
+		final Map<ObjectId, String> branchHeads = new HashMap<>();
 
-        RevCommit selectedCommit = null;
+		RevCommit selectedCommit = null;
 
-        if (null == selected) {
-            final Set<String> branches = db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet();
+		if (null == selected) {
+			final Set<String> branches = db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet();
 
-            for (final String branch : branches) {
-                try {
-                    final RevCommit commit = Git.wrap(db).log().add(db.resolve(branch)).setMaxCount(1).call().iterator().next();
-                    branchHeads.put(commit.getId(), branch);
-                } catch (final GitAPIException e) {
-                    LOG.error("Error getting head commit for branch {}", branch, e);
-                }
-            }
-        } else {
-            selectedCommit = repoUtils.getRefHeadCommit(selected, db);
-            branchHeads.put(selectedCommit.getId(), selected);
-        }
+			for (final String branch : branches) {
+				try {
+					final RevCommit commit = Git.wrap(db).log().add(db.resolve(branch)).setMaxCount(1).call().iterator().next();
+					branchHeads.put(commit.getId(), branch);
+				} catch (final GitAPIException e) {
+					LOG.error("Error getting head commit for branch {}", branch, e);
+				}
+			}
+		} else {
+			selectedCommit = repoUtils.getRefHeadCommit(selected, db);
+			branchHeads.put(selectedCommit.getId(), selected);
+		}
 
-        final int maxCount = 50;
-        final List<Commit> commits = new ArrayList<>();
+		final int maxCount = 50;
+		final List<Commit> commits = new ArrayList<>();
 
-        try (final RevWalk revWalk = new RevWalk(db)) {
-            if (null == selectedCommit) {
-                final List<RevCommit> headCommits = new ArrayList<>();
-                final Map<String, Ref> refs = db.getRefDatabase().getRefs(ALL);
-                for (Ref ref : refs.values()) {
-                    if(!ref.isPeeled()) {
-                        ref = db.peel(ref);
-                    }
+		try (final RevWalk revWalk = new RevWalk(db)) {
+			if (null == selectedCommit) {
+				final List<RevCommit> headCommits = new ArrayList<>();
+				final Map<String, Ref> refs = db.getRefDatabase().getRefs(ALL);
+				for (Ref ref : refs.values()) {
+					if (!ref.isPeeled()) {
+						ref = db.peel(ref);
+					}
 
-                    ObjectId objectId = ref.getPeeledObjectId();
-                    if (null == objectId) {
-                        objectId = ref.getObjectId();
-                    }
-                    RevCommit commit = null;
-                    try {
-                        commit = revWalk.parseCommit(objectId);
-                    } catch (MissingObjectException | IncorrectObjectTypeException e) {
-                        LOG.trace("Exception while parsing what should have been a known objectid {}", objectId, e);
-                    }
-                    if (commit != null) {
-                        headCommits.add(commit);
-                    }
-                }
-                revWalk.markStart(headCommits);
-            } else {
-                revWalk.markStart(selectedCommit);
-            }
+					ObjectId objectId = ref.getPeeledObjectId();
+					if (null == objectId) {
+						objectId = ref.getObjectId();
+					}
+					RevCommit commit = null;
+					try {
+						commit = revWalk.parseCommit(objectId);
+					} catch (MissingObjectException | IncorrectObjectTypeException e) {
+						LOG.trace("Exception while parsing what should have been a known objectid {}", objectId, e);
+					}
+					if (commit != null) {
+						headCommits.add(commit);
+					}
+				}
+				revWalk.markStart(headCommits);
+			} else {
+				revWalk.markStart(selectedCommit);
+			}
 
-            for (final RevCommit rev : revWalk) {
-                commits.add(new Commit(rev, repo, branchHeads.get(rev.getId())));
-                if (commits.size() == maxCount) {
-                    break;
-                }
-            }
-        }
+			for (final RevCommit rev : revWalk) {
+				commits.add(new Commit(rev, repo, branchHeads.get(rev.getId())));
+				if (commits.size() == maxCount) {
+					break;
+				}
+			}
+		}
 
-        return commits;
-    }
+		return commits;
+	}
 
-    @Cacheable(cacheNames = RepoCacheService.COMMIT, key = "{ #repo.fullDisplayName, #parent == null ? '' : #parent.name, #commit.name }")
-    public List<Diff> getDiffsForCommmit(final GitRepository repo, final Repository db, final RevCommit parent, final RevCommit commit, final RevWalk revWalk) throws IOException, GitAPIException {
-        LOG.info("Cache Miss - {}, {}, {}", repo.getFullDisplayName(), parent == null ? "" : parent.getName(), commit.getName());
+	@Cacheable(cacheNames = RepoCacheService.COMMIT, key = "{ #repo.fullDisplayName, #parent == null ? '' : #parent.name, #commit.name }")
+	public List<Diff> getDiffsForCommmit(final GitRepository repo, final Repository db, final RevCommit parent, final RevCommit commit, final RevWalk revWalk) throws IOException, GitAPIException {
+		LOG.info("Cache Miss - {}, {}, {}", repo.getFullDisplayName(), parent == null ? "" : parent.getName(), commit.getName());
 
-        final List<DiffEntry> diff = Git.wrap(db)
-                .diff()
-                .setOldTree(prepareTree(parent, db, revWalk))
-                .setNewTree(prepareTree(commit, db, revWalk))
-                .call();
+		final List<DiffEntry> diff = Git.wrap(db)
+				.diff()
+				.setOldTree(prepareTree(parent, db, revWalk))
+				.setNewTree(prepareTree(commit, db, revWalk))
+				.call();
 
-        final List<Diff> diffs = new ArrayList<>();
+		final List<Diff> diffs = new ArrayList<>();
 
-        for (final DiffEntry entry : diff) {
-            try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                 final DiffFormatter formatter = new DiffFormatter(baos)) {
-                formatter.setRepository(db);
-                formatter.format(entry);
+		for (final DiffEntry entry : diff) {
+			try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				 final DiffFormatter formatter = new DiffFormatter(baos)) {
+				formatter.setRepository(db);
+				formatter.format(entry);
 
-                final DiffEntry.ChangeType changeType = entry.getChangeType();
+				final DiffEntry.ChangeType changeType = entry.getChangeType();
 
-                diffs.add(
-                        new Diff(
-                                baos.toString(),
-                                changeType == DiffEntry.ChangeType.DELETE ? entry.getOldPath() : entry.getNewPath(),
-                                changeType)
-                );
-            }
-        }
+				diffs.add(
+						new Diff(
+								baos.toString(),
+								changeType == DiffEntry.ChangeType.DELETE ? entry.getOldPath() : entry.getNewPath(),
+								changeType)
+				);
+			}
+		}
 
-        return diffs;
-    }
+		return diffs;
+	}
 
-    private AbstractTreeIterator prepareTree(final RevCommit commit, final Repository db, final RevWalk revWalk) throws IOException {
-        if (null == commit) {
-            return new EmptyTreeIterator();
-        } else {
-            final RevTree tree = revWalk.parseTree(commit.getTree().getId());
-            final CanonicalTreeParser parser = new CanonicalTreeParser();
-            final ObjectReader reader = db.newObjectReader();
+	private AbstractTreeIterator prepareTree(final RevCommit commit, final Repository db, final RevWalk revWalk) throws IOException {
+		if (null == commit) {
+			return new EmptyTreeIterator();
+		} else {
+			final RevTree tree = revWalk.parseTree(commit.getTree().getId());
+			final CanonicalTreeParser parser = new CanonicalTreeParser();
+			final ObjectReader reader = db.newObjectReader();
 
-            parser.reset(reader, tree.getId());
+			parser.reset(reader, tree.getId());
 
-            return parser;
-        }
-    }
+			return parser;
+		}
+	}
 }
