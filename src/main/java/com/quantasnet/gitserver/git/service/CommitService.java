@@ -34,6 +34,8 @@ import org.springframework.stereotype.Service;
 
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.exception.CommitNotFoundException;
+import com.quantasnet.gitserver.git.exception.GitServerErrorException;
+import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.Diff;
 import com.quantasnet.gitserver.git.repo.GitRepository;
@@ -48,6 +50,21 @@ public class CommitService {
 
     @Autowired
     private RepositoryUtilities repoUtils;
+
+    @Cacheable(cacheNames = RepoCacheService.COMMIT_COUNT, key = "{ #repo.fullDisplayName }")
+    public long commitCount(final GitRepository repo) throws GitServerException {
+        return repo.executeWithReturn(db -> {
+            long count = 0;
+            try {
+                for (final RevCommit commit : Git.wrap(db).log().call()) {
+                    count++;
+                }
+            } catch (final GitAPIException e) {
+                throw new GitServerErrorException(e);
+            }
+            return count;
+        });
+    }
 
     @Cacheable(cacheNames = RepoCacheService.ALL_COMMITS, key = "{ #repo.fullDisplayName, #selected }")
     public List<Commit> getCommits(final GitRepository repo, final String selected, final Repository db) throws IOException, CommitNotFoundException {

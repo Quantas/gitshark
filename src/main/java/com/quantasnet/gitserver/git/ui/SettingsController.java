@@ -15,6 +15,7 @@ import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.git.service.CommitService;
 import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
 import com.quantasnet.gitserver.git.service.RepoCacheService;
 
@@ -26,11 +27,15 @@ public class SettingsController {
 	private FilesystemRepositoryService repoService;
 
 	@Autowired
+	private CommitService commitService;
+
+	@Autowired
 	private RepoCacheService repoCacheService;
 	
 	@RequestMapping(method = RequestMethod.GET)
-	public String settings(final GitRepository repo, final Model model) {
+	public String settings(final GitRepository repo, final Model model) throws GitServerException {
 		model.addAttribute("size", readableFileSize(repoService.repoSize(repo)));
+		model.addAttribute("commitCount", commitService.commitCount(repo));
 		return "git/settings";
 	}
 	
@@ -60,7 +65,7 @@ public class SettingsController {
 		return "redirect:/repo/" + repo.getInterfaceBaseUrl() + "/settings";
 	}
 
-	public static String readableFileSize(final long size) {
+	private static String readableFileSize(final long size) {
 		if (size <= 0) {
 			return "0";
 		}
