@@ -34,8 +34,10 @@ public class SettingsController {
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String settings(final GitRepository repo, final Model model) throws GitServerException {
-		model.addAttribute("size", readableFileSize(repoService.repoSize(repo)));
-		model.addAttribute("commitCount", commitService.commitCount(repo));
+		if (repo.hasCommits()) {
+			model.addAttribute("size", readableFileSize(repoService.repoSize(repo)));
+			model.addAttribute("commitCount", commitService.commitCount(repo));
+		}
 		return "git/settings";
 	}
 	
