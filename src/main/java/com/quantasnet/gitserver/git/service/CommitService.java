@@ -134,10 +134,10 @@ public class CommitService {
 		LOG.info("Cache Miss - {}, {}, {}", repo.getFullDisplayName(), parent == null ? "" : parent.getName(), commit.getName());
 
 		final List<DiffEntry> diff = Git.wrap(db)
-				.diff()
-				.setOldTree(prepareTree(parent, db, revWalk))
-				.setNewTree(prepareTree(commit, db, revWalk))
-				.call();
+			.diff()
+			.setOldTree(prepareTree(parent, db, revWalk))
+			.setNewTree(prepareTree(commit, db, revWalk))
+			.call();
 
 		final List<Diff> diffs = new ArrayList<>();
 
@@ -149,11 +149,10 @@ public class CommitService {
 
 				final DiffEntry.ChangeType changeType = entry.getChangeType();
 
-				diffs.add(
-						new Diff(
-								baos.toString(),
-								changeType == DiffEntry.ChangeType.DELETE ? entry.getOldPath() : entry.getNewPath(),
-								changeType)
+				diffs.add(new Diff(
+					baos.toString(),
+					changeType == DiffEntry.ChangeType.DELETE ? entry.getOldPath() : entry.getNewPath(),
+					changeType)
 				);
 			}
 		}
