@@ -45,15 +45,14 @@ public class TreeController {
 	
 	@RequestMapping("/tree")
 	public String displayRepoTreeNoBranch(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, final Model model, final HttpServletRequest req) throws GitServerException {
-		final StringBuilder builder = new StringBuilder();
-		repo.execute(db -> {
+		final String branch = repo.executeWithReturn(db -> {
 			try {
-				builder.append(db.getBranch());
+				return db.getBranch();
 			} catch (final Exception e) {
 				throw new GitServerErrorException(e);
 			}
 		});
-		return displayRepoTree(repo, repoOwner, repoName, builder.toString(), false, model, req);
+		return displayRepoTree(repo, repoOwner, repoName, branch, false, model, req);
 	}
 	
 	@RequestMapping("/tree/{branch}/**")
