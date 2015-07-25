@@ -24,7 +24,9 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 public class ReadmeFileService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReadmeFileService.class);
-	
+
+	private final Asciidoctor asciidoctor = Factory.create();
+
 	@Autowired
 	private RepositoryUtilities repoUtils;
 	
@@ -63,7 +65,6 @@ public class ReadmeFileService {
 	}
 	
 	private String renderAsciiDoc(final String originalText) {
-		final Asciidoctor asciidoctor = Factory.create();
 		return asciidoctor.convert(originalText, new HashMap<>());
 	}
 }
