@@ -51,7 +51,7 @@ public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 	}
 
 	private String generateUrl(final GitRepository repo) {
-		return repo.getInterfaceBaseUrl() + "/tree" + branch + '/' + parent + name;
+		return repo.getInterfaceBaseUrl() + "/tree/" + branch + '/' + parent + name;
 	}
 	
 	public String getName() {
