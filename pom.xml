@@ -41,7 +41,6 @@
 		<org.asciidoctor.version>1.5.2</org.asciidoctor.version>
 		<org.eclipse.jgit.version>4.0.1.201506240215-r</org.eclipse.jgit.version>
 		<org.apache.commons.commons-lang3.version>3.4</org.apache.commons.commons-lang3.version>
-		<org.pegdown.version>1.5.0</org.pegdown.version>
 		<org.webjars.bootstrap.version>3.3.1</org.webjars.bootstrap.version>
 		<org.webjars.bootswatch.version>3.3.1+2</org.webjars.bootswatch.version>
 		<org.webjars.fontawesome.version>4.2.0</org.webjars.fontawesome.version>
@@ -143,11 +142,6 @@
 			<version>${org.webjars.modernizr.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.pegdown</groupId>
-			<artifactId>pegdown</artifactId>
-			<version>${org.pegdown.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.asciidoctor</groupId>
 			<artifactId>asciidoctorj</artifactId>

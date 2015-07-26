@@ -44,34 +44,34 @@ public class TreeController {
 	private ReadmeFileService readmeService;
 	
 	@RequestMapping("/tree")
-	public String displayRepoTreeNoBranch(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, final Model model, final HttpServletRequest req) throws GitServerException {
-		final String branch = repo.executeWithReturn(db -> {
+	public String displayRepoTreeNoBranch(final GitRepository repo, final Model model, final HttpServletRequest req) throws GitServerException {
+		final String ref = repo.executeWithReturn(db -> {
 			try {
 				return db.getBranch();
 			} catch (final Exception e) {
 				throw new GitServerErrorException(e);
 			}
 		});
-		return displayRepoTree(repo, repoOwner, repoName, branch, false, model, req);
+		return displayRepoTree(repo, ref, false, model, req);
 	}
 	
-	@RequestMapping("/tree/{branch}/**")
-	public String displayRepoTree(final GitRepository repo, @PathVariable final String repoOwner, @PathVariable final String repoName, @PathVariable final String branch, @RequestParam(required = false) final boolean file, final Model model, final HttpServletRequest req) throws GitServerException {
-		final String repoPath = "/repo/" + repoOwner + '/' + repoName + "/tree/" + branch + '/';
-		final String path = repoUtils.resolvePath(req, repoPath, branch);
+	@RequestMapping("/tree/{ref}/**")
+	public String displayRepoTree(final GitRepository repo, @PathVariable final String ref, @RequestParam(required = false) final boolean file, final Model model, final HttpServletRequest req) throws GitServerException {
+		final String repoPath = "/repo/" + repo.getInterfaceBaseUrl() + "/tree/" + ref + '/';
+		final String path = repoUtils.resolvePath(req, repoPath, ref);
 		
-		model.addAttribute("branch", branch);
-		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repoName, repoPath, path));
+		model.addAttribute("branch", ref);
+		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repo.getDisplayName(), repoPath, path));
 		
 		repo.execute(db -> {
 			if (repo.hasCommits()) {
 				repoUtils.addRefsToModel(model, db);
 				
-				final RevCommit commit = repoUtils.getRefHeadCommit(branch, db);
+				final RevCommit commit = repoUtils.getRefHeadCommit(ref, db);
 				model.addAttribute("lastCommit", new Commit(commit, repo));
 				
 				if (file) {
-					final RepoFile repoFile = repoUtils.getFileToDisplay(repo, db, branch, path);
+					final RepoFile repoFile = repoUtils.getFileToDisplay(repo, db, ref, path);
 
 					if (null != repoFile) {
 						final Tika tika = new Tika();
@@ -88,10 +88,10 @@ public class TreeController {
 						model.addAttribute("file", repoFile);
 					}
 				} else {
-					final List<RepoFile> files = repoUtils.getFiles(repo, db, branch, path, false);
+					final List<RepoFile> files = repoUtils.getFiles(repo, db, ref, path, false);
 
 					if (repoUtils.isPathRoot(path)) {
-						model.addAttribute("readme", readmeService.resolveReadMeFile(repo, db, files));
+						model.addAttribute("readme", readmeService.resolveReadMeFile(repo, db, ref, files));
 					}
 
 					model.addAttribute("files", files);

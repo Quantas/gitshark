@@ -65,10 +65,10 @@
    	<div th:if="${readme != null}" class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title">
-				<span style="font-weight: bold;">README</span>
+				<span style="font-weight: bold;" th:text="${readme.name}"></span>
 			</h3>
 		</div>
-  		<div class="panel-body" th:utext="${readme}">
+  		<div class="panel-body" th:utext="${readme.contents}">
 		</div>
 	</div>
 </div>

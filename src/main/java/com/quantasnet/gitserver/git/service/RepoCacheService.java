@@ -20,7 +20,6 @@ public class RepoCacheService {
     
     public static final String COMMIT = "commit";
 
-    public static final String README = "readme";
     public static final String HAS_COMMITS = "hasCommits";
     public static final String COMMIT_COUNT = "commitCount";
     public static final String REPO_SIZE = "repoSize";
@@ -30,7 +29,7 @@ public class RepoCacheService {
         LOG.info("Wiping caches");
     }
 
-    @CacheEvict(cacheNames = { README, HAS_COMMITS, COMMIT_COUNT, REPO_SIZE }, key = "#repo.fullDisplayName")
+    @CacheEvict(cacheNames = { HAS_COMMITS, COMMIT_COUNT, REPO_SIZE }, key = "#repo.fullDisplayName")
     public void clearCacheForRepo(final GitRepository repo) {
         LOG.info("Wiping caches for repo {}", repo.getFullDisplayName());
     }
