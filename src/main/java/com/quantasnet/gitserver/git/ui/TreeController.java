@@ -15,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.common.collect.ImmutableSet;
 import com.quantasnet.gitserver.git.exception.GitServerErrorException;
@@ -52,26 +51,34 @@ public class TreeController {
 				throw new GitServerErrorException(e);
 			}
 		});
-		return displayRepoTree(repo, ref, false, model, req);
+		return displayRepoTree(repo, ref, model, req);
 	}
 	
 	@RequestMapping("/tree/{ref}/**")
-	public String displayRepoTree(final GitRepository repo, @PathVariable final String ref, @RequestParam(required = false) final boolean file, final Model model, final HttpServletRequest req) throws GitServerException {
+	public String displayRepoTree(final GitRepository repo, @PathVariable final String ref, final Model model, final HttpServletRequest req) throws GitServerException {
 		final String repoPath = "/repo/" + repo.getInterfaceBaseUrl() + "/tree/" + ref + '/';
 		final String path = repoUtils.resolvePath(req, repoPath, ref);
 		
 		model.addAttribute("branch", ref);
 		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repo.getDisplayName(), repoPath, path));
 		
-		repo.execute(db -> {
+		return repo.executeWithReturn(db -> {
 			if (repo.hasCommits()) {
 				repoUtils.addRefsToModel(model, db);
 				
 				final RevCommit commit = repoUtils.getRefHeadCommit(ref, db);
 				model.addAttribute("lastCommit", new Commit(commit, repo));
-				
+
+				final List<RepoFile> files = repoUtils.getFiles(repo, db, ref, path, true);
+
+				boolean file = false;
+
+				if (!files.get(0).isDirectory()) {
+					file = true;
+				}
+
 				if (file) {
-					final RepoFile repoFile = repoUtils.getFileToDisplay(repo, db, ref, path);
+					final RepoFile repoFile = files.get(0);
 
 					if (null != repoFile) {
 						final Tika tika = new Tika();
@@ -86,10 +93,9 @@ public class TreeController {
 						}
 
 						model.addAttribute("file", repoFile);
+						return "git/file";
 					}
 				} else {
-					final List<RepoFile> files = repoUtils.getFiles(repo, db, ref, path, false);
-
 					if (repoUtils.isPathRoot(path)) {
 						model.addAttribute("readme", readmeService.resolveReadMeFile(repo, db, ref, files));
 					}
@@ -97,11 +103,7 @@ public class TreeController {
 					model.addAttribute("files", files);
 				}
 			}
+			return "git/tree";
 		});
-		
-		if (file) {
-			return "git/file";
-		}
-		return "git/tree";
 	}
 }

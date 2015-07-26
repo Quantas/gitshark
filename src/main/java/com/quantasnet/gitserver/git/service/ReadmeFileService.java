@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Asciidoctor.Factory;
 import org.asciidoctor.AttributesBuilder;
@@ -38,6 +40,9 @@ public class ReadmeFileService {
 
 	@Autowired
 	private RepositoryUtilities repoUtils;
+
+	@Autowired
+	private ServletContext servletContext;
 	
 	@Cacheable(cacheNames = RepoCacheService.ALL_READMES, key = "{ #repo.fullDisplayName, #branch }")
 	public ReadmeFile resolveReadMeFile(final GitRepository repo, final Repository db, final String branch) throws GitServerException {
@@ -53,7 +58,7 @@ public class ReadmeFileService {
 					final String fileName = file.getName();
 					if (ASCIIDOC_NAMES.contains(fileName.toLowerCase())) {
 						final String readme = new String(repoUtils.getFileContents(db, ObjectId.fromString(file.getObjectId())));
-						return new ReadmeFile(fileName, renderAsciiDoc(readme));
+						return new ReadmeFile(fileName, renderAsciiDoc(readme, repo, branch));
 					} else if (MARKDOWN_NAMES.contains(fileName.toLowerCase())) {
 						final String readme = new String(repoUtils.getFileContents(db, ObjectId.fromString(file.getObjectId())));
 						return new ReadmeFile(fileName, renderMarkdown(readme));
@@ -66,17 +71,22 @@ public class ReadmeFileService {
 		}
 	}
 	
-	private String renderAsciiDoc(final String originalText) {
+	private String renderAsciiDoc(final String originalText, final GitRepository repo, final String branch) {
 		final Options options = OptionsBuilder
 			.options()
 			.safe(SafeMode.SERVER)
 			.backend("xhtml5")
 			.attributes(AttributesBuilder.attributes().showTitle(true))
 			.get();
-		return asciidoctor.render(originalText, options);
+		return asciidoctor.render(fixLinks(originalText, repo, branch), options);
 	}
 
 	private String renderMarkdown(final String originalText) {
 		return new PegDownProcessor().markdownToHtml(originalText);
+	}
+
+	private String fixLinks(final String originalText, final GitRepository repo, final String branch) {
+		return originalText.replaceAll("link:",
+				"link:" + servletContext.getContextPath() + "/repo/" + repo.getInterfaceBaseUrl() + "/tree/" + branch + "/");
 	}
 }

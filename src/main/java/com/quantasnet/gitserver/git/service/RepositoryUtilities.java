@@ -46,6 +46,10 @@ public class RepositoryUtilities {
 		if (path.endsWith("/tree")) {
 			path += "/" + branch + "/";
 		}
+
+		if (path.endsWith("/tree/")) {
+			path += branch + "/";
+		}
 		
 		if (!path.endsWith("/")) {
 			path = path + "/";
@@ -73,15 +77,6 @@ public class RepositoryUtilities {
 			}
 			return false;
 		});
-	}
-
-	public RepoFile getFileToDisplay(final GitRepository repo, final Repository db, final String branch, final String path) throws GitServerException {
-		final List<RepoFile> files = getFiles(repo, db, branch, path, true);
-		if (!files.isEmpty()) {
-			return files.get(0);
-		}
-		
-		return null;
 	}
 	
 	public List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String branch, final String path, final boolean file) throws GitServerException {
@@ -117,7 +112,7 @@ public class RepositoryUtilities {
 					alreadyInside = true;
 					
 					// If we don't want a single file, we need a dummy file for navigating backwards
-					if (!file) {
+					if (directory) {
 						// Add dummy file for navigating backwards
 						files.add(buildBackwardsNavigationFile(repo, pathString, branch));
 						continue;
@@ -130,18 +125,23 @@ public class RepositoryUtilities {
 					final RepoFile repoFile = buildRepoFileObject(repo, db, path, branch, customPath, pathString, directory, objectId); 
 					files.add(repoFile);
 					
-					// if we wanted just a single file, get it's contents for display and get out of here
-					if (file) {
-						repoFile.setFileContentsRaw(getFileContents(db, objectId));
-						break;
-					}
 				}
 			}
 		} catch (final IOException | GitAPIException e) {
 			throw new GitServerErrorException(e);
 		}
 		
-		Collections.sort(files);
+		if (files.size() == 1) {
+			// if we wanted just a single file, get it's contents for display and get out of here
+			try {
+				files.get(0).setFileContentsRaw(getFileContents(db, ObjectId.fromString(files.get(0).getObjectId())));
+			} catch (IOException e) {
+				throw new GitServerErrorException(e);
+			}
+		} else if (files.size() > 1) {
+			Collections.sort(files);
+		}
+
 		return files;
 	}
 
