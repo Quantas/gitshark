@@ -49,10 +49,20 @@ table,.label,.navbar,pre {
 	font-size: 15px;
 }
 
-.readme-section h1,
-.readme-section h2 {
-	margin-top: 5px;
+.readme-section h1 {
+	margin-top: 0px;
 	border-bottom: 1px solid #cccccc;
+}
+
+.readme-section h2 {
+	margin-top: 20px;
+	border-bottom: 1px solid #cccccc;
+}
+
+.readme-section h3,
+.readme-section h4,
+.readme-section h5 {
+	margin-top: 20px;
 }
 
 .readme-section table,
