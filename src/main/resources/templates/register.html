@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/default">
+<head>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="center-block" style="max-width: 600px;">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h1 class="panel-title">Register New Account</h1>
+            </div>
+            <div class="panel-body">
+                <form th:object="${registrationForm}" th:action="@{/register}" method="post" class="form">
+                    <div class="alert alert-danger" th:if="${#fields.hasErrors('*')}">
+                        <p th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>
+                    </div>
+                    <table class="table">
+                        <tr>
+                            <th><label for="userName">User Name</label></th>
+                            <td><input th:field="*{userName}" id="userName" name="userName" type="text" class="form-control input-md" placeholder="User Name" /></td>
+                        </tr>
+                        <tr>
+                            <th><label for="password">Password</label></th>
+                            <td><input th:field="*{password}" id="password" name="password" type="password" class="form-control input-md" placeholder="Password" /></td>
+                        </tr>
+                        <tr>
+                            <th><label for="passwordAgain">Password</label></th>
+                            <td><input id="passwordAgain" name="passwordAgain" type="password" class="form-control input-md" placeholder="Password Again" /></td>
+                        </tr>
+                        <tr>
+                            <th><label for="firstName">First Name</label></th>
+                            <td><input th:field="*{firstName}" id="firstName" name="firstName" type="text" class="form-control input-md" placeholder="First Name" /></td>
+                        </tr>
+                        <tr>
+                            <th><label for="lastName">Last Name</label></th>
+                            <td><input th:field="*{lastName}" id="lastName" name="lastName" type="text" class="form-control input-md" placeholder="Last Name" /></td>
+                        </tr>
+                        <tr>
+                            <th><label for="email">E-Mail</label></th>
+                            <td><input th:field="*{email}" id="email" name="email" type="text" class="form-control input-md" placeholder="E-Mail" /></td>
+                        </tr>
+                    </table>
+                    <button id="submit" type="submit" name="submit" class="btn btn-md btn-primary btn-block">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

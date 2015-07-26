@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/default"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+	<script type="text/javascript" th:src="@{/js/branchchange.js}"></script>
+</head>
+<body>
+<div layout:fragment="content">
+    <div layout:include="git/fragments/header :: header">
+    	Git Header here
+    </div>
+   	<div th:if="${repo.commits}" class="panel panel-default">
+		<div class="panel-heading">
+			<div class="panel-title" style="font-weight: bold;">
+				<div style="display: inline;" layout:include="git/fragments/breadcrumbs :: breadcrumbs">
+					breadcrumbs
+				</div>
+			</div>
+		</div>
+		<div class="panel-heading">
+			<div th:if="${lastCommit == null}">
+				Tag: <span th:text="${branch}"></span>
+			</div>
+			<div th:if="${lastCommit != null}">
+				<div class="pull-left">
+					<img th:src="${lastCommit.gravatarUrl} + '&amp;s=25'" th:alt="${lastCommit.authorName} + ' Avatar'" />
+					&nbsp;&nbsp;
+					<span th:text="${lastCommit.authorName}"></span>
+					&nbsp;-&nbsp;
+					<a th:href="@{/repo/} + ${lastCommit.commitUrl}" th:text="${lastCommit.commit.shortMessage}"></a>
+				</div>
+				<div class="pull-right">
+					<time class="timeago" th:attr="datetime=${lastCommit.dateTimeString}"></time>
+				</div>
+				<div class="clearfix"></div>
+			</div>
+		</div>
+		<span th:if="${#lists.isEmpty(files)}" class="container" style="text-align: center;">
+			<h4>
+				<i class="fa fa-fw fa-code-fork"></i>
+				This directory did not exist at this point in time.
+			</h4>
+		</span>
+		<table th:if="${!#lists.isEmpty(files)}" class="table table-hover">
+	   		<tr th:each="file : ${files}">
+	   			<td>
+	   				<i th:if="${file.directory}" class="fa fa-fw fa-folder"></i>
+	   				<i th:if="${!file.directory}" class="fa fa-fw fa-file-o"></i>
+	   				&nbsp;&nbsp;
+	   				<a th:href="@{/repo/} + ${file.url}" th:text="${file.display}">Filename</a>
+				</td>
+				<td>
+					<a th:if="${!file.directory and file.commit != null}" th:href="@{/repo/} + ${file.commitUrl}" th:text="${file.commit.shortMessage}">message</a>
+				</td>
+				<td class="text-right">
+					<time th:if="${!file.directory}" class="timeago" th:attr="datetime=${file.dateTimeString}"></time>
+				</td>
+	   		</tr>
+	   	</table>
+	</div>
+	
+   	<div th:if="${readme != null}" class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">
+				<span style="font-weight: bold;" th:text="${readme.name}"></span>
+			</h3>
+		</div>
+  		<div class="panel-body readme-section" th:utext="${readme.contents}">
+		</div>
+	</div>
+</div>
+</body>
+</html>

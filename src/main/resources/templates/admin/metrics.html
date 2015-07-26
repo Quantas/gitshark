@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/default">
+<head>
+</head>
+<body>
+<div layout:fragment="content">
+	<div class="panel panel-default">
+	    <div class="panel-heading">
+	        <h1 class="panel-title">
+	        	<span style="font-weight: bold;">HTTP Metrics</span>
+	        </h1>
+	    </div>
+	    <div class="panel-body">
+	    	<p><span>Active requests</span> <strong th:text="${counters['com.codahale.metrics.servlet.InstrumentedFilter.activeRequests'].count}"></strong>
+	    	&nbsp;-&nbsp;<span>Total requests</span> <strong th:text="${timers['com.codahale.metrics.servlet.InstrumentedFilter.requests'].count}"></strong></p>
+			<div class="table-responsive">
+			    <table class="table table-striped">
+			        <thead>
+			        <tr>
+			            <th>Code</th>
+			            <th>Count</th>
+			            <th class="text-right">Mean</th>
+			            <th class="text-right"><span>Average</span> (1 min)</th>
+			            <th class="text-right"><span>Average</span> (5 min)</th>
+			            <th class="text-right"><span>Average</span> (15 min)</th>
+			        </tr>
+			        </thead>
+			        <tbody>
+			        <tr>
+			            <td>OK</td>
+			            <td>
+			                <div class="progress">
+			                    <div class="progress-bar progress-bar-success" role="progressbar"
+			                         th:style="'width: ' + ${#numbers.formatInteger(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.ok'].count * 100 / timers['com.codahale.metrics.servlet.InstrumentedFilter.requests'].count, 0)} + '%'">
+			                        <span th:text="${meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.ok'].count}"></span>
+			                    </div>
+		                    </div>
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.ok'].meanRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.ok'].oneMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.ok'].fiveMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right"  th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.ok'].fifteenMinuteRate, 1, 2)}">
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>Not Found</td>
+			            <td>
+			                <div class="progress">
+			                    <div class="progress-bar progress-bar-success" role="progressbar"
+			                         th:style="'width: ' + ${#numbers.formatInteger(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.notFound'].count * 100 / timers['com.codahale.metrics.servlet.InstrumentedFilter.requests'].count, 0)} + '%'">
+			                        <span th:text="${meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.notFound'].count}"></span>
+			                    </div>
+		                    </div>
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.notFound'].meanRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.notFound'].oneMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.notFound'].fiveMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right"  th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.notFound'].fifteenMinuteRate, 1, 2)}">
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>Server Error</td>
+			            <td>
+			                <div class="progress">
+			                    <div class="progress-bar progress-bar-success" role="progressbar"
+			                         th:style="'width: ' + ${#numbers.formatInteger(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.serverError'].count * 100 / timers['com.codahale.metrics.servlet.InstrumentedFilter.requests'].count, 0)} + '%'">
+			                        <span th:text="${meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.serverError'].count}"></span>
+			                    </div>
+		                    </div>
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.serverError'].meanRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.serverError'].oneMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.serverError'].fiveMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right"  th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.serverError'].fifteenMinuteRate, 1, 2)}">
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>Bad Request</td>
+			            <td>
+			                <div class="progress">
+			                    <div class="progress-bar progress-bar-success" role="progressbar"
+			                         th:style="'width: ' + ${#numbers.formatInteger(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.badRequest'].count * 100 / timers['com.codahale.metrics.servlet.InstrumentedFilter.requests'].count, 0)} + '%'">
+			                        <span th:text="${meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.badRequest'].count}"></span>
+			                    </div>
+		                    </div>
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.badRequest'].meanRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.badRequest'].oneMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right" th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.badRequest'].fiveMinuteRate, 1, 2)}">
+			            </td>
+			            <td class="text-right"  th:text="${#numbers.formatDecimal(meters['com.codahale.metrics.servlet.InstrumentedFilter.responseCodes.badRequest'].fifteenMinuteRate, 1, 2)}">
+			            </td>
+			        </tr>
+		        	</tbody>
+		        </table>
+	        </div>
+	    </div>
+    </div>
+    
+    <div class="panel panel-default">
+	    <div class="panel-heading">
+	        <h1 class="panel-title">
+	        	<span style="font-weight: bold;">Cache Metrics</span>
+	        </h1>
+	    </div>
+	    <div class="panel-body">
+	    	<div class="table-responsive">
+			    <table class="table table-striped">
+			        <thead>
+			        <tr>
+			            <th>Cache</th>
+			            <th class="text-right">Size</th>
+			        </tr>
+			        </thead>
+			        <tbody>
+			        <tr th:each="cache : ${caches}">
+			            <td th:text="${cache.name}"></td>
+			            <td class="text-right" th:text="${cache.value}"></td>
+			        </tr>
+			        </tbody>
+			    </table>
+			</div>
+	    </div>
+    </div>
+</div>
+</body>
+</html>

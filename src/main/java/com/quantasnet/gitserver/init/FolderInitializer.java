@@ -1,16 +1,17 @@
 package com.quantasnet.gitserver.init;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class FolderInitializer implements Initializer {
+import com.quantasnet.gitserver.git.exception.ServerInitializerException;
+
+public abstract class FolderInitializer extends InitializerAdapter {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	protected void initializeDirectory(final String dir, final String name) throws FileNotFoundException {
+	protected void initializeDirectory(final String dir, final String name) throws ServerInitializerException {
 		final File folder = new File(dir);
 		
 		logger.info("Checking folder: {}", folder.getAbsolutePath());
@@ -25,7 +26,7 @@ public abstract class FolderInitializer implements Initializer {
 		
 		if (!folder.canWrite()) {
 			logger.error("ERROR can not write {}, {}", name, folder);
-			throw new FileNotFoundException("ERROR can not write " + name + ", " + folder);
+			throw new ServerInitializerException("ERROR can not write " + name + ", " + folder);
 		}
 	}
 

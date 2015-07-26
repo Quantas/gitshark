@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/default">
+<head>
+    <script type="text/javascript" th:src="@{/webjars/datatables/1.10.7/js/jquery.dataTables.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/datatables.bootstrap.min.js}"></script>
+
+    <link rel="stylesheet" th:href="@{/css/datatables.bootstrap.min.css}" />
+
+    <script>
+        $(document).ready( function () {
+            $('#loggerTable').DataTable({
+                /* Disable initial sort */
+                "aaSorting": [],
+                "columnDefs": [
+                    { "orderable": false, "targets": 0 }
+                ]
+            });
+        });
+    </script>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h1 class="panel-title">
+                <span style="font-weight: bold;">Users</span>
+            </h1>
+        </div>
+        <div class="panel-body">
+            <table id="loggerTable" class="table table-striped dt-responsive">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>E-Mail</th>
+                    <th>Active</th>
+                    <th>Admin</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${users}">
+                    <td style="width: 30px;">
+                        <img th:src="${user.imageUrl} + '&amp;s=25'" th:alt="${user.userName} + ' Avatar'" />
+                    </td>
+                    <td th:text="${user.userName}">
+                    </td>
+                    <td th:text="${user.firstName} + ' ' + ${user.lastName}">
+                    </td>
+                    <td th:text="${user.email}">
+                    </td>
+                    <td>
+                        <span class="fa fa-fw fa-check" th:if="${user.active}"></span>
+                        <span class="fa fa-fw fa-ban" th:if="${!user.active}"></span>
+                    </td>
+                    <td>
+                        <span class="fa fa-fw fa-check" th:if="${user.admin}"></span>
+                        <span class="fa fa-fw fa-ban" th:if="${!user.admin}"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

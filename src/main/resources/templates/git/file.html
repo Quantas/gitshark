@@ -2,77 +2,58 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorator="layouts/default"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+      layout:decorator="layouts/default">
 <head>
-	<script type="text/javascript" th:src="@{/webjars/highlightjs/8.4-4/highlight.min.js}"></script>
-	<link rel="stylesheet" th:href="@{/webjars/highlightjs/8.4-4/styles/github.min.css}" />
-	<script>
-		$(document).ready(function() {
-			$('pre.file').each(function(i, block) {
-			  hljs.highlightBlock(block);
-			});
-		});
-	</script>
-	<style>
-		table.committerInfo td,th {
-			padding: 3px;
-		}
-	</style>
+	<script th:src="@{/webjars/prettify/4-Mar-2013/run_prettify.js}"></script>
+	<script type="text/javascript" th:src="@{/js/branchchange.js}"></script>
 </head>
 <body>
 <div layout:fragment="content">
     <div layout:include="git/fragments/header :: header">
     	Git Header here
     </div>
-   	<div class="panel panel-default" th:if="${file != null and file.commit != null}">
+	<div class="panel panel-default" th:if="${file != null and file.commit != null}">
 		<div class="panel-heading">
-			<h3 class="panel-title">
-				<span style="font-weight: bold;">Commit Information</span>
-			</h3>
+			<span class="panel-title">
+				<span style="font-weight: bold;" th:text="${file.commit.shortMessage}"></span>
+			</span>
 		</div>
-  		<div class="panel-body">
-  			<table class="committerInfo">
-    			<tr>
-    				<th>Commit ID</th>
-    				<td>
-    					<a th:href="@{/repo/} + ${file.commitUrl}" th:text="${file.commit.id.name}"></a><br />
-    				</td>
-    			</tr>
-    			<tr>
-    				<th>Parent(s)</th>
-    				<td>
-    					<span th:each="parent : ${file.parents}">
-    						<a th:href="@{/repo/} + ${parent.url}" th:text="${parent.id}"></a>
-    					</span>
-    				</td>
-    			</tr>
-    			<tr>
-    				<th>Committer</th>
-    				<td th:text="${file.commit.committerIdent.name} + ' &lt;' + ${file.commit.committerIdent.emailAddress} + '&gt; ' + ${file.commit.committerIdent.when}"></td>
-    			</tr>
-    			<tr>
-    				<th>Author</th>
-    				<td th:text="${file.commit.authorIdent.name} + ' &lt;' + ${file.commit.authorIdent.emailAddress} + '&gt; ' + ${file.commit.authorIdent.when}"></td>
-    			</tr>
-    			<tr>
-    				<th>Message</th>
-    				<td><pre th:text="${file.commit.fullMessage}"></pre></td>
-    			</tr>
-    		</table>
+		<div class="panel-heading" th:if="${!#strings.isEmpty(file.messageBody)}">
+			<pre class="commit-message" th:text="${file.messageBody}">
+			</pre>
+		</div>
+		<div class="panel-body">
+			<span class="pull-left">
+				<img th:src="${file.gravatarUrl} + '&amp;s=25'" th:alt="${file.authorName} + ' Avatar'" />
+				&nbsp;
+				<span th:text="${file.authorName} + ' - ' + ${file.commit.authorIdent.when}"></span>
+			</span>
+			<span class="pull-right">
+				Parent(s):&nbsp;
+				<span th:if="${!#lists.isEmpty(file.parents)}" th:each="parent : ${file.parents}">
+					<a th:href="@{/repo/} + ${parent.url}" th:text="${parent.shortId}"></a>&nbsp;
+				</span>
+				Commit:&nbsp;
+				<a th:href="@{/repo/} + ${file.commitUrl}" th:text="${file.shortId}"></a>
+			</span>
 		</div>
 	</div>
-  	   	<div class="panel panel-default">
+	<div class="panel panel-default">
 		<div class="panel-heading">
 			<div class="panel-title" style="font-weight: bold;" layout:include="git/fragments/breadcrumbs :: breadcrumbs">
 			breadcrumbs
 			</div>
 		</div>
   		<div class="panel-body">
-  			<div th:if="${file == null}">
-    			<h1>File not found!</h1>
+  			<div th:if="${file == null}" class="container" style="text-align: center;">
+				<h4>
+					<i class="fa fa-fw fa-code-fork"></i>
+					This file did not exist at this point in time.
+				</h4>
     		</div>
-  			<pre class="file" th:if="${file != null}" th:text="${file.fileContents}"></pre>
+    		<img th:if="${mediaType != null}" style="max-width: 100%" th:src="'data:' + ${mediaType} + ';base64,' + ${base64contents}" />
+    		<div class="alert alert-danger" th:if="${rawError != null}" th:text="${rawError}"></div>
+  			<pre class="prettyprint linenums" th:if="${file != null and mediaType == null and rawError == null}" th:text="${file.fileContents}"></pre>
 		</div>
 	</div>
 </div>

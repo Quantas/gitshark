@@ -2,23 +2,20 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorator="layouts/default"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+      layout:decorator="layouts/default">
 <head>
-	<script type="text/javascript" th:src="@{/webjars/highlightjs/8.4-4/highlight.min.js}"></script>
-	<link rel="stylesheet" th:href="@{/webjars/highlightjs/8.4-4/styles/github.min.css}" />
+	<script th:src="@{/webjars/prettify/4-Mar-2013/run_prettify.js}"></script>
 	<script>
 		$(document).ready(function() {
-			$('pre.file').each(function(i, block) {
-			  hljs.highlightBlock(block);
+			$('.fileLink').click(function(e) {
+				var name = $(this).data('filename');
+				$('html, body').animate({
+					scrollTop: $('a[name=' + name + ']').offset().top - 60
+				}, 0);
+				e.preventDefault();
 			});
 		});
 	</script>
-	<style>
-		table.committerInfo td,th {
-			padding: 3px;
-		}
-	</style>
 </head>
 <body>
 <div layout:fragment="content">
@@ -27,53 +24,86 @@
     </div>
    	<div class="panel panel-default" th:if="${commit != null}">
 		<div class="panel-heading">
-			<h3 class="panel-title">
-				<span style="font-weight: bold;">Commit Information</span>
-			</h3>
+			<span class="panel-title">
+				<span style="font-weight: bold;" th:text="${commit.commit.shortMessage}"></span>
+			</span>
+		</div>
+		<div class="panel-heading" th:if="${!#strings.isEmpty(commit.messageBody)}">
+			<pre class="commit-message" th:text="${commit.messageBody}">
+			</pre>
 		</div>
   		<div class="panel-body">
-  			<table class="committerInfo">
-    			<tr>
-    				<th>Commit ID</th>
-    				<td th:text="${commit.id}">
-    				</td>
-    			</tr>
-    			<tr>
-    				<th>Parent(s)</th>
-    				<td>
-    					<span th:each="parent : ${commit.parents}">
-    						<a th:href="@{/repo/} + ${parent.url}" th:text="${parent.id}"></a><br />
-    					</span>
-    				</td>
-    			</tr>
-    			<tr>
-    				<th>Committer</th>
-    				<td th:text="${commit.commit.committerIdent.name} + ' &lt;' + ${commit.commit.committerIdent.emailAddress} + '&gt; ' + ${commit.commit.committerIdent.when}"></td>
-    			</tr>
-    			<tr>
-    				<th>Author</th>
-    				<td th:text="${commit.commit.authorIdent.name} + ' &lt;' + ${commit.commit.authorIdent.emailAddress} + '&gt; ' + ${commit.commit.authorIdent.when}"></td>
-    			</tr>
-    			<tr>
-    				<th>Message</th>
-    				<td><pre th:text="${commit.commit.fullMessage}"></pre></td>
-    			</tr>
-    		</table>
+			<span class="pull-left">
+				<img th:src="${commit.gravatarUrl} + '&amp;s=25'" th:alt="${commit.authorName} + ' Avatar'" />
+				&nbsp;
+				<span th:text="${commit.authorName} + ' - ' + ${commit.commit.authorIdent.when}"></span>
+			</span>
+			<span class="pull-right">
+				Parent(s):&nbsp;
+				<span th:if="${!#lists.isEmpty(commit.parents)}" th:each="parent : ${commit.parents}">
+					<a th:href="@{/repo/} + ${parent.url}" th:text="${parent.shortId}"></a>&nbsp;
+				</span>
+				Commit:&nbsp;
+				<a th:href="@{/repo/} + ${commit.commitUrl}" th:text="${commit.shortId}"></a>
+			</span>
 		</div>
 	</div>
+
    	<div class="panel panel-default" th:if="${diffs == null}">
   		<div class="panel-body">
    			<h1>Commit not found!</h1>
 		</div>
 	</div>
-	<div th:if="${diffs != null}" th:each="diff : ${diffs}">
+
+	<div class="panel panel-default" th:if="${diffs != null}">
+		<div class="panel-heading">
+			<h3 class="panel-title" style="font-weight: bold">
+				Files in this commit
+			</h3>
+		</div>
+		<table class="table table-hover">
+			<tr th:each="diff,iterStat : ${diffs}">
+				<td>
+					<a href="#" class="fileLink" th:attr="data-filename='file' + ${iterStat.index}" th:text="${diff.fileName}"></a>
+				</td>
+				<td>
+					<span style="width: 75px;" class="label label-danger pull-right" th:text="'- ' + ${diff.deletions}"></span>
+					<span style="width: 75px;" class="label label-success pull-right" th:text="'+ ' + ${diff.additions}"></span>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<div th:if="${diffs != null}" th:each="diff,iterStat : ${diffs}">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<a class="panel-title" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/master/' + ${diff.fileName} + '?file=true'" th:text="${diff.fileName} + ' - ' + ${diff.changeType}"></a>
+				<h3 class="panel-title" style="font-weight: bold">
+					<a th:name="'file' + ${iterStat.index}" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/master/' + ${diff.fileName} + '?file=true'" th:text="${diff.fileName}"></a>
+					&nbsp;&nbsp;
+					<span class="pull-right">
+						<span th:text="${diff.changeType}"></span>
+						<span class="label label-success" th:text="'+ ' + ${diff.additions}"></span>
+						<span class="label label-danger" th:text="'- ' + ${diff.deletions}"></span>
+					</span>
+				</h3>
 			</div>
-	  		<div class="panel-body">
-	  			<pre class="file diff" th:text="${diff.diffString}"></pre>
-			</div>
+			<table class="table table-hover hunk-table" th:each="hunk : ${diff.hunks}">
+				<thead th:if="${hunk.header != null}">
+					<tr class="hunk-header">
+						<td colspan="4" th:text="${hunk.header}"></td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="line : ${hunk.contentsLines}" th:class="${line.add ? 'addition' : line.delete ? 'deletion' : ''}">
+						<td th:text="${line.leftNumber}" class="diff-line-num"></td>
+						<td th:text="${line.rightNumber}" class="diff-line-num"></td>
+						<td th:if="${line.add}">+</td>
+						<td th:if="${line.delete}">-</td>
+						<td th:if="${!line.add and !line.delete}">&nbsp;</td>
+						<td><code th:utext="${line.text}" class="prettyprint"></code></td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
 </div>

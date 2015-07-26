@@ -1,12 +1,15 @@
 package com.quantasnet.gitserver.git.repo;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
 
 import com.google.common.collect.ComparisonChain;
 import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.exception.GitServerErrorException;
+import com.quantasnet.gitserver.git.exception.GitServerException;
 
 /**
  * Note: this class has a natural ordering that is inconsistent with equals.
@@ -20,6 +23,7 @@ public class GitRepository implements Comparable<GitRepository> {
 	private final String name;
 	
 	private final String displayName;
+	private final String fullDisplayName;
 	private final String interfaceBaseUrl;
 	
 	private final boolean anonRead;
@@ -35,12 +39,23 @@ public class GitRepository implements Comparable<GitRepository> {
 		this.anonWrite = anonWrite;
 		
 		this.displayName = name.replaceAll("\\" + Constants.DOT_GIT_SUFFIX, "");
+		this.fullDisplayName = getOwner() + '/' + getDisplayName();
 		this.interfaceBaseUrl = getOwner() + '/' + getDisplayName();
 	}
 	
-	public void execute(final RepositoryAction repoAction) throws Exception {
+	public void execute(final RepositoryAction repoAction) throws GitServerException {
 		try (final Repository db = Git.open(getFullRepoDirectory()).getRepository()) {
 			repoAction.doAction(db);
+		} catch (final IOException e) {
+			throw new GitServerErrorException(e);
+		}
+	}
+
+	public <T> T executeWithReturn(final RepositoryActionWithReturn<T> repoAction) throws GitServerException {
+		try (final Repository db = Git.open(getFullRepoDirectory()).getRepository()) {
+			return repoAction.doAction(db);
+		} catch (final IOException e) {
+			throw new GitServerErrorException(e);
 		}
 	}
 	
@@ -81,6 +96,10 @@ public class GitRepository implements Comparable<GitRepository> {
 	
 	public String getDisplayName() {
 		return displayName;
+	}
+	
+	public String getFullDisplayName() {
+		return fullDisplayName;
 	}
 	
 	public String getInterfaceBaseUrl() {

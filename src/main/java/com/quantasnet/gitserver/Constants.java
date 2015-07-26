@@ -14,6 +14,8 @@ public abstract class Constants {
 	
 	public static final String REFS_HEADS = "refs/heads/";
 	
+	public static final String REFS_TAGS = "refs/tags/";
+	
 	
 	public static final String GIT_RECEIVE_PACK = "git-receive-pack";
 	
@@ -37,6 +39,11 @@ public abstract class Constants {
 	
 	
 	public static final String OS_USER_HOME = System.getProperty("user.home");
+	
+	
+	public static final String SUCCESS_STATUS = "successStatus";
+	
+	public static final String FAILURE_STATUS = "failureStatus";
 	
 	private Constants() {
 	}

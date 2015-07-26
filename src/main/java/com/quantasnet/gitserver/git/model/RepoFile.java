@@ -1,5 +1,6 @@
 package com.quantasnet.gitserver.git.model;
 
+import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.google.common.collect.ComparisonChain;
@@ -12,6 +13,8 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
  */
 public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 
+	private static final long serialVersionUID = 1L;
+	
 	private final String name;
 	private final String display;
 	private final String parent;
@@ -20,7 +23,7 @@ public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 	private final String objectId;
 	private final String url;
 	
-	private String fileContents;
+	private byte[] fileContentsRaw;
 
 	public RepoFile(final GitRepository repo, final String name, final String parent, final boolean directory, final String branch, final String objectId, final RevCommit commit) {
 		this(repo, name, name, parent, directory, branch, objectId, commit);
@@ -35,6 +38,16 @@ public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 		this.branch = branch;
 		this.objectId = objectId;
 		this.url = generateUrl(repo);
+	}
+
+	@Override
+	protected PersonIdent getCommitter() {
+		return commit.getCommitterIdent();
+	}
+
+	@Override
+	protected PersonIdent getAuthor() {
+		return commit.getAuthorIdent();
 	}
 
 	private String generateUrl(final GitRepository repo) {
@@ -80,12 +93,16 @@ public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 		return url;
 	}
 	
-	public void setFileContents(String fileContents) {
-		this.fileContents = fileContents;
+	public void setFileContentsRaw(byte[] fileContentsRaw) {
+		this.fileContentsRaw = fileContentsRaw;
+	}
+	
+	public byte[] getFileContentsRaw() {
+		return fileContentsRaw;
 	}
 	
 	public String getFileContents() {
-		return fileContents;
+		return new String(fileContentsRaw);
 	}
 	
 	@Override

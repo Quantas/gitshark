@@ -1,0 +1,84 @@
+.main-content {
+	padding-top: 55px;
+}
+
+.page-header {
+	margin: 0;
+}
+
+.commit-message {
+	border: none;
+}
+
+.hunk-table>thead>tr>td, .hunk-table>tbody>tr>td, .hunk-table>tfoot>tr>td {
+	line-height: 1.0;
+}
+
+.hunk-table>tbody>tr>td {
+	border: 0;
+}
+
+.hunk-header {
+	background-color: #f4f7fb;
+}
+
+.diff-line-num {
+	width: 3em;
+	background-color: #f5f5f5;
+}
+
+.deletion {
+	background-color: #ffecec;
+}
+
+.addition {
+	background-color: #eaffea;
+}
+
+li.L0, li.L1, li.L2, li.L3,
+li.L5, li.L6, li.L7, li.L8
+{
+	list-style-type: decimal !important;
+}
+
+code {
+	background-color: inherit;
+}
+
+table,.label,.navbar,pre {
+	font-size: 15px;
+}
+
+.readme-section h1,
+.readme-section h2 {
+	margin-top: 5px;
+	border-bottom: 1px solid #cccccc;
+}
+
+.readme-section table,
+.readme-section table th,
+.readme-section table td {
+	border: 1px solid black;
+	padding: 5px;
+	margin-bottom: 5px;
+}
+
+.navbar-brand {
+	width: 130px;
+}
+
+.navbar-nav li a:hover, 
+.navbar-nav li a:focus,
+.navbar-brand:hover, 
+.navbar-brand:focus {
+	outline: none;
+	background-color: #555 !important;
+}
+
+.merged {
+	color: #cccccc;
+}
+
+.giturl {
+	margin-top: 0;
+}

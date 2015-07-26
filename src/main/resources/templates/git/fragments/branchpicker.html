@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<head>
+	</head>
+	<body>
+		<div layout:fragment="branchpicker">
+			<i class="fa fa-code-fork"></i>
+			<select id="branchDropdown" class="form-control" style="display: inline; width: 10%;">
+				<option value="" th:if="${commits != null}">All Branches</option>
+		   		<option value="" th:if="${!#lists.isEmpty(branches)}">== Branches ==</option>
+		   		<option th:each="aBranch : ${branches}" th:value="${aBranch}" th:text="${aBranch}" th:selected="${branch == aBranch}">branch</option>
+		   		<option value="" th:if="${!#lists.isEmpty(tags)}">== Tags ==</option>
+		   		<option th:each="aTag : ${tags}" th:value="${aTag}" th:text="${aTag}" th:selected="${branch == aTag}">tag</option>
+		    </select>
+		</div>
+	</body>
+</html>

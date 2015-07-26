@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/default"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+</head>
+<body>
+<div layout:fragment="content">
+    <div layout:include="git/fragments/header :: header">
+    	Git Header here
+    </div>
+   	<div class="panel panel-default" th:if="${repo.commits}">
+		<div class="panel-heading">
+			<h3 class="panel-title">
+				<span style="font-weight: bold;" th:text="${sectionTitle}"></span>
+			</h3>
+		</div>
+		<table class="table table-hover">
+			<tr th:each="ref : ${refs}" th:if="${ref.commit != null}">
+				<td>
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/' + ${ref.name}" th:text="${ref.name}">tree</a>
+				</td>
+	   			<td>
+	   				<time class="timeago" th:attr="datetime=${ref.dateTimeString}"></time>
+	   			</td>
+				<td>
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/commit/' + ${ref.commit.id.name}" th:text="${ref.shortId}">commit</a>
+				</td>
+				<td>
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/' + ${ref.commit.id.name}">tree</a>
+				</td>
+				<td>
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/download/' + ${ref.name} + '?format=zip'">zip</a>
+					&nbsp;|&nbsp;
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/download/' + ${ref.name} + '?format=tar.gz'">tar.gz</a>
+					&nbsp;|&nbsp;
+					<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/download/' + ${ref.name} + '?format=tar.bz2'">tar.bz2</a>
+				</td>
+			</tr>
+		</table>
+	</div>
+	 <a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/' + ${refType} + '/create'" th:text="'Create ' + ${refTitle}" class="btn btn-default btn-md" role="button">Create Branch</a>
+</div>
+</body>
+</html>

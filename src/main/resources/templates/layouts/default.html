@@ -3,78 +3,62 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
     <head>
-		<title th:if="${repo != null}" th:text="${repo.owner} + ' / ' + ${repo.displayName}">owner / name</title>
-		<title th:if="${repo == null}">Git Server</title>
-		
+        <title th:if="${repo != null}" th:text="${repo.owner} + ' / ' + ${repo.displayName}">owner / name</title>
+        <title th:if="${repo == null}">Git Server</title>
+        
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        <script type="text/javascript" th:src="@{/webjars/jquery/2.1.3/jquery.min.js}"></script>
+        <!--[if !IE]><!-->
+            <script type="text/javascript" th:src="@{/webjars/jquery/2.1.3/jquery.min.js}"></script>
+        <!--<![endif]-->
+        <!--[if gt IE 8]>
+            <script type="text/javascript" th:src="@{/webjars/jquery/2.1.3/jquery.min.js}"></script>
+        <![endif]-->
+        <!--[if lte IE 8]>
+            <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1.11.3/jquery.min.js"></script>
+        <![endif]-->
+        
+        <script type="text/javascript" th:src="@{/webjars/modernizr/2.8.3/modernizr.min.js}"></script>
+        
         <script type="text/javascript" th:src="@{/webjars/bootstrap/3.3.1/js/bootstrap.min.js}"></script>
-		<script type="text/javascript" th:src="@{/js/timeago.min.js}"></script>
+        <script type="text/javascript" th:src="@{/js/timeago.min.js}"></script>
 
         <link rel="stylesheet" th:href="@{/webjars/bootswatch/3.3.1+2/yeti/bootstrap.min.css}" />
         <link rel="stylesheet" th:href="@{/webjars/font-awesome/4.2.0/css/font-awesome.min.css}" />
-        <style>
-            body {
-                padding-top: 1.5em;
+        <link rel="stylesheet" th:href="@{/css/menu.css}" />
+        <link rel="stylesheet" th:href="@{/css/gitserver.css}" />
+
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lte IE 8]>
+          <script src="//cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <style th:if="${repo == null and admin == null}">
+            .wrapper {
+                padding-left: 0;
             }
         </style>
-        
+               
         <script>
             $(document).ready(function() {
-            	$("time.timeago").timeago();
-            	
+                $("time.timeago").timeago();
+                
+                $('[data-toggle="tooltip"]').tooltip();
+                
                 $('#logoutLink').on("click", function(e) {
                     e.preventDefault();
                     $('#logoutForm').submit();
                 });
             });
         </script>
-        <script>
-      		//<![CDATA[
-	        function getParameterByName(name) {
-	            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-	            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-	                results = regex.exec(location.search);
-	            return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-	        }
-	        // ]]>
-        
-			var ogBranch;
-			
-			$(document).ready(function() {
-				ogBranch = $('#branchDropdown').val();
-				$('#branchDropdown').on('change', function() {
-					var path = window.location.pathname;
-					var isFile = getParameterByName('file');
-					
-					if (path.endsWith('/tree')) {
-						var newPath = path + '/' + this.value;
-						if (isFile === 'true') {
-							newPath += '?file=true';
-						}
-						window.location.href = newPath;
-					} else {
-						var newPath = path.replace('/tree/' + ogBranch, '/tree/' + this.value);
-						if (isFile === 'true') {
-							newPath += '?file=true';
-						}
-						window.location.href = newPath;
-					}
-				});
-			});
-		</script>
     </head>
     <body>
-        <div class="container">
-            <div id="top">
-                <div layout:include="fragments/header :: header">
-                    Header
-                </div>
-            </div>
-            <br />
-            <div id="middle" style="margin-bottom: 30px">
+        <div class="wrapper">
+            <div id="top" layout:include="fragments/header :: header">Header</div>
+            <div class="page-wrapper">
+                <div class="container-fluid main-content">
                     <div th:if="${successStatus != null}" class="alert alert-dismissable alert-success">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                         <span th:text="${successStatus}">Success!</span>
@@ -83,13 +67,8 @@
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                         <span th:text="${failureStatus}">Failure!</span>
                     </div>
-                <div layout:fragment="content">
-                    Content
-                </div>
-            </div>
-            <div id="bottom">
-                <div layout:include="fragments/footer :: footer">
-                    Footer
+                    <div layout:fragment="content">Content</div>
+                    <div id="bottom" layout:include="fragments/footer :: footer">Footer</div>
                 </div>
             </div>
         </div>

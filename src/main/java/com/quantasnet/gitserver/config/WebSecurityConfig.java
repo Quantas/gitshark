@@ -24,7 +24,9 @@ import com.quantasnet.gitserver.security.GitServerUserDetailsService;
 
 @Configuration
 public class WebSecurityConfig {
-
+	
+	static final String GIT_HTTP_REGEX = "(\\/repo\\/)(.*)(?=.*\\.git(?!ignore))(.*)"; 
+	
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -46,15 +48,18 @@ public class WebSecurityConfig {
 		@Override
 		protected void configure(final HttpSecurity http) throws Exception {
 			http
-				.regexMatcher("(\\/repo\\/)(.*)(\\.git)(.*)")
+				.regexMatcher(GIT_HTTP_REGEX)
 				.authorizeRequests()
 					.anyRequest().authenticated()
 				.and()
 					.httpBasic()
 				.and()
 					.csrf().disable()
-					.headers().disable()
-            	.requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env))
+					.headers()
+						.defaultsDisabled()
+						.cacheControl().and()
+				.and()
+            		.requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env))
 	            .and()
 	                .sessionManagement().sessionFixation().changeSessionId();
 		}
@@ -78,10 +83,10 @@ public class WebSecurityConfig {
 		private PasswordEncoder passwordEncoder;
 	    
 		@Override
-		public void configure(WebSecurity web) throws Exception {
+		public void configure(final WebSecurity web) throws Exception {
 			web
 				.ignoring()
-					.antMatchers("/webjars/**", "/js/**");
+					.antMatchers("/webjars/**", "/js/**", "/css/**");
 		}
 		
 		@Override
@@ -90,6 +95,8 @@ public class WebSecurityConfig {
 	            .authorizeRequests()
 	                .antMatchers("/admin/**").hasRole("ADMIN")
 	                .antMatchers("/management/**").hasRole("ADMIN")
+	                .antMatchers("/404", "/403", "/401", "/503").permitAll()
+	                .antMatchers("/register").anonymous()
 	                .anyRequest().authenticated()
 	            .and()
 	                .formLogin()
@@ -98,11 +105,12 @@ public class WebSecurityConfig {
 	            .and()
 	                .logout()
 	                .permitAll()
-               .and()
-               .csrf().disable()
+                .and()
+               		.csrf()
+           		.and()
+               		.headers()
+           		.and()
 	                .requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env))
-	            .and()
-	                .sessionManagement().sessionFixation().changeSessionId()
 	            .and()
 	                .rememberMe().key(KEY).rememberMeServices(rememberMeServices());
 		}
