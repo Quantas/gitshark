@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.tika.Tika;
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -30,6 +31,8 @@ import com.quantasnet.gitserver.git.service.RepositoryUtilities;
 @RequestMapping("/repo/{repoOwner}/{repoName}")
 @Controller
 public class TreeController {
+
+	private static final String SPECIAL_MARKUP = "specialmarkup";
 
 	private static final Set<MediaType> ADDITIONAL_TYPES = new ImmutableSet.Builder<MediaType>()
 			.add(MediaType.APPLICATION_XML)
@@ -96,23 +99,16 @@ public class TreeController {
 						model.addAttribute("file", repoFile);
 
 						if (specialMarkupService.isSpecialMarkup(repoFile.getName())) {
-							model.addAttribute("specialmarkup", specialMarkupService.retrieveMarkup(repo, db, repoFile, ref));
+							model.addAttribute(SPECIAL_MARKUP, specialMarkupService.retrieveMarkup(repo, db, repoFile, ref));
 						}
 
 						return "git/file";
 					}
 				} else {
 					if (repoUtils.isPathRoot(path)) {
-						model.addAttribute("specialmarkup", specialMarkupService.resolveReadMeFile(repo, db, ref, files));
+						model.addAttribute(SPECIAL_MARKUP, specialMarkupService.resolveReadMeFile(repo, db, ref, files));
 					} else {
-						for (final RepoFile aFile : files) {
-							if (!aFile.isDirectory()) {
-								if (specialMarkupService.isReadmeFile(aFile.getName())) {
-									model.addAttribute("specialmarkup", new ReadmeFile(aFile.getName(), specialMarkupService.retrieveMarkup(repo, db, aFile, ref)));
-									break;
-								}
-							}
-						}
+						addReadmeIfExists(repo, ref, model, db, files);
 					}
 
 					model.addAttribute("files", files);
@@ -121,4 +117,15 @@ public class TreeController {
 			return "git/tree";
 		});
 	}
+
+	private void addReadmeIfExists(final GitRepository repo, final String ref, final Model model, final Repository db, final List<RepoFile> files) throws GitServerErrorException {
+		for (final RepoFile aFile : files) {
+			if (!aFile.isDirectory() && specialMarkupService.isReadmeFile(aFile.getName())) {
+				model.addAttribute(SPECIAL_MARKUP,
+						new ReadmeFile(aFile.getName(), specialMarkupService.retrieveMarkup(repo, db, aFile, ref)));
+				break;
+			}
+		}
+	}
+
 }
