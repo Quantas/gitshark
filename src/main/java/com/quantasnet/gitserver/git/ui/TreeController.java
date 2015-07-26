@@ -69,7 +69,7 @@ public class TreeController {
 				final RevCommit commit = repoUtils.getRefHeadCommit(ref, db);
 				model.addAttribute("lastCommit", new Commit(commit, repo));
 
-				final List<RepoFile> files = repoUtils.getFiles(repo, db, ref, path, true);
+				final List<RepoFile> files = repoUtils.getFiles(repo, db, ref, path);
 
 				boolean file = false;
 

@@ -65,7 +65,7 @@ public class SpecialMarkupService {
 
 	@Cacheable(cacheNames = RepoCacheService.ALL_READMES, key = "{ #repo.fullDisplayName, #branch }")
 	public ReadmeFile resolveReadMeFile(final GitRepository repo, final Repository db, final String branch) throws GitServerException {
-		return resolveReadMeFile(repo, db, branch, repoUtils.getFiles(repo, db, branch, "", false));
+		return resolveReadMeFile(repo, db, branch, repoUtils.getFiles(repo, db, branch, ""));
 	}
 	
 	@Cacheable(cacheNames = RepoCacheService.ALL_READMES, key = "{ #repo.fullDisplayName, #branch }")

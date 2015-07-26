@@ -79,7 +79,7 @@ public class RepositoryUtilities {
 		});
 	}
 	
-	public List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String branch, final String path, final boolean file) throws GitServerException {
+	public List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String branch, final String path) throws GitServerException {
 		final List<RepoFile> files = new ArrayList<>();
 		
 		try (final RevWalk revWalk = new RevWalk(db); final TreeWalk treeWalk = new TreeWalk(db)) {
