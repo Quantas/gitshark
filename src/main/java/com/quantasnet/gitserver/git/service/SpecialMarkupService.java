@@ -52,12 +52,22 @@ public class SpecialMarkupService {
 		return ADOC_POSTFIXES.contains(postfix) || MD_POSTFIXES.contains(postfix);
 	}
 
-	public String retrieveMarkup(final GitRepository repo, final RepoFile file, final String branch) {
-		final String postfix = getFilePostfix(file.getName());
-		if (ADOC_POSTFIXES.contains(postfix)) {
-			return renderAsciiDoc(file.getFileContents(), repo, branch);
-		} else if (MD_POSTFIXES.contains(postfix)) {
-			return renderMarkdown(file.getFileContents());
+	public boolean isReadmeFile(final String fileName) {
+		final String fileNameLower = fileName.toLowerCase();
+		return ASCIIDOC_NAMES.contains(fileNameLower) || MARKDOWN_NAMES.contains(fileNameLower);
+	}
+
+	public String retrieveMarkup(final GitRepository repo, final Repository db, final RepoFile file, final String branch) throws GitServerErrorException {
+		try {
+			final String postfix = getFilePostfix(file.getName());
+			final String content = file.getFileContents() == null ? new String(repoUtils.getFileContents(db, ObjectId.fromString(file.getObjectId()))) : file.getFileContents();
+			if (ADOC_POSTFIXES.contains(postfix)) {
+				return renderAsciiDoc(content, repo, branch, file.getParent());
+			} else if (MD_POSTFIXES.contains(postfix)) {
+				return renderMarkdown(content);
+			}
+		} catch (final IOException e) {
+			throw new GitServerErrorException(e);
 		}
 
 		return null;
@@ -77,7 +87,7 @@ public class SpecialMarkupService {
 					final String fileName = file.getName();
 					if (ASCIIDOC_NAMES.contains(fileName.toLowerCase())) {
 						final String readme = new String(repoUtils.getFileContents(db, ObjectId.fromString(file.getObjectId())));
-						return new ReadmeFile(fileName, renderAsciiDoc(readme, repo, branch));
+						return new ReadmeFile(fileName, renderAsciiDoc(readme, repo, branch, ""));
 					} else if (MARKDOWN_NAMES.contains(fileName.toLowerCase())) {
 						final String readme = new String(repoUtils.getFileContents(db, ObjectId.fromString(file.getObjectId())));
 						return new ReadmeFile(fileName, renderMarkdown(readme));
@@ -94,22 +104,22 @@ public class SpecialMarkupService {
 		return FilenameUtils.getExtension(fileName).toLowerCase();
 	}
 
-	private String renderAsciiDoc(final String originalText, final GitRepository repo, final String branch) {
+	private String renderAsciiDoc(final String originalText, final GitRepository repo, final String branch, final String parent) {
 		final Options options = OptionsBuilder
 			.options()
 			.safe(SafeMode.SERVER)
 			.backend("xhtml5")
 			.attributes(AttributesBuilder.attributes().showTitle(true))
 			.get();
-		return asciidoctor.render(fixLinks(originalText, repo, branch), options);
+		return asciidoctor.render(fixLinks(originalText, repo, branch, parent), options);
 	}
 
 	private String renderMarkdown(final String originalText) {
 		return new PegDownProcessor().markdownToHtml(originalText);
 	}
 
-	private String fixLinks(final String originalText, final GitRepository repo, final String branch) {
+	private String fixLinks(final String originalText, final GitRepository repo, final String branch, final String parent) {
 		return originalText.replaceAll("link:",
-				"link:" + servletContext.getContextPath() + "/repo/" + repo.getInterfaceBaseUrl() + "/tree/" + branch + "/");
+				"link:" + servletContext.getContextPath() + "/repo/" + repo.getInterfaceBaseUrl() + "/tree/" + branch + "/" + parent);
 	}
 }

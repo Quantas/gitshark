@@ -21,6 +21,7 @@ import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.Breadcrumb;
 import com.quantasnet.gitserver.git.model.Commit;
+import com.quantasnet.gitserver.git.model.ReadmeFile;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.git.service.SpecialMarkupService;
@@ -95,7 +96,7 @@ public class TreeController {
 						model.addAttribute("file", repoFile);
 
 						if (specialMarkupService.isSpecialMarkup(repoFile.getName())) {
-							model.addAttribute("specialmarkup", specialMarkupService.retrieveMarkup(repo, repoFile, ref));
+							model.addAttribute("specialmarkup", specialMarkupService.retrieveMarkup(repo, db, repoFile, ref));
 						}
 
 						return "git/file";
@@ -103,6 +104,15 @@ public class TreeController {
 				} else {
 					if (repoUtils.isPathRoot(path)) {
 						model.addAttribute("specialmarkup", specialMarkupService.resolveReadMeFile(repo, db, ref, files));
+					} else {
+						for (final RepoFile aFile : files) {
+							if (!aFile.isDirectory()) {
+								if (specialMarkupService.isReadmeFile(aFile.getName())) {
+									model.addAttribute("specialmarkup", new ReadmeFile(aFile.getName(), specialMarkupService.retrieveMarkup(repo, db, aFile, ref)));
+									break;
+								}
+							}
+						}
 					}
 
 					model.addAttribute("files", files);

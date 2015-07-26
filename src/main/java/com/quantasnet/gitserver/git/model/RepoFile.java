@@ -87,7 +87,7 @@ public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 	}
 	
 	public String getFileContents() {
-		return new String(fileContentsRaw);
+		return null == fileContentsRaw ? null : new String(fileContentsRaw);
 	}
 	
 	@Override
