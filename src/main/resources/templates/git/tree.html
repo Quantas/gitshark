@@ -62,13 +62,13 @@
 	   	</table>
 	</div>
 	
-   	<div th:if="${readme != null}" class="panel panel-default">
+   	<div th:if="${specialmarkup != null}" class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title">
-				<span style="font-weight: bold;" th:text="${readme.name}"></span>
+				<span style="font-weight: bold;" th:text="${specialmarkup.name}"></span>
 			</h3>
 		</div>
-  		<div class="panel-body readme-section" th:utext="${readme.contents}">
+  		<div class="panel-body special-markup-section" th:utext="${specialmarkup.contents}">
 		</div>
 	</div>
 </div>

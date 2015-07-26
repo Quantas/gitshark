@@ -49,25 +49,25 @@ table,.label,.navbar,pre {
 	font-size: 15px;
 }
 
-.readme-section h1,
-.readme-section h2{
+.special-markup-section h1,
+.special-markup-section h2{
 	border-bottom: 1px solid #cccccc;
 }
 
-.readme-section h1 {
+.special-markup-section h1 {
 	margin-top: 0px;
 }
 
-.readme-section h2,
-.readme-section h3,
-.readme-section h4,
-.readme-section h5 {
+.special-markup-section h2,
+.special-markup-section h3,
+.special-markup-section h4,
+.special-markup-section h5 {
 	margin-top: 25px;
 }
 
-.readme-section table,
-.readme-section table th,
-.readme-section table td {
+.special-markup-section table,
+.special-markup-section table th,
+.special-markup-section table td {
 	border: 1px solid black;
 	padding: 5px;
 	margin-bottom: 5px;

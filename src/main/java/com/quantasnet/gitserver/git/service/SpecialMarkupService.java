@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
+import org.apache.commons.io.FilenameUtils;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Asciidoctor.Factory;
 import org.asciidoctor.AttributesBuilder;
@@ -28,12 +29,14 @@ import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
 @Component
-public class ReadmeFileService {
+public class SpecialMarkupService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ReadmeFileService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SpecialMarkupService.class);
 
+	private static final List<String> ADOC_POSTFIXES = Arrays.asList("adoc", "ad");
 	private static final List<String> ASCIIDOC_NAMES = Arrays.asList("readme.adoc", "readme.ad");
 
+	private static final List<String> MD_POSTFIXES = Arrays.asList("md", "markdown");
 	private static final List<String> MARKDOWN_NAMES = Arrays.asList("readme.md", "readme.markdown");
 
 	private final Asciidoctor asciidoctor = Factory.create();
@@ -43,7 +46,23 @@ public class ReadmeFileService {
 
 	@Autowired
 	private ServletContext servletContext;
-	
+
+	public boolean isSpecialMarkup(final String fileName) {
+		final String postfix = getFilePostfix(fileName);
+		return ADOC_POSTFIXES.contains(postfix) || MD_POSTFIXES.contains(postfix);
+	}
+
+	public String retrieveMarkup(final GitRepository repo, final RepoFile file, final String branch) {
+		final String postfix = getFilePostfix(file.getName());
+		if (ADOC_POSTFIXES.contains(postfix)) {
+			return renderAsciiDoc(file.getFileContents(), repo, branch);
+		} else if (MD_POSTFIXES.contains(postfix)) {
+			return renderMarkdown(file.getFileContents());
+		}
+
+		return null;
+	}
+
 	@Cacheable(cacheNames = RepoCacheService.ALL_READMES, key = "{ #repo.fullDisplayName, #branch }")
 	public ReadmeFile resolveReadMeFile(final GitRepository repo, final Repository db, final String branch) throws GitServerException {
 		return resolveReadMeFile(repo, db, branch, repoUtils.getFiles(repo, db, branch, "", false));
@@ -70,7 +89,11 @@ public class ReadmeFileService {
 			throw new GitServerErrorException(e);
 		}
 	}
-	
+
+	private String getFilePostfix(final String fileName) {
+		return FilenameUtils.getExtension(fileName).toLowerCase();
+	}
+
 	private String renderAsciiDoc(final String originalText, final GitRepository repo, final String branch) {
 		final Options options = OptionsBuilder
 			.options()

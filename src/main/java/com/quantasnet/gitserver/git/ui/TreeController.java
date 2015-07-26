@@ -23,7 +23,7 @@ import com.quantasnet.gitserver.git.model.Breadcrumb;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.git.service.ReadmeFileService;
+import com.quantasnet.gitserver.git.service.SpecialMarkupService;
 import com.quantasnet.gitserver.git.service.RepositoryUtilities;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}")
@@ -40,7 +40,7 @@ public class TreeController {
 	private RepositoryUtilities repoUtils;
 	
 	@Autowired
-	private ReadmeFileService readmeService;
+	private SpecialMarkupService specialMarkupService;
 	
 	@RequestMapping("/tree")
 	public String displayRepoTreeNoBranch(final GitRepository repo, final Model model, final HttpServletRequest req) throws GitServerException {
@@ -93,11 +93,16 @@ public class TreeController {
 						}
 
 						model.addAttribute("file", repoFile);
+
+						if (specialMarkupService.isSpecialMarkup(repoFile.getName())) {
+							model.addAttribute("specialmarkup", specialMarkupService.retrieveMarkup(repo, repoFile, ref));
+						}
+
 						return "git/file";
 					}
 				} else {
 					if (repoUtils.isPathRoot(path)) {
-						model.addAttribute("readme", readmeService.resolveReadMeFile(repo, db, ref, files));
+						model.addAttribute("specialmarkup", specialMarkupService.resolveReadMeFile(repo, db, ref, files));
 					}
 
 					model.addAttribute("files", files);
