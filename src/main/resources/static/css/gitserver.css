@@ -49,6 +49,20 @@ table,.label,.navbar,pre {
 	font-size: 15px;
 }
 
+.readme-section h1,
+.readme-section h2 {
+	margin-top: 5px;
+	border-bottom: 1px solid #cccccc;
+}
+
+.readme-section table,
+.readme-section table th,
+.readme-section table td {
+	border: 1px solid black;
+	padding: 5px;
+	margin-bottom: 5px;
+}
+
 .navbar-brand {
 	width: 130px;
 }
