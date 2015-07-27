@@ -11,7 +11,10 @@ import org.apache.tika.Tika;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,7 +50,7 @@ public class TreeController {
 	private SpecialMarkupService specialMarkupService;
 	
 	@RequestMapping("/tree")
-	public String displayRepoTreeNoBranch(final GitRepository repo, final Model model, final HttpServletRequest req) throws GitServerException {
+	public Object displayRepoTreeNoBranch(final GitRepository repo, final Model model, final HttpServletRequest req) throws GitServerException {
 		final String ref = repo.executeWithReturn(db -> {
 			try {
 				return db.getBranch();
@@ -55,11 +58,11 @@ public class TreeController {
 				throw new GitServerErrorException(e);
 			}
 		});
-		return displayRepoTree(repo, ref, model, req);
+		return displayRepoTree(repo, "tree", ref, model, req);
 	}
 	
-	@RequestMapping("/tree/{ref}/**")
-	public String displayRepoTree(final GitRepository repo, @PathVariable final String ref, final Model model, final HttpServletRequest req) throws GitServerException {
+	@RequestMapping("/{type:(?:tree|raw)}/{ref}/**")
+	public Object displayRepoTree(final GitRepository repo, @PathVariable final String type, @PathVariable final String ref, final Model model, final HttpServletRequest req) throws GitServerException {
 		final String repoPath = "/repo/" + repo.getInterfaceBaseUrl() + "/tree/" + ref + '/';
 		final String path = repoUtils.resolvePath(req, repoPath, ref);
 		
@@ -84,15 +87,21 @@ public class TreeController {
 				if (file) {
 					final RepoFile repoFile = files.get(0);
 
+					if ("raw".equals(type)) {
+						final HttpHeaders headers = new HttpHeaders();
+						headers.setContentType(MediaType.TEXT_PLAIN);
+						return new ResponseEntity<>(new String(repoFile.getFileContentsRaw()), headers, HttpStatus.OK);
+					}
+
 					if (null != repoFile) {
 						final Tika tika = new Tika();
-						final String mediaType = tika.detect(new ByteArrayInputStream(repoFile.getFileContentsRaw()));
-						final MediaType type = MediaType.parseMediaType(mediaType);
+						final String mediaTypeString = tika.detect(new ByteArrayInputStream(repoFile.getFileContentsRaw()));
+						final MediaType mediaType = MediaType.parseMediaType(mediaTypeString);
 
-						if ("image".equals(type.getType())) {
-							model.addAttribute("mediaType", mediaType);
+						if ("image".equals(mediaType.getType())) {
+							model.addAttribute("mediaType", mediaTypeString);
 							model.addAttribute("base64contents", Base64.getEncoder().encodeToString(repoFile.getFileContentsRaw()));
-						} else if (!"text".equals(type.getType()) && !ADDITIONAL_TYPES.contains(type)) {
+						} else if (!"text".equals(mediaType.getType()) && !ADDITIONAL_TYPES.contains(mediaType)) {
 							model.addAttribute("rawError", "Cannot display file.");
 						}
 

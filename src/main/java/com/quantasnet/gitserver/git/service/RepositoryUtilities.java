@@ -41,8 +41,8 @@ public class RepositoryUtilities {
 	private static final Logger LOG = LoggerFactory.getLogger(RepositoryUtilities.class);
 
 	public  String resolvePath(final HttpServletRequest req, final String repoPath, final String branch) {
-		String path = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-		
+		String path = ((String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).replaceFirst("\\/raw\\/", "/tree/");
+
 		if (path.endsWith("/tree")) {
 			path += "/" + branch + "/";
 		}
