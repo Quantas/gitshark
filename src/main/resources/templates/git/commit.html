@@ -97,9 +97,9 @@
 					<tr th:each="line : ${hunk.contentsLines}" th:class="${line.add ? 'addition' : line.delete ? 'deletion' : ''}">
 						<td th:text="${line.leftNumber}" class="diff-line-num"></td>
 						<td th:text="${line.rightNumber}" class="diff-line-num"></td>
-						<td th:if="${line.add}">+</td>
-						<td th:if="${line.delete}">-</td>
-						<td th:if="${!line.add and !line.delete}">&nbsp;</td>
+						<td th:if="${line.add}" class="diff-add-or-remove">+</td>
+						<td th:if="${line.delete}" class="diff-add-or-remove">-</td>
+						<td th:if="${!line.add and !line.delete}" class="diff-add-or-remove">&nbsp;</td>
 						<td><code th:utext="${line.text}" class="prettyprint"></code></td>
 					</tr>
 				</tbody>
