@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
@@ -28,7 +28,7 @@ import com.quantasnet.gitserver.git.model.ReadmeFile;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
-@Component
+@Service
 public class SpecialMarkupService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SpecialMarkupService.class);

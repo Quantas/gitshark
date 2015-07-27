@@ -124,28 +124,18 @@ public class RepositoryUtilities {
 					final ObjectId objectId = treeWalk.getObjectId(0);
 					final RepoFile repoFile = buildRepoFileObject(repo, db, path, branch, customPath, pathString, directory, objectId); 
 					files.add(repoFile);
-					
 				}
 			}
 		} catch (final IOException | GitAPIException e) {
 			throw new GitServerErrorException(e);
 		}
 		
-		if (files.size() == 1) {
-			// if we wanted just a single file, get it's contents for display and get out of here
-			try {
-				files.get(0).setFileContentsRaw(getFileContents(db, ObjectId.fromString(files.get(0).getObjectId())));
-			} catch (IOException e) {
-				throw new GitServerErrorException(e);
-			}
-		} else if (files.size() > 1) {
-			Collections.sort(files);
-		}
+		collectFileContentsOrSortFiles(db, files);
 
 		return files;
 	}
 
-	public RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final String ref, final boolean customPath, final String pathString, 
+	public RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final String ref, final boolean customPath, final String pathString,
 			final boolean directory, final ObjectId objectId) throws GitAPIException, CommitNotFoundException {
 		
 		final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
@@ -216,5 +206,18 @@ public class RepositoryUtilities {
 		
 		// Add dummy file for navigating backwards
 		return new RepoFile(repo, "", ". .", parent, true, branch, null, null);
+	}
+
+	private void collectFileContentsOrSortFiles(final Repository db, final List<RepoFile> files) throws GitServerErrorException {
+		if (files.size() == 1) {
+			// if we wanted just a single file, get it's contents for display and get out of here
+			try {
+				files.get(0).setFileContentsRaw(getFileContents(db, ObjectId.fromString(files.get(0).getObjectId())));
+			} catch (IOException e) {
+				throw new GitServerErrorException(e);
+			}
+		} else if (files.size() > 1) {
+			Collections.sort(files);
+		}
 	}
 }

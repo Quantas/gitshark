@@ -33,7 +33,7 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 
 		final Principal principalObject = webRequest.getUserPrincipal();
 
-		User user = null;
+		User user;
 		String userName = null;
 
 		if (null != principalObject) {
