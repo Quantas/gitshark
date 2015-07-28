@@ -21,15 +21,17 @@ public class RepoCacheService {
 	public static final String COMMIT = "commit";
 
 	public static final String HAS_COMMITS = "hasCommits";
+	public static final String BRANCHES = "branches";
+	public static final String TAGS = "tags";
 	public static final String COMMIT_COUNT = "commitCount";
 	public static final String REPO_SIZE = "repoSize";
 
-	@CacheEvict(cacheNames = {ALL_COMMITS, ALL_READMES}, allEntries = true)
+	@CacheEvict(cacheNames = { ALL_COMMITS, ALL_READMES }, allEntries = true)
 	public void clearCache() {
 		LOG.info("Wiping caches");
 	}
 
-	@CacheEvict(cacheNames = {HAS_COMMITS, COMMIT_COUNT, REPO_SIZE}, key = "#repo.fullDisplayName")
+	@CacheEvict(cacheNames = { HAS_COMMITS, COMMIT_COUNT, REPO_SIZE, BRANCHES, TAGS }, key = "#repo.fullDisplayName")
 	public void clearCacheForRepo(final GitRepository repo) {
 		LOG.info("Wiping caches for repo {}", repo.getFullDisplayName());
 	}

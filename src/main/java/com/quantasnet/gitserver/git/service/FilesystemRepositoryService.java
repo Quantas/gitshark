@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.io.FileUtils;
@@ -89,6 +90,16 @@ public class FilesystemRepositoryService {
 	public long repoSize(final GitRepository repo) {
 		final Iterable<File> files = Files.fileTreeTraverser().breadthFirstTraversal(repo.getFullRepoDirectory());
 		return StreamSupport.stream(files.spliterator(), false).mapToLong(File::length).sum();
+	}
+
+	@Cacheable(cacheNames = RepoCacheService.BRANCHES, key = "#repo.fullDisplayName")
+	public Set<String> branches(final GitRepository repo) throws GitServerException {
+		return repo.executeWithReturn(db -> db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet());
+	}
+
+	@Cacheable(cacheNames = RepoCacheService.TAGS, key = "#repo.fullDisplayName")
+	public Set<String> tags(final GitRepository repo) throws GitServerException {
+		return repo.executeWithReturn(db -> db.getRefDatabase().getRefs(Constants.REFS_TAGS).keySet());
 	}
 
 	public boolean deleteRepo(final GitRepository repo) {

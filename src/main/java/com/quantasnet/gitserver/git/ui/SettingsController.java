@@ -37,6 +37,8 @@ public class SettingsController {
 		if (repo.hasCommits()) {
 			model.addAttribute("size", readableFileSize(repoService.repoSize(repo)));
 			model.addAttribute("commitCount", commitService.commitCount(repo));
+			model.addAttribute("branchCount", repoService.branches(repo).size());
+			model.addAttribute("tagCount", repoService.tags(repo).size());
 		}
 		return "git/settings";
 	}
