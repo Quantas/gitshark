@@ -78,7 +78,7 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title" style="font-weight: bold">
-					<a th:name="'file' + ${iterStat.index}" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/master/' + ${diff.fileName} + '?file=true'" th:text="${diff.fileName}"></a>
+					<a th:name="'file' + ${iterStat.index}" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/' + ${commit.commit.id.name} + '/' + ${diff.fileName}" th:text="${diff.fileName}"></a>
 					&nbsp;&nbsp;
 					<span class="pull-right">
 						<span th:text="${diff.changeType}"></span>

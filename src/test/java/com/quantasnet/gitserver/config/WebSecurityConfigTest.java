@@ -21,7 +21,7 @@ public class WebSecurityConfigTest {
 	
 	@Test
 	public void testGitRepoRegexDoesntMatchGitIgnore() {
-		Assert.assertFalse(pattern.matcher("/repo/user/gitserver/tree/master/.gitignore?file=true").matches());
+		Assert.assertFalse(pattern.matcher("/repo/user/gitserver/tree/master/.gitignore").matches());
 	}
 	
 	@Test
