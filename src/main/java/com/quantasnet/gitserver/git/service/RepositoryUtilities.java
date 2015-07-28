@@ -168,7 +168,7 @@ public class RepositoryUtilities {
 	
 	public RevCommit getRefHeadCommit(final String refString, final Repository db) throws IOException, CommitNotFoundException {
 		final Ref branchRef = db.getRefDatabase().getRefs(Constants.REFS_HEADS).get(refString);
-		final Ref tagRef = db.getRefDatabase().getRefs(Constants.REFS_TAGS).get(refString);		
+		final Ref tagRef = db.getRefDatabase().getRefs(Constants.REFS_TAGS).get(refString);
 		final Ref ref = branchRef != null ? branchRef : tagRef != null ? tagRef : null;
 
 		// must be a commit id and not a ref
