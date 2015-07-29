@@ -119,7 +119,7 @@ public class SpecialMarkupService {
 	}
 
 	private String fixLinks(final String originalText, final GitRepository repo, final String branch, final String parent) {
-		return originalText.replaceAll("link:",
+		return originalText.replaceAll("(link:|include::)",
 				"link:" + servletContext.getContextPath() + "/repo/" + repo.getInterfaceBaseUrl() + "/tree/" + branch + "/" + parent);
 	}
 }
