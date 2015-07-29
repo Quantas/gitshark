@@ -6,7 +6,9 @@
 	</head>
 	<body>
 		<div layout:fragment="breadcrumbs">
-			<span layout:include="git/fragments/branchpicker :: branchpicker">
+			<span th:if="${skipBranchSelector == null or !skipBranchSelector}" layout:include="git/fragments/branchpicker :: branchpicker">
+			</span>
+			<span th:if="${prefixTitle != null}" th:text="${prefixTitle}">
 			</span>
 			<span th:each="crumb : ${breadcrumbs}">
 				<a th:if="${crumb.link}" th:href="${crumb.url}" th:text="${crumb.name}"></a>

@@ -50,6 +50,8 @@
 			<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/raw/' + ${file.commit.id.name} + '/' + ${file.name}">permalink</a>
 			&nbsp;|&nbsp;
 			<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/' + ${file.commit.id.name}">tree</a>
+			&nbsp;|&nbsp;
+			<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/history/' + ${file.commit.id.name} + '/' + ${file.name}">history</a>
 		</div>
   		<div class="panel-body">
   			<div th:if="${file == null}" class="container" style="text-align: center;">

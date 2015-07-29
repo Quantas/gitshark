@@ -6,10 +6,12 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.tika.Tika;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,9 @@ public class TreeController {
 	
 	@Autowired
 	private SpecialMarkupService specialMarkupService;
+
+	@Autowired
+	private ServletContext servletContext;
 	
 	@RequestMapping("/tree")
 	public Object displayRepoTreeNoBranch(final GitRepository repo, final Model model, final HttpServletRequest req) throws GitServerException {
@@ -71,7 +76,7 @@ public class TreeController {
 		final String breadCrumbsPath = "history".equals(type) ? repoPath.replaceFirst("\\/tree\\/", "/history/") : repoPath;
 		
 		model.addAttribute("branch", ref);
-		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repo.getDisplayName(), breadCrumbsPath, path));
+		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(servletContext.getContextPath(), repo.getDisplayName(), breadCrumbsPath, path));
 		
 		return repo.executeWithReturn(db -> {
 			if (repo.hasCommits()) {
@@ -91,9 +96,16 @@ public class TreeController {
 				if ("history".equals(type)) {
 					try {
 						final List<Commit> history = new ArrayList<>();
-						for (final RevCommit historyCommit : Git.wrap(db).log().addPath(path).add(commit).call()) {
+						final LogCommand logCommand = Git.wrap(db).log().setMaxCount(50);
+
+						if (path.length() > 1) {
+							logCommand.addPath(path);
+						}
+
+						for (final RevCommit historyCommit : logCommand.call()) {
 							history.add(new Commit(historyCommit, repo));
 						}
+						model.addAttribute("historyPos", ref);
 						model.addAttribute("history", history);
 						return "git/history";
 					} catch (Exception e) {

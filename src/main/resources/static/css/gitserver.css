@@ -93,6 +93,10 @@ table,.label,.navbar,pre {
 	color: #cccccc;
 }
 
+.history-selected {
+	background-color: #cccccc;
+}
+
 .giturl {
 	margin-top: 0;
 }

@@ -39,6 +39,8 @@
 				<span th:text="${commit.authorName} + ' - ' + ${commit.commit.authorIdent.when}"></span>
 			</span>
 			<span class="pull-right">
+				<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree/' + ${commit.commit.id.name}">Tree</a>
+				&nbsp;
 				Parent(s):&nbsp;
 				<span th:if="${!#lists.isEmpty(commit.parents)}" th:each="parent : ${commit.parents}">
 					<a th:href="@{/repo/} + ${parent.url}" th:text="${parent.shortId}"></a>&nbsp;

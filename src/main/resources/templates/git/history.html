@@ -14,22 +14,17 @@
     </div>
    	<div th:if="${repo.commits}" class="panel panel-default">
 		<div class="panel-heading">
-			<div class="panel-title" style="font-weight: bold;">
-				File History For
-			</div>
-		</div>
-		<div class="panel-heading">
-			<div class="panel-title" style="font-weight: bold;" layout:include="git/fragments/breadcrumbs :: breadcrumbs">
+			<div class="panel-title" style="font-weight: bold;" th:with="skipBranchSelector=true,prefixTitle='File History For '" layout:include="git/fragments/breadcrumbs :: breadcrumbs">
 				breadcrumbs
 			</div>
 		</div>
     	<table class="table table-hover">
-	   		<tr th:each="commit : ${history}" th:class="${commit.merge ? 'merged' : ''}">
+	   		<tr th:each="commit : ${history}" th:class="${commit.merge ? 'merged' : ''} + ${commit.commit.id.name eq historyPos ? ' history-selected' : ''}">
 	   			<td>
 	   				<img th:src="${commit.gravatarUrl} + '&amp;s=25'" data-toggle="tooltip" data-placement="right" th:title="${commit.authorName}" />
 	   			</td>
 	   			<td>
-	   				<time class="timeago" th:attr="datetime=${commit.dateTimeString}"></time>
+	   				<time class="timeago" th:attr="datetime=${commit.dateTimeString}" data-toggle="tooltip" data-placement="right" th:title="${commit.committer.when}"></time>
 	   			</td>
 	   			<td>
 					<a th:href="@{'/repo/'} + ${commit.commitUrl}" th:text="${commit.shortId}"></a>
