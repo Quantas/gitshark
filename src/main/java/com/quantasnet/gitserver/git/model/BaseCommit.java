@@ -25,8 +25,8 @@ public abstract class BaseCommit implements Serializable {
 		buildParents(repo);
 	}
 	
-	protected abstract PersonIdent getCommitter();
-	protected abstract PersonIdent getAuthor();
+	public abstract PersonIdent getCommitter();
+	public abstract PersonIdent getAuthor();
 	
 	private String buildCommitUrl(final GitRepository repo) {
 		if (null == commit) {

@@ -23,12 +23,12 @@ public class RefHolder extends BaseCommit implements Comparable<RefHolder> {
 	}
 
 	@Override
-	protected PersonIdent getCommitter() {
+	public PersonIdent getCommitter() {
 		return commit.getCommitterIdent();
 	}
 
 	@Override
-	protected PersonIdent getAuthor() {
+	public PersonIdent getAuthor() {
 		return commit.getAuthorIdent();
 	}
 

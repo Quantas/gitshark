@@ -79,12 +79,12 @@ public class RefLog extends BaseCommit implements Comparable<RefLog> {
 	}
 	
 	@Override
-	protected PersonIdent getCommitter() {
+	public PersonIdent getCommitter() {
 		return committer;
 	}
 
 	@Override
-	protected PersonIdent getAuthor() {
+	public PersonIdent getAuthor() {
 		return committer;
 	}
 

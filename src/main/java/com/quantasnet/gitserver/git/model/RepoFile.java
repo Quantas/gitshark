@@ -41,12 +41,12 @@ public class RepoFile extends BaseCommit implements Comparable<RepoFile> {
 	}
 
 	@Override
-	protected PersonIdent getCommitter() {
+	public PersonIdent getCommitter() {
 		return commit.getCommitterIdent();
 	}
 
 	@Override
-	protected PersonIdent getAuthor() {
+	public PersonIdent getAuthor() {
 		return commit.getAuthorIdent();
 	}
 
