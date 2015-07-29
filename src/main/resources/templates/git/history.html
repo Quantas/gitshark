@@ -21,7 +21,7 @@
     	<table class="table table-hover">
 	   		<tr th:each="commit : ${history}" th:class="${commit.merge ? 'merged' : ''} + ${commit.commit.id.name eq historyPos ? ' history-selected' : ''}">
 	   			<td>
-	   				<img th:src="${commit.gravatarUrl} + '&amp;s=25'" data-toggle="tooltip" data-placement="right" th:title="${commit.authorName}" />
+	   				<img th:src="${commit.gravatarUrl} + '&amp;s=25'" data-toggle="tooltip" data-placement="right" th:title="${commit.authorName}" th:alt="${commit.authorName + ' Avatar'}" />
 	   			</td>
 	   			<td>
 	   				<time class="timeago" th:attr="datetime=${commit.dateTimeString}" data-toggle="tooltip" data-placement="right" th:title="${commit.committer.when}"></time>

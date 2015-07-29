@@ -60,7 +60,7 @@
 					This file did not exist at this point in time.
 				</h4>
     		</div>
-    		<img th:if="${mediaType != null}" style="max-width: 100%" th:src="'data:' + ${mediaType} + ';base64,' + ${base64contents}" />
+    		<img th:if="${mediaType != null}" style="max-width: 100%" th:src="'data:' + ${mediaType} + ';base64,' + ${base64contents}" alt="" />
     		<div class="alert alert-danger" th:if="${rawError != null}" th:text="${rawError}"></div>
   			<pre class="prettyprint linenums" th:if="${specialmarkup == null and file != null and mediaType == null and rawError == null}" th:text="${file.fileContents}"></pre>
 			<div class="special-markup-section" th:if="${specialmarkup != null}" th:utext="${specialmarkup}"></div>
