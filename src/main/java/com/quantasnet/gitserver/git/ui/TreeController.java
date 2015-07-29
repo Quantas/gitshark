@@ -1,6 +1,7 @@
 package com.quantasnet.gitserver.git.ui;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -95,66 +96,82 @@ public class TreeController {
 				}
 				
 				if (HISTORY.equals(type)) {
-					try {
-						final List<Commit> history = new ArrayList<>();
-						final LogCommand logCommand = Git.wrap(db).log().setMaxCount(50);
-
-						if (path.length() > 1) {
-							logCommand.addPath(path);
-						}
-
-						for (final RevCommit historyCommit : logCommand.call()) {
-							history.add(new Commit(historyCommit, repo));
-						}
-						model.addAttribute("historyPos", ref);
-						model.addAttribute(HISTORY, history);
-						return "git/history";
-					} catch (Exception e) {
-						throw new GitServerErrorException(e);
-					}
+					return displayHistoryView(repo, ref, model, path, db);
 				}
 
 				if (file) {
-					final RepoFile repoFile = files.get(0);
-
-					if ("raw".equals(type)) {
-						final HttpHeaders headers = new HttpHeaders();
-						headers.setContentType(MediaType.TEXT_PLAIN);
-						return new ResponseEntity<>(new String(repoFile.getFileContentsRaw()), headers, HttpStatus.OK);
-					}
-
-					if (null != repoFile) {
-						final Tika tika = new Tika();
-						final String mediaTypeString = tika.detect(new ByteArrayInputStream(repoFile.getFileContentsRaw()));
-						final MediaType mediaType = MediaType.parseMediaType(mediaTypeString);
-
-						if ("image".equals(mediaType.getType())) {
-							model.addAttribute("mediaType", mediaTypeString);
-							model.addAttribute("base64contents", Base64.getEncoder().encodeToString(repoFile.getFileContentsRaw()));
-						} else if (!"text".equals(mediaType.getType()) && !ADDITIONAL_TYPES.contains(mediaType)) {
-							model.addAttribute("rawError", "Cannot display file.");
-						}
-
-						model.addAttribute("file", repoFile);
-
-						if (specialMarkupService.isSpecialMarkup(repoFile.getName())) {
-							model.addAttribute(SPECIAL_MARKUP, specialMarkupService.retrieveMarkup(repo, db, repoFile, ref));
-						}
-
-						return "git/file";
-					}
+					return displayFileView(repo, type, ref, model, db, files);
 				} else {
-					if (repoUtils.isPathRoot(path)) {
-						model.addAttribute(SPECIAL_MARKUP, specialMarkupService.resolveReadMeFile(repo, db, ref, files));
-					} else {
-						addReadmeIfExists(repo, ref, model, db, files);
-					}
-
-					model.addAttribute("files", files);
+					return displayTreeView(repo, ref, model, path, db, files);
 				}
 			}
-			return "git/tree";
+
+			throw new GitServerErrorException("error in tree rendering");
 		});
+	}
+
+	private String displayHistoryView(final GitRepository repo, final String ref, final Model model, final String path, final Repository db) throws GitServerErrorException {
+		try {
+			final List<Commit> history = new ArrayList<>();
+			final LogCommand logCommand = Git.wrap(db).log().setMaxCount(50);
+
+			if (path.length() > 1) {
+				logCommand.addPath(path);
+			}
+
+			for (final RevCommit historyCommit : logCommand.call()) {
+				history.add(new Commit(historyCommit, repo));
+			}
+			model.addAttribute("historyPos", ref);
+			model.addAttribute(HISTORY, history);
+			return "git/history";
+		} catch (Exception e) {
+			throw new GitServerErrorException(e);
+		}
+	}
+
+	private Object displayFileView(final GitRepository repo, final String type, final String ref, final Model model, final Repository db, final List<RepoFile> files) throws IOException, GitServerErrorException {
+		final RepoFile repoFile = files.get(0);
+
+		if ("raw".equals(type)) {
+			final HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.TEXT_PLAIN);
+			return new ResponseEntity<>(new String(repoFile.getFileContentsRaw()), headers, HttpStatus.OK);
+		}
+
+		if (null != repoFile) {
+			final Tika tika = new Tika();
+			final String mediaTypeString = tika.detect(new ByteArrayInputStream(repoFile.getFileContentsRaw()));
+			final MediaType mediaType = MediaType.parseMediaType(mediaTypeString);
+
+			if ("image".equals(mediaType.getType())) {
+				model.addAttribute("mediaType", mediaTypeString);
+				model.addAttribute("base64contents", Base64.getEncoder().encodeToString(repoFile.getFileContentsRaw()));
+			} else if (!"text".equals(mediaType.getType()) && !ADDITIONAL_TYPES.contains(mediaType)) {
+				model.addAttribute("rawError", "Cannot display file.");
+			}
+
+			model.addAttribute("file", repoFile);
+
+			if (specialMarkupService.isSpecialMarkup(repoFile.getName())) {
+				model.addAttribute(SPECIAL_MARKUP, specialMarkupService.retrieveMarkup(repo, db, repoFile, ref));
+			}
+
+			return "git/file";
+		}
+
+		throw new GitServerErrorException("repoFile was null");
+	}
+
+	private String displayTreeView(final GitRepository repo, final String ref, final Model model, final String path, final Repository db, final List<RepoFile> files) throws GitServerException {
+		if (repoUtils.isPathRoot(path)) {
+			model.addAttribute(SPECIAL_MARKUP, specialMarkupService.resolveReadMeFile(repo, db, ref, files));
+		} else {
+			addReadmeIfExists(repo, ref, model, db, files);
+		}
+
+		model.addAttribute("files", files);
+		return "git/tree";
 	}
 
 	private void addReadmeIfExists(final GitRepository repo, final String ref, final Model model, final Repository db, final List<RepoFile> files) throws GitServerErrorException {
