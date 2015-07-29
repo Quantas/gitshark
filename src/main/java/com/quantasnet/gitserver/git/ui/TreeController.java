@@ -1,6 +1,7 @@
 package com.quantasnet.gitserver.git.ui;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Set;
@@ -8,6 +9,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.tika.Tika;
+import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +30,8 @@ import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.ReadmeFile;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.git.service.SpecialMarkupService;
 import com.quantasnet.gitserver.git.service.RepositoryUtilities;
+import com.quantasnet.gitserver.git.service.SpecialMarkupService;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}")
 @Controller
@@ -61,13 +63,15 @@ public class TreeController {
 		return displayRepoTree(repo, "tree", ref, model, req);
 	}
 	
-	@RequestMapping("/{type:(?:tree|raw)}/{ref}/**")
+	@RequestMapping("/{type:(?:tree|raw|history)}/{ref}/**")
 	public Object displayRepoTree(final GitRepository repo, @PathVariable final String type, @PathVariable final String ref, final Model model, final HttpServletRequest req) throws GitServerException {
 		final String repoPath = "/repo/" + repo.getInterfaceBaseUrl() + "/tree/" + ref + '/';
 		final String path = repoUtils.resolvePath(req, repoPath, ref);
 		
+		final String breadCrumbsPath = "history".equals(type) ? repoPath.replaceFirst("\\/tree\\/", "/history/") : repoPath;
+		
 		model.addAttribute("branch", ref);
-		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repo.getDisplayName(), repoPath, path));
+		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(req.getContextPath(), repo.getDisplayName(), breadCrumbsPath, path));
 		
 		return repo.executeWithReturn(db -> {
 			if (repo.hasCommits()) {
@@ -82,6 +86,19 @@ public class TreeController {
 
 				if (!files.get(0).isDirectory()) {
 					file = true;
+				}
+				
+				if ("history".equals(type)) {
+					try {
+						final List<Commit> history = new ArrayList<>();
+						for (final RevCommit historyCommit : Git.wrap(db).log().addPath(path).add(commit).call()) {
+							history.add(new Commit(historyCommit, repo));
+						}
+						model.addAttribute("history", history);
+						return "git/history";
+					} catch (Exception e) {
+						throw new GitServerErrorException(e);
+					}
 				}
 
 				if (file) {

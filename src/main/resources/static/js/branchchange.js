@@ -1,8 +1,7 @@
-function findRef(path) {
-    var pathArray = path.split('/');
-    for (var i = 0; i < pathArray.length; i++) {
-        if (pathArray[i] === 'tree') {
-            return pathArray[i+1];
+function findRefIndex(pathArray) {
+	for (var i = 0; i < pathArray.length; i++) {
+        if (pathArray[i] === 'tree' || pathArray[i] === 'history') {
+        	return i + 1;
         }
     }
 }
@@ -24,7 +23,20 @@ $(document).ready(function () {
             if (path.endsWith('/tree')) {
                 window.location.href = path + '/' + this.value;
             } else {
-                window.location.href = path.replace('/tree/' + findRef(path), '/tree/' + this.value);
+            	var pathArray = path.split('/');
+            	var refIndex = findRefIndex(pathArray);
+                var newLocation = '';
+                
+            	// yes i starts at 1, browsers are dumb...
+                for (var i = 1; i < pathArray.length; i++) {
+                	if (i == refIndex) {
+                		newLocation += '/' + this.value;
+                	} else {
+                		newLocation += '/' + pathArray[i];
+                	}
+                }
+                
+                window.location.href = newLocation;
             }
         }
     });
