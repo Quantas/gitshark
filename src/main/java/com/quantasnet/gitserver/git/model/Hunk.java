@@ -120,7 +120,9 @@ public class Hunk implements Serializable {
 		return startLine;
 	}
 
-	private class HunkLine implements Serializable {
+	public class HunkLine implements Serializable {
+		private static final long serialVersionUID = 1L;
+		
 		private final boolean add;
 		private final boolean delete;
 		private final Integer leftNumber;
