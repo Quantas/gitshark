@@ -1,7 +1,7 @@
 function findRefIndex(pathArray) {
-	for (var i = 0; i < pathArray.length; i++) {
+    for (var i = 0; i < pathArray.length; i++) {
         if (pathArray[i] === 'tree' || pathArray[i] === 'history') {
-        	return i + 1;
+            return i + 1;
         }
     }
 }
@@ -23,19 +23,19 @@ $(document).ready(function () {
             if (path.endsWith('/tree')) {
                 window.location.href = path + '/' + this.value;
             } else {
-            	var pathArray = path.split('/');
-            	var refIndex = findRefIndex(pathArray);
+                var pathArray = path.split('/');
+                var refIndex = findRefIndex(pathArray);
                 var newLocation = '';
-                
-            	// yes i starts at 1, browsers are dumb...
+
+                // yes i starts at 1, browsers are dumb...
                 for (var i = 1; i < pathArray.length; i++) {
-                	if (i == refIndex) {
-                		newLocation += '/' + this.value;
-                	} else {
-                		newLocation += '/' + pathArray[i];
-                	}
+                    if (i === refIndex) {
+                        newLocation += '/' + this.value;
+                    } else {
+                        newLocation += '/' + pathArray[i];
+                    }
                 }
-                
+
                 window.location.href = newLocation;
             }
         }

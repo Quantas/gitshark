@@ -40,6 +40,7 @@ import com.quantasnet.gitserver.git.service.SpecialMarkupService;
 public class TreeController {
 
 	private static final String SPECIAL_MARKUP = "specialmarkup";
+	private static final String HISTORY = "history";
 
 	private static final Set<MediaType> ADDITIONAL_TYPES = new ImmutableSet.Builder<MediaType>()
 			.add(MediaType.APPLICATION_XML)
@@ -73,7 +74,7 @@ public class TreeController {
 		final String repoPath = "/repo/" + repo.getInterfaceBaseUrl() + "/tree/" + ref + '/';
 		final String path = repoUtils.resolvePath(req, repoPath, ref);
 		
-		final String breadCrumbsPath = "history".equals(type) ? repoPath.replaceFirst("\\/tree\\/", "/history/") : repoPath;
+		final String breadCrumbsPath = HISTORY.equals(type) ? repoPath.replaceFirst("\\/tree\\/", "/history/") : repoPath;
 		
 		model.addAttribute("branch", ref);
 		model.addAttribute("breadcrumbs", Breadcrumb.generateBreadcrumbs(servletContext.getContextPath(), repo.getDisplayName(), breadCrumbsPath, path));
@@ -93,7 +94,7 @@ public class TreeController {
 					file = true;
 				}
 				
-				if ("history".equals(type)) {
+				if (HISTORY.equals(type)) {
 					try {
 						final List<Commit> history = new ArrayList<>();
 						final LogCommand logCommand = Git.wrap(db).log().setMaxCount(50);
@@ -106,7 +107,7 @@ public class TreeController {
 							history.add(new Commit(historyCommit, repo));
 						}
 						model.addAttribute("historyPos", ref);
-						model.addAttribute("history", history);
+						model.addAttribute(HISTORY, history);
 						return "git/history";
 					} catch (Exception e) {
 						throw new GitServerErrorException(e);
