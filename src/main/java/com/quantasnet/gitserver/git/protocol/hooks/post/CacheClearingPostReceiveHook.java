@@ -4,11 +4,13 @@ import java.util.Collection;
 
 import org.eclipse.jgit.transport.ReceiveCommand;
 import org.eclipse.jgit.transport.ReceivePack;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.git.service.RepoCacheService;
+import com.quantasnet.gitserver.git.cache.EvictAllCaches;
+import com.quantasnet.gitserver.git.cache.EvictRepoCache;
 import com.quantasnet.gitserver.user.User;
 
 /**
@@ -17,12 +19,12 @@ import com.quantasnet.gitserver.user.User;
 @Component
 public class CacheClearingPostReceiveHook implements GitServerPostReceiveHook {
 
-    @Autowired
-    private RepoCacheService repoCacheService;
+	private static final Logger LOG = LoggerFactory.getLogger(CacheClearingPostReceiveHook.class);
 
-    @Override
-    public void onPostReceive(final ReceivePack rp, final Collection<ReceiveCommand> commands, final User user, final GitRepository repo) {
-        repoCacheService.clearCache();
-        repoCacheService.clearCacheForRepo(repo);
-    }
+	@EvictRepoCache
+	@EvictAllCaches
+	@Override
+	public void onPostReceive(final ReceivePack rp, final Collection<ReceiveCommand> commands, final User user, final GitRepository repo) {
+		LOG.info("Clearing All Caches and Cache for {}", repo.getFullDisplayName());
+	}
 }

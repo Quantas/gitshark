@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.io.Files;
 import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.cache.RepoCacheConstants;
 import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
@@ -86,18 +87,18 @@ public class FilesystemRepositoryService {
 		return buildRepo(newRepo, owner, name);
 	}
 
-	@Cacheable(cacheNames = RepoCacheService.REPO_SIZE, key = "#repo.fullDisplayName")
+	@Cacheable(cacheNames = RepoCacheConstants.REPO_SIZE, key = "#repo.fullDisplayName")
 	public long repoSize(final GitRepository repo) {
 		final Iterable<File> files = Files.fileTreeTraverser().breadthFirstTraversal(repo.getFullRepoDirectory());
 		return StreamSupport.stream(files.spliterator(), false).mapToLong(File::length).sum();
 	}
 
-	@Cacheable(cacheNames = RepoCacheService.BRANCHES, key = "#repo.fullDisplayName")
+	@Cacheable(cacheNames = RepoCacheConstants.BRANCHES, key = "#repo.fullDisplayName")
 	public Set<String> branches(final GitRepository repo) throws GitServerException {
 		return repo.executeWithReturn(db -> db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet());
 	}
 
-	@Cacheable(cacheNames = RepoCacheService.TAGS, key = "#repo.fullDisplayName")
+	@Cacheable(cacheNames = RepoCacheConstants.TAGS, key = "#repo.fullDisplayName")
 	public Set<String> tags(final GitRepository repo) throws GitServerException {
 		return repo.executeWithReturn(db -> db.getRefDatabase().getRefs(Constants.REFS_TAGS).keySet());
 	}

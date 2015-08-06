@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import com.quantasnet.gitserver.git.cache.RepoCacheConstants;
 import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.ReadmeFile;
@@ -73,12 +74,12 @@ public class SpecialMarkupService {
 		return null;
 	}
 
-	@Cacheable(cacheNames = RepoCacheService.ALL_READMES, key = "{ #repo.fullDisplayName, #branch }")
+	@Cacheable(cacheNames = RepoCacheConstants.ALL_READMES, key = "{ #repo.fullDisplayName, #branch }")
 	public ReadmeFile resolveReadMeFile(final GitRepository repo, final Repository db, final String branch) throws GitServerException {
 		return resolveReadMeFile(repo, db, branch, repoUtils.getFiles(repo, db, branch, ""));
 	}
 	
-	@Cacheable(cacheNames = RepoCacheService.ALL_READMES, key = "{ #repo.fullDisplayName, #branch }")
+	@Cacheable(cacheNames = RepoCacheConstants.ALL_READMES, key = "{ #repo.fullDisplayName, #branch }")
 	public ReadmeFile resolveReadMeFile(final GitRepository repo, final Repository db, final String branch, final List<RepoFile> files) throws GitServerException {
 		LOG.info("Cache Miss - Readme File - {} - {}", repo.getFullDisplayName(), branch);
 		try {

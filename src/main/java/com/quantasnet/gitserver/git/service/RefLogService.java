@@ -26,7 +26,7 @@ public class RefLogService {
 	private static final Logger LOG = LoggerFactory.getLogger(RefLogService.class);
 	
 	// Causes StackOverflowError on enormous pushes
-	// @Cacheable(cacheNames = RepoCacheService.REFLOG, key = "#repo.fullDisplayName")
+	// @Cacheable(cacheNames = RepoCacheConstants.REFLOG, key = "#repo.fullDisplayName")
 	public List<RefLog> retrieveActivity(final GitRepository repo) throws GitServerException {
 		final List<RefLog> logs = new ArrayList<>();
 		

@@ -34,6 +34,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.git.cache.RepoCacheConstants;
 import com.quantasnet.gitserver.git.exception.CommitNotFoundException;
 import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
@@ -52,7 +53,7 @@ public class CommitService {
 	@Autowired
 	private RepositoryUtilities repoUtils;
 
-	@Cacheable(cacheNames = RepoCacheService.COMMIT_COUNT, key = "{ #repo.fullDisplayName }")
+	@Cacheable(cacheNames = RepoCacheConstants.COMMIT_COUNT, key = "{ #repo.fullDisplayName }")
 	public long commitCount(final GitRepository repo) throws GitServerException {
 		return repo.executeWithReturn(db -> {
 			try {
@@ -63,7 +64,7 @@ public class CommitService {
 		});
 	}
 
-	@Cacheable(cacheNames = RepoCacheService.ALL_COMMITS, key = "{ #repo.fullDisplayName, #selected }")
+	@Cacheable(cacheNames = RepoCacheConstants.ALL_COMMITS, key = "{ #repo.fullDisplayName, #selected }")
 	public List<Commit> getCommits(final GitRepository repo, final String selected, final Repository db) throws IOException, CommitNotFoundException {
 		LOG.info("Cache Miss - {}, {}", repo.getFullDisplayName(), selected);
 
@@ -129,7 +130,7 @@ public class CommitService {
 		return commits;
 	}
 
-	@Cacheable(cacheNames = RepoCacheService.COMMIT, key = "{ #repo.fullDisplayName, #parent == null ? '' : #parent.name, #commit.name }")
+	@Cacheable(cacheNames = RepoCacheConstants.COMMIT, key = "{ #repo.fullDisplayName, #parent == null ? '' : #parent.name, #commit.name }")
 	public List<Diff> getDiffsForCommmit(final GitRepository repo, final Repository db, final RevCommit parent, final RevCommit commit, final RevWalk revWalk) throws IOException, GitAPIException {
 		LOG.info("Cache Miss - {}, {}, {}", repo.getFullDisplayName(), parent == null ? "" : parent.getName(), commit.getName());
 
