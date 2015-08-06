@@ -91,7 +91,7 @@ public class TreeController {
 
 				boolean file = false;
 
-				if (!files.get(0).isDirectory()) {
+				if (files.size() == 1 && !files.get(0).isDirectory()) {
 					file = true;
 				}
 				
