@@ -9,13 +9,20 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
 
 @ControllerAdvice("com.quantasnet.gitserver.git.ui")
 public class ExceptionAdvice {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExceptionAdvice.class);
-	
-	@ExceptionHandler({ GitServerException.class })
+
+	@ExceptionHandler(RepositoryAccessDeniedException.class)
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	public String accessDenied() {
+		return "forward:/401";
+	}
+
+	@ExceptionHandler(GitServerException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public String notFound() {
 		return "forward:/404";
