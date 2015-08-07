@@ -13,18 +13,23 @@ import org.springframework.boot.context.embedded.ErrorPage;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import com.quantasnet.gitserver.git.service.RepositoryResolver;
+import com.quantasnet.gitserver.git.ui.display.DisplayTypeConverter;
 
 @Configuration
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
 	@Autowired
 	private RepositoryResolver repositoryResolver;
+
+	@Autowired
+	private DisplayTypeConverter displayTypeConverter;
 	
 	@Override
 	public void addViewControllers(final ViewControllerRegistry registry) {
@@ -68,5 +73,10 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 		super.addArgumentResolvers(argumentResolvers);
 		argumentResolvers.add(repositoryResolver);
 	}
-	
+
+	@Override
+	public void addFormatters(final FormatterRegistry registry) {
+		super.addFormatters(registry);
+		registry.addConverter(displayTypeConverter);
+	}
 }
