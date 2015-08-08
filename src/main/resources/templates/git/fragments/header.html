@@ -10,7 +10,8 @@
 				<span class="h2" th:text="${repo.owner} + ' / ' + ${repo.displayName}">owner / name</span>
 				&nbsp;&nbsp;
 				<blockquote style="display: inline-block; vertical-align: middle;">
-					<p class="h5 giturl" th:text="${checkoutUrl}"></p>
+					<span class="h5 giturl" id="giturl" th:text="${checkoutUrl}"></span>
+					<button id="copy-button" data-clipboard-target="giturl" title="Click to copy URL"><i class="fa fa-fw fa-files-o"></i></button>
 				</blockquote>
 			</div>			
 		    <div th:if="${!repo.commits}" layout:include="git/fragments/emptyrepo :: emptyrepo">
