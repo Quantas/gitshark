@@ -7,7 +7,7 @@
 </head>
 <body>
 <div layout:fragment="header">
-    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <nav class="navbar navbar-default" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -50,48 +50,6 @@
 	                </li>
 	            </ul>
             </div>
-            
-             <div class="collapse navbar-collapse navbar-ex1-collapse" th:if="${repo != null}">
-                <ul class="nav navbar-nav side-nav">
-                	<li>
-                    	<a th:href="@{/repo/} + ${repo.interfaceBaseUrl}"><i class="fa fa-fw fa-home"></i>&nbsp;Summary</a>
-                    </li>
-                    <li>
-						<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree'"><i class="fa fa-fw fa-sitemap"></i>&nbsp;Source</a>
-					</li>
-					<li>
-						<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/reflog'"><i class="fa fa-fw fa-tasks"></i>&nbsp;Activity</a>
-					</li>
-                    <li>
-						<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/commits'"><i class="fa fa-fw fa-list-ul"></i>&nbsp;Commits</a>
-					</li>
-					<li>
-						<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/branch'"><i class="fa fa-fw fa-code-fork"></i>&nbsp;Branches</a>
-					</li>
-					<li>
-						<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tag'"><i class="fa fa-fw fa-tag"></i>&nbsp;Tags</a>
-					</li>
-					<li>
-						<a th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/settings'"><i class="fa fa-fw fa-cogs"></i>&nbsp;Settings</a>
-					</li>
-                </ul>
-            </div>
-			<div class="collapse navbar-collapse navbar-ex1-collapse" th:if="${admin}">
-				<ul class="nav navbar-nav side-nav">
-					<li>
-						<a th:href="@{/admin}"><i class="fa fa-fw fa-tachometer"></i>&nbsp;Dashboard</a>
-					</li>
-					<li>
-						<a th:href="@{/admin/metrics}"><i class="fa fa-fw fa-bar-chart"></i>&nbsp;Metrics</a>
-					</li>
-					<li>
-						<a th:href="@{/admin/loggers}"><i class="fa fa-fw fa-file-text-o"></i>&nbsp;Loggers</a>
-					</li>
-					<li>
-						<a th:href="@{/admin/users}"><i class="fa fa-fw fa-users"></i>&nbsp;Users</a>
-					</li>
-				</ul>
-			</div>
         </div>
     </nav>
 

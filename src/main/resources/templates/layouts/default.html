@@ -26,7 +26,6 @@
 
         <link rel="stylesheet" th:href="@{/webjars/bootswatch/3.3.1+2/yeti/bootstrap.min.css}" />
         <link rel="stylesheet" th:href="@{/webjars/font-awesome/4.2.0/css/font-awesome.min.css}" />
-        <link rel="stylesheet" th:href="@{/css/menu.css}" />
         <link rel="stylesheet" th:href="@{/css/gitserver.css}" />
 
         <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -35,12 +34,6 @@
           <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
         <![endif]-->
 
-        <style th:if="${repo == null and admin == null}">
-            .wrapper {
-                padding-left: 0;
-            }
-        </style>
-               
         <script>
             $(document).ready(function() {
                 $("time.timeago").timeago();
@@ -67,7 +60,10 @@
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                         <span th:text="${failureStatus}">Failure!</span>
                     </div>
-                    <div layout:fragment="content">Content</div>
+                    <div th:class="${repo == null and admin == null ? '' : 'row'}">
+	                    <div th:if="${repo != null or admin != null}" layout:include="fragments/sidenav :: menu">Menu</div>
+	                    <div th:class="${repo == null and admin == null ? '' : 'col-sm-10'}" layout:fragment="content">Content</div>
+                    </div>
                     <div id="bottom" layout:include="fragments/footer :: footer">Footer</div>
                 </div>
             </div>

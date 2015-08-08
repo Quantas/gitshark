@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+</head>
+<body>
+	<div layout:fragment="menu">
+		<div class="col-sm-2">
+			<div th:if="${repo != null}" class="list-group sidenav">
+				<a class="list-group-item" th:href="@{/repo/} + ${repo.interfaceBaseUrl}" data-toggle="tooltip" data-placement="right" title="Summary"><i class="fa fa-fw fa-home"></i><span class="list-text">&nbsp;Summary</span></a>
+				<a class="list-group-item" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tree'" data-toggle="tooltip" data-placement="right" title="Source"><i class="fa fa-fw fa-sitemap"></i><span class="list-text">&nbsp;Source</span></a>
+				<a class="list-group-item" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/reflog'" data-toggle="tooltip" data-placement="right" title="Activity"><i class="fa fa-fw fa-tasks"></i><span class="list-text">&nbsp;Activity</span></a>
+				<a class="list-group-item" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/commits'" data-toggle="tooltip" data-placement="right" title="Commits"><i class="fa fa-fw fa-list-ul"></i><span class="list-text">&nbsp;Commits</span></a>
+				<a class="list-group-item" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/branch'" data-toggle="tooltip" data-placement="right" title="Branches"><i class="fa fa-fw fa-code-fork"></i><span class="list-text">&nbsp;Branches</span></a>
+				<a class="list-group-item" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/tag'" data-toggle="tooltip" data-placement="right" title="Tags"><i class="fa fa-fw fa-tag"></i><span class="list-text">&nbsp;Tags</span></a>
+				<a class="list-group-item" th:href="@{/repo/} + ${repo.interfaceBaseUrl} + '/settings'" data-toggle="tooltip" data-placement="right" title="Settings"><i class="fa fa-fw fa-cogs"></i><span class="list-text">&nbsp;Settings</span></a>
+			</div>
+			<div th:if="${admin}" class="list-group sidenav">
+				<a class="list-group-item" th:href="@{/admin}" data-toggle="tooltip" data-placement="right" title="Dashboard"><i class="fa fa-fw fa-tachometer"></i><span class="list-text">&nbsp;Dashboard</span></a>
+				<a class="list-group-item" th:href="@{/admin/metrics}" data-toggle="tooltip" data-placement="right" title="Metrics"><i class="fa fa-fw fa-bar-chart"></i><span class="list-text">&nbsp;Metrics</span></a>
+				<a class="list-group-item" th:href="@{/admin/loggers}" data-toggle="tooltip" data-placement="right" title="Loggers"><i class="fa fa-fw fa-file-text-o"></i><span class="list-text">&nbsp;Loggers</span></a>
+				<a class="list-group-item" th:href="@{/admin/users}" data-toggle="tooltip" data-placement="right" title="Users"><i class="fa fa-fw fa-users"></i><span class="list-text">&nbsp;Users</span></a>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -5,17 +5,6 @@
       layout:decorator="layouts/default">
 <head>
 	<script th:src="@{/webjars/prettify/4-Mar-2013/run_prettify.js}"></script>
-	<script>
-		$(document).ready(function() {
-			$('.fileLink').click(function(e) {
-				var name = $(this).data('filename');
-				$('html, body').animate({
-					scrollTop: $('a[name=' + name + ']').offset().top - 60
-				}, 0);
-				e.preventDefault();
-			});
-		});
-	</script>
 </head>
 <body>
 <div layout:fragment="content">
@@ -66,7 +55,7 @@
 		<table class="table table-hover">
 			<tr th:each="diff,iterStat : ${diffs}">
 				<td>
-					<a href="#" class="fileLink" th:attr="data-filename='file' + ${iterStat.index}" th:text="${diff.fileName}"></a>
+					<a th:href="${'#file' + iterStat.index}" th:text="${diff.fileName}"></a>
 				</td>
 				<td>
 					<span style="width: 75px;" class="label label-danger pull-right" th:text="'- ' + ${diff.deletions}"></span>

@@ -1,9 +1,6 @@
-.main-content {
-	padding-top: 55px;
-}
-
 .page-header {
 	margin: 0;
+	border-bottom: 0;
 }
 
 .commit-message {
@@ -49,7 +46,7 @@ code {
 	background-color: inherit;
 }
 
-table,.label,.navbar,pre {
+table,.label,.navbar,pre,.list-group-item {
 	font-size: 15px;
 }
 
@@ -77,18 +74,6 @@ table,.label,.navbar,pre {
 	margin-bottom: 5px;
 }
 
-.navbar-brand {
-	width: 130px;
-}
-
-.navbar-nav li a:hover, 
-.navbar-nav li a:focus,
-.navbar-brand:hover, 
-.navbar-brand:focus {
-	outline: none;
-	background-color: #555 !important;
-}
-
 .merged {
 	color: #cccccc;
 }
@@ -99,4 +84,22 @@ table,.label,.navbar,pre {
 
 .giturl {
 	margin-top: 0;
+}
+
+@media(max-width:768px) {
+    .sidenav .list-group-item {
+        display: inline-block;
+    }
+}
+
+@media(max-width:911px) {
+    .sidenav .list-group-item > .list-text {
+    	display: none;
+    }
+}
+
+@media(min-width:911px) {
+	.sidenav .tooltip {
+        display: none !important;
+    }
 }
