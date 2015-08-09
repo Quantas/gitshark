@@ -21,12 +21,12 @@
         
         <script type="text/javascript" th:src="@{/webjars/modernizr/2.8.3/modernizr.min.js}"></script>
         
-        <script type="text/javascript" th:src="@{/webjars/bootstrap/3.3.1/js/bootstrap.min.js}"></script>
+        <script type="text/javascript" th:src="@{/webjars/bootstrap/3.3.5/js/bootstrap.min.js}"></script>
         <script type="text/javascript" th:src="@{/js/timeago.min.js}"></script>
         <script type="text/javascript" th:src="@{/webjars/zeroclipboard/2.2.0/ZeroClipboard.min.js}"></script>
 
-        <link rel="stylesheet" th:href="@{/webjars/bootswatch/3.3.1+2/yeti/bootstrap.min.css}" />
-        <link rel="stylesheet" th:href="@{/webjars/font-awesome/4.2.0/css/font-awesome.min.css}" />
+        <link rel="stylesheet" th:href="@{/webjars/bootswatch/3.3.5/yeti/bootstrap.min.css}" />
+        <link rel="stylesheet" th:href="@{/webjars/font-awesome/4.4.0/css/font-awesome.min.css}" />
         <link rel="stylesheet" th:href="@{/css/gitserver.css}" />
 
         <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -46,7 +46,7 @@
                     $('#logoutForm').submit();
                 });
 
-                new ZeroClipboard($("#copy-button"));
+                new ZeroClipboard($(".copy-button"));
             });
         </script>
     </head>
