@@ -18,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 
 import com.quantasnet.gitserver.security.GitServerUserDetailsService;
 
@@ -59,9 +58,7 @@ public class WebSecurityConfig {
 						.defaultsDisabled()
 						.cacheControl().and()
 				.and()
-            		.requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env))
-	            .and()
-	                .sessionManagement().sessionFixation().changeSessionId();
+            		.requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env));
 		}
 	}
 	
@@ -132,19 +129,14 @@ public class WebSecurityConfig {
 	    public AuthenticationManager authenticationManagerBean() throws Exception {
 	        return super.authenticationManagerBean();
 	    }
-		
+
 	    @Bean
 	    public RememberMeServices rememberMeServices() {
 	        final PersistentTokenBasedRememberMeServices rememberMeServices =
-	                new PersistentTokenBasedRememberMeServices(KEY, userDetailsService(), gitServerPersistentTokenRepository);
+	                new PersistentTokenBasedRememberMeServices(KEY, gitServerUserDetailsService(), gitServerPersistentTokenRepository);
 	        rememberMeServices.setCookieName("GIT_SERVER_REMEMBER_ME");
 	        rememberMeServices.setParameter("_git_server_remember_me");
 	        return rememberMeServices;
-	    }
-	    
-	    @Bean
-	    public RememberMeAuthenticationFilter rememberMeAuthenticationFilter() throws Exception {
-	        return new RememberMeAuthenticationFilter(authenticationManager(), rememberMeServices());
 	    }
 	}
 }
