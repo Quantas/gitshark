@@ -1,4 +1,4 @@
-# gitserver (still needs a name)
+# GitShark
 
 > A Java based Git Server solution.
 
