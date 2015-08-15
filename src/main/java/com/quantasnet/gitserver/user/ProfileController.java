@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.quantasnet.gitserver.Constants;
+
 @RequestMapping("/profile")
 @Controller
 public class ProfileController {
@@ -48,6 +50,7 @@ public class ProfileController {
 			redirectAttributes.addFlashAttribute(PROFILE_USER, profileUser);
 		} else {
 			userService.profileUpdate(user, profileUser);
+			redirectAttributes.addFlashAttribute(Constants.SUCCESS_STATUS, "Profile successfully updated.");
 		}
 
 		return "redirect:/profile";
@@ -66,6 +69,8 @@ public class ProfileController {
 		if (bindingResult.hasErrors()) {
 			redirectAttributes.addFlashAttribute(BindingResult.MODEL_KEY_PREFIX + CHANGE_PASSWORD, bindingResult);
 			redirectAttributes.addFlashAttribute(CHANGE_PASSWORD, changePasswordForm);
+		} else {
+			redirectAttributes.addFlashAttribute(Constants.SUCCESS_STATUS, "Password successfully changed.");
 		}
 
 		return "redirect:/profile";
