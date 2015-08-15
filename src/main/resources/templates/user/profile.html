@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/default">
+<head>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-md-6">
+            <form th:object="${profileUser}" method="post" th:action="@{/profile/save}" class="form-signin" role="form">
+                <div>
+                    <h2 class="form-signin-heading">Profile</h2>
+                    <div class="alert alert-danger" th:if="${#fields.hasErrors('*')}">
+                        <p th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>
+                    </div>
+                    <table class="table">
+                        <tr>
+                            <th>
+                                User Name
+                            </th>
+                            <td th:text="${#authentication.principal.userName}">
+                                User Name
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Profile Image
+                            </th>
+                            <td>
+                                <img th:src="${#authentication.principal.imageUrl}" width="50" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                First Name
+                            </th>
+                            <td>
+                                <input id="firstName" th:field="*{firstName}" class="form-control input-md" placeholder="First Name" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Last Name
+                            </th>
+                            <td>
+                                <input id="lastName" th:field="*{lastName}" class="form-control input-md" placeholder="Last Name" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                E-Mail
+                            </th>
+                            <td>
+                                <input id="email" th:field="*{email}" class="form-control input-md" placeholder="E-Mail" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <button id="submit" type="submit" name="submit" class="btn btn-lg btn-primary btn-block">Update</button>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <form th:object="${changePasswordForm}" method="post" th:action="@{/profile/changePassword}" class="form-signin" role="form">
+                <div>
+                    <h2 class="form-signin-heading">Change Password</h2>
+                    <div class="alert alert-danger" th:if="${#fields.hasErrors('*')}">
+                        <p th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>
+                    </div>
+                    <table class="table">
+                        <tr>
+                            <th>
+                                Current Password
+                            </th>
+                            <td>
+                                <input id="currentPassword" type="password" th:field="*{currentPassword}" class="form-control input-md" placeholder="Current Password" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                New Password
+                            </th>
+                            <td>
+                                <input id="newPassword" type="password" th:field="*{newPassword}" class="form-control input-md" placeholder="New Password" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                New Password Again
+                            </th>
+                            <td>
+                                <input id="newPasswordAgain" type="password" th:field="*{newPasswordAgain}" class="form-control input-md" placeholder="New Password Again" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <button id="submit" type="submit" name="submit" class="btn btn-lg btn-primary btn-block">Update</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -90,6 +90,7 @@ public class WebSecurityConfig {
 		protected void configure(final HttpSecurity http) throws Exception {
 			http
 	            .authorizeRequests()
+					.antMatchers("/profile/**").authenticated()
 	                .antMatchers("/admin/**").hasRole("ADMIN")
 	                .antMatchers("/management/**").hasRole("ADMIN")
 	                .antMatchers("/404", "/403", "/401", "/503").permitAll()
