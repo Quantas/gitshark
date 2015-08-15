@@ -75,12 +75,11 @@ public class UserService {
 	public boolean changePassword(final User user, final ChangePasswordForm changePasswordForm) {
 		final User dbUser = userRepository.getUserByUserName(user.getUserName());
 
-		if (passwordEncoder.matches(changePasswordForm.getCurrentPassword(), dbUser.getPassword())) {
-			if (changePasswordForm.getNewPassword().equals(changePasswordForm.getNewPasswordAgain())) {
-				user.setPassword(passwordEncoder.encode(changePasswordForm.getNewPassword()));
-				userRepository.save(user);
-				return true;
-			}
+		if (passwordEncoder.matches(changePasswordForm.getCurrentPassword(), dbUser.getPassword()) &&
+				changePasswordForm.getNewPassword().equals(changePasswordForm.getNewPasswordAgain())) {
+			user.setPassword(passwordEncoder.encode(changePasswordForm.getNewPassword()));
+			userRepository.save(user);
+			return true;
 		}
 
 		return false;
