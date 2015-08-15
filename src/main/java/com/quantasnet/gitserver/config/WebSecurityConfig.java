@@ -24,19 +24,19 @@ import com.quantasnet.gitserver.security.GitServerUserDetailsService;
 @Configuration
 public class WebSecurityConfig {
 	
-	static final String GIT_HTTP_REGEX = "(\\/repo\\/)(.*)(?=.*\\.git(?!ignore))(.*)"; 
+	static final String GIT_HTTP_REGEX = "(\\/repo\\/)(.*)(?=.*\\.git(?!ignore))(.*)";
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 	
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-	
-    private static String channel(final Environment env) {
-        return env.acceptsProfiles("openshift") ? "REQUIRES_SECURE_CHANNEL" : "REQUIRES_INSECURE_CHANNEL";
-    }
-    
-    @EnableWebSecurity
-    @EnableGlobalMethodSecurity(prePostEnabled = true)
+	private static String channel(final Environment env) {
+		return env.acceptsProfiles("openshift") ? "REQUIRES_SECURE_CHANNEL" : "REQUIRES_INSECURE_CHANNEL";
+	}
+
+	@EnableWebSecurity
+	@EnableGlobalMethodSecurity(prePostEnabled = true)
 	@Configuration
 	@Order(1)
 	public static class GitRepoSecurity extends WebSecurityConfigurerAdapter {
@@ -54,16 +54,16 @@ public class WebSecurityConfig {
 					.httpBasic()
 				.and()
 					.csrf().disable()
-					.headers()
-						.defaultsDisabled()
-						.cacheControl().and()
+				.headers()
+					.defaultsDisabled()
+					.cacheControl().and()
 				.and()
-            		.requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env));
+				.requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env));
 		}
 	}
 	
-    @EnableWebSecurity
-    @EnableGlobalMethodSecurity(prePostEnabled = true)
+	@EnableWebSecurity
+	@EnableGlobalMethodSecurity(prePostEnabled = true)
 	@Configuration
 	@Order(2)
 	public static class WebUISecurity extends WebSecurityConfigurerAdapter {
@@ -73,71 +73,71 @@ public class WebSecurityConfig {
 		@Autowired
 		private Environment env;
 		
-	    @Autowired
-	    private PersistentTokenRepository gitServerPersistentTokenRepository;
+		@Autowired
+		private PersistentTokenRepository gitServerPersistentTokenRepository;
 		
 		@Autowired
 		private PasswordEncoder passwordEncoder;
-	    
+
 		@Override
 		public void configure(final WebSecurity web) throws Exception {
 			web
 				.ignoring()
-					.antMatchers("/webjars/**", "/js/**", "/css/**");
+				.antMatchers("/webjars/**", "/js/**", "/css/**");
 		}
 		
 		@Override
 		protected void configure(final HttpSecurity http) throws Exception {
 			http
-	            .authorizeRequests()
+				.authorizeRequests()
 					.antMatchers("/profile/**").authenticated()
-	                .antMatchers("/admin/**").hasRole("ADMIN")
-	                .antMatchers("/management/**").hasRole("ADMIN")
-	                .antMatchers("/404", "/403", "/401", "/503").permitAll()
-	                .antMatchers("/register").anonymous()
-	                .anyRequest().authenticated()
-	            .and()
-	                .formLogin()
-	                .loginPage("/login")
-	                .permitAll()
-	            .and()
-	                .logout()
-	                .permitAll()
-                .and()
-               		.csrf()
-           		.and()
-               		.headers()
-           		.and()
-	                .requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env))
-	            .and()
-	                .rememberMe().key(KEY).rememberMeServices(rememberMeServices());
+					.antMatchers("/admin/**").hasRole("ADMIN")
+					.antMatchers("/management/**").hasRole("ADMIN")
+					.antMatchers("/404", "/403", "/401", "/503").permitAll()
+					.antMatchers("/register").anonymous()
+					.anyRequest().authenticated()
+				.and()
+					.formLogin()
+						.loginPage("/login")
+						.permitAll()
+				.and()
+					.logout()
+						.permitAll()
+				.and()
+					.csrf()
+				.and()
+					.headers()
+				.and()
+					.requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env))
+				.and()
+					.rememberMe().key(KEY).rememberMeServices(rememberMeServices());
 		}
 		
 		@Autowired
-	    public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
-	        auth
-	            .userDetailsService(gitServerUserDetailsService())
-	            .passwordEncoder(passwordEncoder);
-	    }
-	    
+		public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
+			auth
+				.userDetailsService(gitServerUserDetailsService())
+				.passwordEncoder(passwordEncoder);
+		}
+
 		@Bean
 		public UserDetailsService gitServerUserDetailsService() {
 			return new GitServerUserDetailsService();
 		}
 		
-	    @Bean
-	    @Override
-	    public AuthenticationManager authenticationManagerBean() throws Exception {
-	        return super.authenticationManagerBean();
-	    }
+		@Bean
+		@Override
+		public AuthenticationManager authenticationManagerBean() throws Exception {
+			return super.authenticationManagerBean();
+		}
 
-	    @Bean
-	    public RememberMeServices rememberMeServices() {
-	        final PersistentTokenBasedRememberMeServices rememberMeServices =
-	                new PersistentTokenBasedRememberMeServices(KEY, gitServerUserDetailsService(), gitServerPersistentTokenRepository);
-	        rememberMeServices.setCookieName("GIT_SERVER_REMEMBER_ME");
-	        rememberMeServices.setParameter("_git_server_remember_me");
-	        return rememberMeServices;
-	    }
+		@Bean
+		public RememberMeServices rememberMeServices() {
+			final PersistentTokenBasedRememberMeServices rememberMeServices =
+				new PersistentTokenBasedRememberMeServices(KEY, gitServerUserDetailsService(), gitServerPersistentTokenRepository);
+			rememberMeServices.setCookieName("GIT_SERVER_REMEMBER_ME");
+			rememberMeServices.setParameter("_git_server_remember_me");
+			return rememberMeServices;
+		}
 	}
 }
