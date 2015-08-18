@@ -20,9 +20,12 @@ public class MongoDfsRepository extends DfsRepository {
 			return new MongoDfsRepository(this);
 		}
 	}
+
+	private MongoOperations mongoOperations;
 	
-	public MongoDfsRepository(final String repoName) {
+	public MongoDfsRepository(final String repoName, final MongoOperations mongoOperations) {
 		this(new MongoRepositoryBuilder().setRepositoryDescription(new DfsRepositoryDescription(repoName)));
+		this.mongoOperations = mongoOperations;
 	}
 	
 	private MongoDfsRepository(final MongoRepositoryBuilder builder) {
@@ -31,11 +34,15 @@ public class MongoDfsRepository extends DfsRepository {
 
 	@Override
 	public DfsObjDatabase getObjectDatabase() {
-		return null;
+		return new MongoObjDatabase(this);
 	}
 
 	@Override
 	public DfsRefDatabase getRefDatabase() {
-		return null;
-	}	
+		return new MongoDfsRefDatabase(this);
+	}
+
+	public MongoOperations getMongoOperations() {
+		return mongoOperations;
+	}
 }

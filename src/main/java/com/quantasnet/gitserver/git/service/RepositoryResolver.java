@@ -1,15 +1,13 @@
 package com.quantasnet.gitserver.git.service;
 
+import java.io.IOException;
 import java.security.Principal;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
-import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -17,6 +15,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import com.quantasnet.gitserver.git.backend.mongo.MongoDfsRepository;
+import com.quantasnet.gitserver.git.backend.mongo.MongoOperations;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.user.User;
 
@@ -27,17 +27,14 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 	private FilesystemRepositoryService repositoryService;
 
 	@Autowired
-	private MongoDbFactory mongoFactory;
-	
-	@Autowired
-	private GridFsTemplate gridFsTemplate;
-	
+	private MongoOperations mongoOperations;
+
 	@PostConstruct
-	public void post() {
-		LoggerFactory.getLogger(RepositoryResolver.class).info("Mongo {}", mongoFactory.getDb().getName());
-		LoggerFactory.getLogger(RepositoryResolver.class).info("GridFS {}", gridFsTemplate.toString());
+	public void post() throws IOException {
+		final MongoDfsRepository repo = new MongoDfsRepository("user/gitserver", mongoOperations);
+		repo.getBranch();
 	}
-	
+
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		return parameter.getParameterType().isAssignableFrom(GitRepository.class);
