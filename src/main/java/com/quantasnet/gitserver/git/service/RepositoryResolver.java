@@ -2,10 +2,14 @@ package com.quantasnet.gitserver.git.service;
 
 import java.security.Principal;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -22,6 +26,18 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 	@Autowired
 	private FilesystemRepositoryService repositoryService;
 
+	@Autowired
+	private MongoDbFactory mongoFactory;
+	
+	@Autowired
+	private GridFsTemplate gridFsTemplate;
+	
+	@PostConstruct
+	public void post() {
+		LoggerFactory.getLogger(RepositoryResolver.class).info("Mongo {}", mongoFactory.getDb().getName());
+		LoggerFactory.getLogger(RepositoryResolver.class).info("GridFS {}", gridFsTemplate.toString());
+	}
+	
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		return parameter.getParameterType().isAssignableFrom(GitRepository.class);
