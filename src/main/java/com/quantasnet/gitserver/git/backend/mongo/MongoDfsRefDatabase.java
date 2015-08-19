@@ -83,14 +83,14 @@ public class MongoDfsRefDatabase extends DfsRefDatabase {
 		if (cur != null) {
 			Ref toCompare = new Unpeeled(cur.getStorage(), cur.getName(), ObjectId.fromString(cur.getObjectId()));
 			
-			if (toCompare.isSymbolic()) {
+			if (cur.isSymbolic()) {
 					toCompare = new SymbolicRef(name, new ObjectIdRef.Unpeeled(Storage.NEW, toCompare.getName(), toCompare.getObjectId()));
 			} else {
 				toCompare = toCompare.getLeaf();
 			}
 			
 			if (eq(toCompare, oldRef)) {
-				return mongoService.storeRefByNameForRepo(name, mongoRepo.getId(), newRef);
+				return mongoService.updateRefByNameForRepo(name, mongoRepo.getId(), newRef);
 			}
 		}
 

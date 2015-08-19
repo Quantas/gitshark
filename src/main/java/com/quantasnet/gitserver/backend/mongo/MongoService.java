@@ -56,6 +56,27 @@ public class MongoService {
 		return mongoRefRepository.findByRepoIdAndName(repoId, name);
 	}
 	
+	public boolean updateRefByNameForRepo(final String name, final String repoId, final Ref ref) {
+		final MongoRef current = mongoRefRepository.findByRepoIdAndName(repoId, name);
+		final MongoRef currentHEAD = mongoRefRepository.findByRepoIdAndName(repoId, "HEAD");
+		if (current != null) {
+			
+			if (currentHEAD.getTargetName().equals(current.getName())) {
+				// update HEAD
+				currentHEAD.setObjectId(ref.getObjectId().name());
+				currentHEAD.setTargetObjectId(ref.getObjectId().name());
+				mongoRefRepository.save(currentHEAD);
+			}
+			
+			final MongoRef newRef = buildFromRef(name, repoId, ref);
+			newRef.setId(current.getId());
+			mongoRefRepository.save(newRef);
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public boolean storeRefByNameForRepo(final String name, final String repoId, final Ref ref) {
 		mongoRefRepository.save(buildFromRef(name, repoId, ref));
 		return true;
