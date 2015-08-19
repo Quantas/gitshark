@@ -25,7 +25,7 @@ public class GitServerPersistentTokenRepository implements PersistentTokenReposi
         final RememberMeToken rememberMeToken = convert(token);
 
         try {
-            rememberMeTokenRepository.saveAndFlush(rememberMeToken);
+            rememberMeTokenRepository.save(rememberMeToken);
         } catch (final DataAccessException dae) {
             LOG.error("Error storing new Remember Me Token", dae);
         }
@@ -34,7 +34,12 @@ public class GitServerPersistentTokenRepository implements PersistentTokenReposi
     @Override
     public void updateToken(final String series, final String tokenValue, final Date lastUsed) {
         try {
-            rememberMeTokenRepository.updateToken(tokenValue, lastUsed, series);
+        	final RememberMeToken existingToken = rememberMeTokenRepository.findOne(series);
+        	if (null != existingToken) {
+        		existingToken.setToken(tokenValue);
+        		existingToken.setLastUsed(lastUsed);
+        		rememberMeTokenRepository.save(existingToken);
+        	}
         } catch (final DataAccessException dae) {
             LOG.error("Error updating Remember Me token", dae);
         }
@@ -58,7 +63,7 @@ public class GitServerPersistentTokenRepository implements PersistentTokenReposi
     @Override
     public void removeUserTokens(final String username) {
         try {
-            rememberMeTokenRepository.removeTokensForUser(username);
+            rememberMeTokenRepository.deleteRememberMeTokenByUsername(username);
         } catch (final DataAccessException dae) {
             LOG.error("Error removing all previous Remember Me tokens", dae);
         }
@@ -67,7 +72,7 @@ public class GitServerPersistentTokenRepository implements PersistentTokenReposi
     protected RememberMeToken convert(final PersistentRememberMeToken persistentRememberMeToken) {
         final RememberMeToken rememberMeToken = new RememberMeToken();
         rememberMeToken.setToken(persistentRememberMeToken.getTokenValue());
-        rememberMeToken.setSeries(persistentRememberMeToken.getSeries());
+        rememberMeToken.setId(persistentRememberMeToken.getSeries());
         rememberMeToken.setUsername(persistentRememberMeToken.getUsername());
         rememberMeToken.setLastUsed(persistentRememberMeToken.getDate());
         return rememberMeToken;
@@ -75,7 +80,7 @@ public class GitServerPersistentTokenRepository implements PersistentTokenReposi
 
     protected PersistentRememberMeToken convert(final RememberMeToken rememberMeToken) {
         return new PersistentRememberMeToken(rememberMeToken.getUsername(),
-                rememberMeToken.getSeries(), rememberMeToken.getToken(),
+                rememberMeToken.getId(), rememberMeToken.getToken(),
                 rememberMeToken.getLastUsed());
     }
 }

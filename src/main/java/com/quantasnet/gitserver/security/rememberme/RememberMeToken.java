@@ -3,36 +3,27 @@ package com.quantasnet.gitserver.security.rememberme;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
-@Entity
-@Table(name = "remember_me_token")
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document
 public class RememberMeToken implements Serializable {
 
     private static final long serialVersionUID = -5228741667258598180L;
 
     @Id
-    @Column(name = "series")
-    private String series;
-
-    @Column(name = "user_name", nullable = false)
+    private String id;
     private String username;
-
-    @Column(name = "token", nullable = false)
     private String token;
-
-    @Column(name = "last_used", nullable = false)
     private Date lastUsed;
 
-    public String getSeries() {
-        return series;
+    public String getId() {
+        return id;
     }
 
-    public void setSeries(final String series) {
-        this.series = series;
+    public void setId(final String id) {
+        this.id = id;
     }
 
     public String getUsername() {
