@@ -3,12 +3,13 @@ package com.quantasnet.gitserver.backend.mongo;
 import java.util.List;
 
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.SymbolicRef;
 import org.eclipse.jgit.lib.Ref.Storage;
+import org.eclipse.jgit.lib.SymbolicRef;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.stereotype.Service;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.gridfs.GridFS;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.user.User;
@@ -37,6 +38,18 @@ public class MongoService {
 		repo.setName(name);
 		repo.setOwnerId(user.getId());
 		return mongoRepoRepository.save(repo);
+	}
+	
+	public boolean deleteRepo(final String name, final User user) {
+		try {
+			final MongoRepo repo = getRepo(name, user);
+			gridFS().remove(new BasicDBObject("metadata.repoId", repo.getId()));
+			mongoRepoRepository.delete(repo);
+			mongoRefRepository.delete(mongoRefRepository.findByRepoId(repo.getId()));
+			return true;
+		} catch (final Exception e) {
+			return false;
+		}
 	}
 	
 	public MongoRepo getRepo(final String name, final User user) {

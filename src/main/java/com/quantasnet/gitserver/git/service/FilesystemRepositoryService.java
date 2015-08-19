@@ -29,9 +29,4 @@ public class FilesystemRepositoryService {
 	public Map<String, Ref> tags(final GitRepository repo) throws GitServerException {
 		return repo.executeWithReturn(db -> db.getRefDatabase().getRefs(Constants.REFS_TAGS));
 	}
-
-	public boolean deleteRepo(final GitRepository repo) {
-		// TODO
-		return false;
-	}
 }
