@@ -47,7 +47,7 @@ public class MongoDfsRefDatabase extends DfsRefDatabase {
 		if (sym.size() == 0 && ids.size() > 0) {
 			// HEAD is missing
 			for (final Ref ref : ids.toRefList()) {
-				if (ref.getName().equals("refs/heads/master")) {
+				if ("refs/heads/master".equals(ref.getName())) {
 					final Ref head = new SymbolicRef("HEAD", new Unpeeled(ref.getStorage(), ref.getName(), ref.getObjectId()));
 					sym.add(head);
 					ids.add(head);
