@@ -21,7 +21,6 @@ import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
 import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePackFactory;
 import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
 
 @Scope("prototype")
 @Component
@@ -30,11 +29,8 @@ public class GitProtocolClientThread extends Thread {
 	private static final Logger LOG = LoggerFactory.getLogger(GitProtocolClientThread.class);
 	
 	@Autowired
-	private FilesystemRepositoryService repositoryService;
-	
-	@Autowired
 	private GitServerReceivePackFactory receivePackFactory;
-
+	
 	private Socket socket;
 	
 	public GitProtocolClientThread setup(final Socket socket) {
@@ -78,7 +74,7 @@ public class GitProtocolClientThread extends Thread {
 
 	private void handleRequest(final InputStream input, final OutputStream output, final String requestedMethod, final String owner, final String repo) {
 		try {
-			final GitRepository gitRepo = repositoryService.getRepository(null, owner, repo);
+			final GitRepository gitRepo = null; // TODO
 			
 			if (Constants.GIT_UPLOAD_PACK.equals(requestedMethod)) {
 				if (gitRepo.isAnonRead()) {

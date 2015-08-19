@@ -41,7 +41,7 @@ public class DisplayController {
 			try {
 				return db.getBranch();
 			} catch (final Exception e) {
-				throw new GitServerErrorException(e);
+				return null;
 			}
 		});
 		return displayRepoTree(repo, DisplayType.TREE, ref, model, req);
@@ -56,9 +56,9 @@ public class DisplayController {
 		
 		return repo.executeWithReturn(db -> {
 			if (repo.hasCommits()) {
-				repoUtils.addRefsToModel(model, db);
+				repoUtils.addRefsToModel(model, repo);
 				
-				final RevCommit commit = repoUtils.getRefHeadCommit(ref, db);
+				final RevCommit commit = repoUtils.getRefHeadCommit(ref, repo, db);
 				model.addAttribute("lastCommit", new Commit(commit, repo));
 
 				final List<RepoFile> files = repoUtils.getFiles(repo, db, ref, path);

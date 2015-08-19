@@ -13,9 +13,9 @@ import org.eclipse.jgit.lib.ReflogEntry;
 import org.eclipse.jgit.lib.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.RefLog;
 import com.quantasnet.gitserver.git.repo.GitRepository;
@@ -25,13 +25,18 @@ public class RefLogService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RefLogService.class);
 	
+	@Autowired
+	private FilesystemRepositoryService repoService;
+	
+	// TODO completely broken when using DFS
+	
 	// Causes StackOverflowError on enormous pushes
 	// @Cacheable(cacheNames = RepoCacheConstants.REFLOG, key = "#repo.fullDisplayName")
 	public List<RefLog> retrieveActivity(final GitRepository repo) throws GitServerException {
 		final List<RefLog> logs = new ArrayList<>();
 		
 		repo.execute(db -> {
-			final Set<String> branches = db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet();
+			final Set<String> branches = repoService.branches(repo).keySet();
 			
 			final Git git = Git.wrap(db);
 			

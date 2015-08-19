@@ -17,7 +17,7 @@
         </thead>
         <tbody>
 	        <tr th:each="repo : ${repos}">
-	            <td class="left"><a th:href="@{/repo/} + ${repo.owner} + '/' + ${repo.displayName}" th:text="${repo.owner} + '/' + ${repo.displayName}">Name</a></td>
+	            <td class="left"><a th:href="@{/repo/} + ${#authentication.principal.userName} + '/' + ${repo.name}" th:text="${#authentication.principal.userName} + '/' + ${repo.name}">Name</a></td>
 	        </tr>
         </tbody>
     </table>

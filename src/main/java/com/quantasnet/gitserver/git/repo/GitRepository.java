@@ -1,13 +1,14 @@
 package com.quantasnet.gitserver.git.repo;
 
-import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
 
 import com.google.common.collect.ComparisonChain;
 import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.backend.mongo.MongoRepo;
+import com.quantasnet.gitserver.backend.mongo.MongoService;
+import com.quantasnet.gitserver.git.backend.mongo.MongoDfsRepository;
 import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 
@@ -18,7 +19,8 @@ import com.quantasnet.gitserver.git.exception.GitServerException;
  */
 public class GitRepository implements Comparable<GitRepository> {
 
-	private final File fullRepoDirectory;
+	private final MongoService mongoService;
+	private final MongoRepo mongoRepo;
 	private final String owner;
 	private final String name;
 	
@@ -31,8 +33,9 @@ public class GitRepository implements Comparable<GitRepository> {
 	
 	private boolean commits;
 	
-	public GitRepository(final File fullRepoDirectory, final String owner, final String name, final boolean anonRead, final boolean anonWrite) {
-		this.fullRepoDirectory = fullRepoDirectory;
+	public GitRepository(final MongoService mongoService, final MongoRepo mongoRepo, final String owner, final String name, final boolean anonRead, final boolean anonWrite) {
+		this.mongoService = mongoService;
+		this.mongoRepo = mongoRepo;
 		this.owner = owner;
 		this.name = name;
 		this.anonRead = anonRead;
@@ -44,7 +47,7 @@ public class GitRepository implements Comparable<GitRepository> {
 	}
 	
 	public void execute(final RepositoryAction repoAction) throws GitServerException {
-		try (final Repository db = Git.open(getFullRepoDirectory()).getRepository()) {
+		try (final Repository db = new MongoDfsRepository(mongoRepo.getId(), mongoRepo.getName(), mongoService)) {
 			repoAction.doAction(db);
 		} catch (final IOException e) {
 			throw new GitServerErrorException(e);
@@ -52,17 +55,13 @@ public class GitRepository implements Comparable<GitRepository> {
 	}
 
 	public <T> T executeWithReturn(final RepositoryActionWithReturn<T> repoAction) throws GitServerException {
-		try (final Repository db = Git.open(getFullRepoDirectory()).getRepository()) {
+		try (final Repository db = new MongoDfsRepository(mongoRepo.getId(), mongoRepo.getName(), mongoService)) {
 			return repoAction.doAction(db);
 		} catch (final IOException e) {
 			throw new GitServerErrorException(e);
 		}
 	}
 	
-	public File getFullRepoDirectory() {
-		return fullRepoDirectory;
-	}
-
 	public String getOwner() {
 		return owner;
 	}
@@ -108,9 +107,9 @@ public class GitRepository implements Comparable<GitRepository> {
 
 	@Override
 	public String toString() {
-		return "GitRepository [fullRepoDirectory=" + fullRepoDirectory
-			+ ", owner=" + owner + ", name=" + name + ", anonRead="
-			+ anonRead + ", anonWrite=" + anonWrite + "]";
+		return "GitRepository [owner=" + owner + ", name=" + name + ", displayName=" + displayName
+				+ ", fullDisplayName=" + fullDisplayName + ", anonRead=" + anonRead + ", anonWrite=" + anonWrite
+				+ ", commits=" + commits + "]";
 	}
 
 	@Override

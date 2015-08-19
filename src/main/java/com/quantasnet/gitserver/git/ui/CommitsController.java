@@ -35,7 +35,7 @@ public class CommitsController {
 	public String showLog(final GitRepository repo, @RequestParam(required = false) final String selected, final Model model) throws GitServerException {
 		repo.execute(db -> {
 			if (repo.hasCommits()) {
-				repoUtils.addRefsToModel(model, db);
+				repoUtils.addRefsToModel(model, repo);
 				
 				if (null != selected) {
 					model.addAttribute("branch", selected);

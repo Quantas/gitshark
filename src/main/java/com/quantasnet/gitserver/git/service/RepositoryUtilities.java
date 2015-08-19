@@ -1,6 +1,5 @@
 package com.quantasnet.gitserver.git.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,6 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.ObjectId;
@@ -23,12 +23,12 @@ import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
 import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.HandlerMapping;
 
-import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.exception.CommitNotFoundException;
 import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
@@ -40,6 +40,9 @@ public class RepositoryUtilities {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RepositoryUtilities.class);
 
+	@Autowired
+	private FilesystemRepositoryService repoService;
+	
 	public  String resolvePath(final HttpServletRequest req, final String repoPath, final String branch) {
 		String path = ((String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).replaceFirst("\\/(raw|history)\\/", "/tree/");
 
@@ -71,11 +74,11 @@ public class RepositoryUtilities {
 	@Cacheable(cacheNames = "hasCommits", key = "#repo.fullDisplayName")
 	public boolean hasCommits(final GitRepository repo) throws GitServerException {
 		return repo.executeWithReturn(db -> {
-			if (db != null && db.getDirectory().exists()) {
-				return (new File(db.getDirectory(), "objects").list().length > 2)
-						|| (new File(db.getDirectory(), "objects/pack").list().length > 0);
+			try {
+				return Git.wrap(db).log().setMaxCount(1).call().iterator().hasNext();
+			} catch (final GitAPIException e) {
+				return false;
 			}
-			return false;
 		});
 	}
 	
@@ -136,7 +139,7 @@ public class RepositoryUtilities {
 	}
 
 	public RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final String ref, final boolean customPath, final String pathString,
-			final boolean directory, final ObjectId objectId) throws GitAPIException, CommitNotFoundException {
+			final boolean directory, final ObjectId objectId) throws GitAPIException, GitServerException {
 		
 		final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
 		final String parent = pathString.substring(0, pathString.lastIndexOf("/") + 1);
@@ -150,7 +153,7 @@ public class RepositoryUtilities {
 						PathFilterGroup.create(Collections.singletonList(PathFilter.create(pathString))),
 						TreeFilter.ANY_DIFF));
 				walk.setRevFilter(MaxCountRevFilter.create(1));
-				walk.markStart(getRefHeadCommit(ref, db));
+				walk.markStart(getRefHeadCommit(ref, repo, db));
 				
 				commit = walk.iterator().next();
 			} catch (final RevisionSyntaxException | IOException e) {
@@ -166,9 +169,9 @@ public class RepositoryUtilities {
 		return db.newObjectReader().open(objectId).getBytes();
 	}
 	
-	public RevCommit getRefHeadCommit(final String refString, final Repository db) throws IOException, CommitNotFoundException {
-		final Ref branchRef = db.getRefDatabase().getRefs(Constants.REFS_HEADS).get(refString);
-		final Ref tagRef = db.getRefDatabase().getRefs(Constants.REFS_TAGS).get(refString);
+	public RevCommit getRefHeadCommit(final String refString, final GitRepository repo, final Repository db) throws IOException, GitServerException {
+		final Ref branchRef = repoService.branches(repo).get(refString);
+		final Ref tagRef = repoService.tags(repo).get(refString);
 		final Ref ref = branchRef != null ? branchRef : tagRef != null ? tagRef : null;
 
 		// must be a commit id and not a ref
@@ -190,9 +193,9 @@ public class RepositoryUtilities {
 		return null;
 	}
 	
-	public void addRefsToModel(final Model model, final Repository db) throws IOException {
-		model.addAttribute("tags", db.getRefDatabase().getRefs(Constants.REFS_TAGS).keySet());
-		model.addAttribute("branches", db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet());
+	public void addRefsToModel(final Model model, final GitRepository repo) throws GitServerException {
+		model.addAttribute("tags", repoService.tags(repo).keySet());
+		model.addAttribute("branches", repoService.branches(repo).keySet());
 	}
 	
 	private RepoFile buildBackwardsNavigationFile(final GitRepository repo, final String pathString, final String branch) {

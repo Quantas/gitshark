@@ -8,6 +8,8 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRepository;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryBuilder;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 
+import com.quantasnet.gitserver.backend.mongo.MongoService;
+
 /**
  * 
  * @author Andrew
@@ -21,11 +23,13 @@ public class MongoDfsRepository extends DfsRepository {
 		}
 	}
 
-	private MongoOperations mongoOperations;
+	private String id;
+	private MongoService mongoService;
 	
-	public MongoDfsRepository(final String repoName, final MongoOperations mongoOperations) {
+	public MongoDfsRepository(final String id, final String repoName, final MongoService mongoService) {
 		this(new MongoRepositoryBuilder().setRepositoryDescription(new DfsRepositoryDescription(repoName)));
-		this.mongoOperations = mongoOperations;
+		this.id = id;
+		this.mongoService = mongoService;
 	}
 	
 	private MongoDfsRepository(final MongoRepositoryBuilder builder) {
@@ -34,15 +38,15 @@ public class MongoDfsRepository extends DfsRepository {
 
 	@Override
 	public DfsObjDatabase getObjectDatabase() {
-		return new MongoObjDatabase(this);
+		return new MongoDfsObjDatabase(this, mongoService);
 	}
 
 	@Override
 	public DfsRefDatabase getRefDatabase() {
-		return new MongoDfsRefDatabase(this);
+		return new MongoDfsRefDatabase(this, mongoService);
 	}
 
-	public MongoOperations getMongoOperations() {
-		return mongoOperations;
+	public String getId() {
+		return id;
 	}
 }

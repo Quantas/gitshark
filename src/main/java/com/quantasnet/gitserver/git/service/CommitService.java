@@ -1,7 +1,5 @@
 package com.quantasnet.gitserver.git.service;
 
-import static org.eclipse.jgit.lib.RefDatabase.ALL;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,9 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.cache.RepoCacheConstants;
-import com.quantasnet.gitserver.git.exception.CommitNotFoundException;
 import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.Commit;
@@ -52,6 +48,9 @@ public class CommitService {
 
 	@Autowired
 	private RepositoryUtilities repoUtils;
+	
+	@Autowired
+	private FilesystemRepositoryService repoService;
 
 	@Cacheable(cacheNames = RepoCacheConstants.COMMIT_COUNT, key = "{ #repo.fullDisplayName }")
 	public long commitCount(final GitRepository repo) throws GitServerException {
@@ -65,7 +64,7 @@ public class CommitService {
 	}
 
 	@Cacheable(cacheNames = RepoCacheConstants.ALL_COMMITS, key = "{ #repo.fullDisplayName, #selected }")
-	public List<Commit> getCommits(final GitRepository repo, final String selected, final Repository db) throws IOException, CommitNotFoundException {
+	public List<Commit> getCommits(final GitRepository repo, final String selected, final Repository db) throws IOException, GitServerException {
 		LOG.info("Cache Miss - {}, {}", repo.getFullDisplayName(), selected);
 
 		final Map<ObjectId, String> branchHeads = new HashMap<>();
@@ -73,7 +72,7 @@ public class CommitService {
 		RevCommit selectedCommit = null;
 
 		if (null == selected) {
-			final Set<String> branches = db.getRefDatabase().getRefs(Constants.REFS_HEADS).keySet();
+			final Set<String> branches = repoService.branches(repo).keySet();
 
 			for (final String branch : branches) {
 				try {
@@ -84,7 +83,7 @@ public class CommitService {
 				}
 			}
 		} else {
-			selectedCommit = repoUtils.getRefHeadCommit(selected, db);
+			selectedCommit = repoUtils.getRefHeadCommit(selected, repo, db);
 			branchHeads.put(selectedCommit.getId(), selected);
 		}
 
@@ -94,7 +93,9 @@ public class CommitService {
 		try (final RevWalk revWalk = new RevWalk(db)) {
 			if (null == selectedCommit) {
 				final List<RevCommit> headCommits = new ArrayList<>();
-				final Map<String, Ref> refs = db.getRefDatabase().getRefs(ALL);
+				final Map<String, Ref> refs = new HashMap<>();
+				refs.putAll(repoService.branches(repo));
+				refs.putAll(repoService.tags(repo));
 				for (Ref ref : refs.values()) {
 					if (!ref.isPeeled()) {
 						ref = db.peel(ref);

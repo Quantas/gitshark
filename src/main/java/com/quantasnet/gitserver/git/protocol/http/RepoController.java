@@ -1,13 +1,12 @@
 package com.quantasnet.gitserver.git.protocol.http;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.RefDatabase;
 import org.eclipse.jgit.transport.RefAdvertiser;
-import org.eclipse.jgit.util.IO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,14 +17,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}.git")
 @Controller
 public class RepoController {
 
+	@Autowired
+	private FilesystemRepositoryService repoService;
+	
 	@RequestMapping(value = "/" + Constants.HEAD, method = RequestMethod.GET)
-	public ResponseEntity<byte[]> head(final GitRepository repo) throws IOException {
-		final byte[] head = IO.readFully(new File(repo.getFullRepoDirectory(), Constants.HEAD));
+	public ResponseEntity<byte[]> head(final GitRepository repo) throws GitServerException {
+		final byte[] head = repo.executeWithReturn(db -> {
+			return ("ref: " + db.getFullBranch()).getBytes();
+		});		
 		return new ResponseEntity<>(head, HttpStatus.OK);
 	}
 	
@@ -49,7 +54,9 @@ public class RepoController {
 			adv.init(db);
 			adv.setDerefTags(true);
 
-			final Map<String, Ref> refs = db.getRefDatabase().getRefs(RefDatabase.ALL);
+			final Map<String, Ref> refs = new HashMap<>();
+			refs.putAll(repoService.branches(repo));
+			refs.putAll(repoService.tags(repo));
 			refs.remove(Constants.HEAD);
 			adv.send(refs);
 		});

@@ -18,6 +18,7 @@ import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.model.RefHolder;
 import com.quantasnet.gitserver.git.model.RefType;
 import com.quantasnet.gitserver.git.repo.GitRepository;
+import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
 import com.quantasnet.gitserver.git.service.RepositoryUtilities;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}")
@@ -27,17 +28,20 @@ public class RefController {
 	@Autowired
 	private RepositoryUtilities repoUtils;
 	
+	@Autowired
+	private FilesystemRepositoryService repoService;
+	
 	@RequestMapping(value = "/{refType:(?:branch|tag)}", method = RequestMethod.GET)
-	public String branches(final GitRepository repo, @PathVariable final String refType, final Model model) throws GitServerException {
+	public String refs(final GitRepository repo, @PathVariable final String refType, final Model model) throws GitServerException {
 		
 		final RefType type = RefType.getForName(refType);
 		
 		repo.execute(db -> {
 			final List<RefHolder> refs = new ArrayList<>();
 			
-			final Map<String, Ref> branchRefs = db.getRefDatabase().getRefs(type.getRefs());
+			final Map<String, Ref> branchRefs =  type == RefType.BRANCH ? repoService.branches(repo) : repoService.tags(repo);
 			for (final String entry : branchRefs.keySet()) {
-				refs.add(new RefHolder(repoUtils.getRefHeadCommit(entry, db), repo, entry));
+				refs.add(new RefHolder(repoUtils.getRefHeadCommit(entry, repo, db), repo, entry));
 			}
 			
 			Collections.sort(refs);

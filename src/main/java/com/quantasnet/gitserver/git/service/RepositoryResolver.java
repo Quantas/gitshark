@@ -1,9 +1,7 @@
 package com.quantasnet.gitserver.git.service;
 
-import java.io.IOException;
 import java.security.Principal;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +13,9 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import com.quantasnet.gitserver.git.backend.mongo.MongoDfsRepository;
-import com.quantasnet.gitserver.git.backend.mongo.MongoOperations;
+import com.quantasnet.gitserver.backend.mongo.MongoRepo;
+import com.quantasnet.gitserver.backend.mongo.MongoService;
+import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.user.User;
 
@@ -24,17 +23,11 @@ import com.quantasnet.gitserver.user.User;
 public class RepositoryResolver implements HandlerMethodArgumentResolver {
 
 	@Autowired
-	private FilesystemRepositoryService repositoryService;
-
+	private MongoService mongoService;
+	
 	@Autowired
-	private MongoOperations mongoOperations;
-
-	@PostConstruct
-	public void post() throws IOException {
-		final MongoDfsRepository repo = new MongoDfsRepository("user/gitserver", mongoOperations);
-		repo.getBranch();
-	}
-
+	private RepositoryUtilities repoUtils;
+	
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		return parameter.getParameterType().isAssignableFrom(GitRepository.class);
@@ -46,7 +39,7 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 
 		final Principal principalObject = webRequest.getUserPrincipal();
 
-		User user;
+		User user = null;
 		String userName = null;
 
 		if (null != principalObject) {
@@ -56,18 +49,33 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 
 		final HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 		final String requestURI = request.getServletPath();
-		final String owner = requestURI.split("/")[2];
-		final String repoName = requestURI.split("/")[3];
+		// final String owner = requestURI.split("/")[2];
+		final String repoName = removeDotGit(requestURI.split("/")[3]);
 		
-		final GitRepository repo = repositoryService.getRepository(userName, owner, repoName);
+		final MongoRepo mongoRepo = mongoService.getRepo(repoName, user);
+		
+		final GitRepository repo = buildRepo(mongoRepo, user);
 		mavContainer.addAttribute("repo", repo);
 		mavContainer.addAttribute("checkoutUrl", buildCheckoutUrl(request, userName, repo));
 
 		return repo;
 	}
 	
+	private GitRepository buildRepo(final MongoRepo mongoRepo, final User user) throws GitServerException {
+		final GitRepository repo = new GitRepository(mongoService, mongoRepo, user.getUserName(), mongoRepo.getName(), false, false);
+		repo.setCommits(repoUtils.hasCommits(repo));
+		return repo;
+	}
+	
 	private String buildCheckoutUrl(final HttpServletRequest request, final String userName, final GitRepository repo) {
 		return request.getScheme() + "://" + userName + '@' + request.getServerName() + ':' + request.getServerPort() + "/repo/"
 				+ repo.getOwner() + '/' + repo.getName();
+	}
+	
+	private String removeDotGit(final String name) {
+		if (name.endsWith(".git")) {
+			return name.substring(0, name.length() - 4);
+		}
+		return name;
 	}
 }

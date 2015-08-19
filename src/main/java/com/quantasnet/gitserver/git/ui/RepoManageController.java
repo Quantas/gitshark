@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.quantasnet.gitserver.Constants;
+import com.quantasnet.gitserver.backend.mongo.MongoRepo;
+import com.quantasnet.gitserver.backend.mongo.MongoService;
 import com.quantasnet.gitserver.git.exception.GitServerException;
-import com.quantasnet.gitserver.git.repo.GitRepository;
-import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
 import com.quantasnet.gitserver.user.User;
 
 @RequestMapping("/repo")
@@ -26,11 +26,11 @@ public class RepoManageController {
 	private static final String REPO_FORM = "repoForm";
 
 	@Autowired
-	private FilesystemRepositoryService repoService;
+	private MongoService mongoService;
 	
 	@RequestMapping
 	public String myRepos(@AuthenticationPrincipal final User user, final Model model) throws GitServerException {
-		model.addAttribute("repos", repoService.getRepositories(user.getUsername()));
+		model.addAttribute("repos", mongoService.getAllReposForUser(user));
 		return "git/repos";
 	}
 	
@@ -46,8 +46,8 @@ public class RepoManageController {
 	public String createRepo(@AuthenticationPrincipal final User user, @Valid final NewRepoForm repoForm, final BindingResult bindingResult, final RedirectAttributes redirectAttributes) throws GitServerException {
 
 		if (!bindingResult.hasErrors()) {
-			for (final GitRepository repo : repoService.getRepositories(user.getUserName())) {
-				if (repo.getDisplayName().equals(repoForm.getRepoName())) {
+			for (final MongoRepo repo : mongoService.getAllReposForUser(user)) {
+				if (repo.getName().equals(repoForm.getRepoName())) {
 					bindingResult.rejectValue("repoName", "reponame.exists", "Repository already exists");
 					break;
 				}
@@ -60,8 +60,8 @@ public class RepoManageController {
 			return "redirect:/repo/create";
 		}
 
-		repoService.createRepo(repoForm.getRepoName(), user.getUsername());
-
+		mongoService.createRepo(repoForm.getRepoName(), user);
+		
 		redirectAttributes.addFlashAttribute(Constants.SUCCESS_STATUS, "Repository created successfully.");
 		return "redirect:/repo/" + user.getUserName() + '/' + repoForm.getRepoName();
 	}
