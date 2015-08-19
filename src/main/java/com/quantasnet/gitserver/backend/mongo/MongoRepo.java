@@ -15,7 +15,7 @@ public class MongoRepo {
 	private String id;
 	
 	@Indexed
-	private long ownerId;
+	private String ownerId;
 	
 	private String name;
 	
@@ -27,11 +27,11 @@ public class MongoRepo {
 		this.id = id;
 	}
 	
-	public long getOwnerId() {
+	public String getOwnerId() {
 		return ownerId;
 	}
 	
-	public void setOwnerId(long ownerId) {
+	public void setOwnerId(String ownerId) {
 		this.ownerId = ownerId;
 	}
 	

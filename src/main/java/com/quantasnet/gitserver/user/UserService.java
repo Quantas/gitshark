@@ -35,7 +35,7 @@ public class UserService {
 		return userRepository.count();
 	}
 
-	public User getUserById(long id) {
+	public User getUserById(String id) {
 		return userRepository.findOne(id);
 	}
 
@@ -53,11 +53,11 @@ public class UserService {
 		user.setActive(true);
 		user.setImageUrl(generateGravatarUrl(user.getEmail()));
 		user.setRoles(Sets.newHashSet(roleService.findUserRole()));
-		return userRepository.saveAndFlush(user);
+		return userRepository.save(user);
 	}
 
 	public User updateUser(final User user) {
-		return userRepository.saveAndFlush(user);
+		return userRepository.save(user);
 	}
 
 	public User profileUpdate(final User authUser, final User profileUser) {

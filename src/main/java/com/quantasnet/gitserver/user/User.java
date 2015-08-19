@@ -4,21 +4,18 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
 
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-@Entity
-@Table(name = "users")
+@Document
 public class User implements UserDetails, CredentialsContainer, Serializable {
 
     public static final String PASSWORD_REGEX = "^(?=.*[0-9])(?=\\S+$).{8,255}$";
@@ -27,37 +24,25 @@ public class User implements UserDetails, CredentialsContainer, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private String id;
 
-    @Column(name = "user_name", nullable = false, unique = true, length = 255)
+    @Indexed(unique = true)
     private String userName;
-
-    @Column(name = "user_password", nullable = true, length = 255)
     private String password;
-
-    @Column(name = "user_first_name", nullable = true)
     private String firstName;
-
-    @Column(name = "user_last_name", nullable = true)
     private String lastName;
-
-    @Column(name = "user_email", nullable = true, unique = true)
     private String email;
-
-    @Column(name = "user_image_url", length = 255)
     private String imageUrl;
-
-    @Column(name = "user_active", nullable = false)
     private boolean active;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @DBRef
     private Set<Role> roles;
     
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(final Long id) {
+    public void setId(final String id) {
         this.id = id;
     }
 

@@ -2,17 +2,15 @@ package com.quantasnet.gitserver.user;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 
-@Entity
-@Table(name = "role")
+@Document
 public class Role implements GrantedAuthority, Serializable {
 
     public static final String USER = "ROLE_USER";
@@ -22,18 +20,16 @@ public class Role implements GrantedAuthority, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private String id;
 
-    @Column(name = "role_name", unique = true)
+    @Indexed(unique = true)
     private String roleName;
 
-    public Long getId() {
-
+    public String getId() {
         return id;
     }
 
-    public void setId(final Long id) {
-
+    public void setId(final String id) {
         this.id = id;
     }
 
