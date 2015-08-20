@@ -1,4 +1,4 @@
-package com.quantasnet.gitserver.git.protocol.hooks.pre;
+package com.quantasnet.gitserver.git.protocol.hooks.post;
 
 import java.util.Collection;
 
@@ -15,12 +15,12 @@ import com.quantasnet.gitserver.user.User;
  * Created by andrewlandsverk on 7/11/15.
  */
 @Component
-public class LoggingPreReceiveHook implements GitServerPreReceiveHook {
+public class LoggingPostReceiveHook implements GitServerPostReceiveHook {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LoggingPreReceiveHook.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LoggingPostReceiveHook.class);
 
     @Override
-    public void onPreReceive(final ReceivePack rp, final Collection<ReceiveCommand> commands, final User user, final GitRepository repo) {
+    public void onPostReceive(ReceivePack rp, Collection<ReceiveCommand> commands, User user, GitRepository repo) {
         final String username = user == null ? "anon" : user.getUsername();
 
         commands.forEach(command -> {
