@@ -1,6 +1,6 @@
 package com.quantasnet.gitserver.git.exception;
 
-public class RepositoryNotFoundException extends GitServerException {
+public class RepositoryNotFoundException extends GitSharkException {
 
 	private static final long serialVersionUID = 1L;
 

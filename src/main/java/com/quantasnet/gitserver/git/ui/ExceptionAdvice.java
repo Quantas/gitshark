@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
 
 @ControllerAdvice("com.quantasnet.gitserver.git.ui")
@@ -22,13 +22,13 @@ public class ExceptionAdvice {
 		return "forward:/401";
 	}
 
-	@ExceptionHandler(GitServerException.class)
+	@ExceptionHandler(GitSharkException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public String notFound() {
 		return "forward:/404";
 	}
 	
-	@ExceptionHandler({ GitServerErrorException.class, Exception.class })
+	@ExceptionHandler({ GitSharkErrorException.class, Exception.class })
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public String serverError(final Exception exception) {
 		LOG.error("Error loading page", exception);

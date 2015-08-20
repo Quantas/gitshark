@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.backend.mongo.MongoService;
 import com.quantasnet.gitserver.git.cache.EvictRepoCache;
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.dfs.mongo.MongoService;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.git.service.CommitService;
 import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
@@ -36,7 +36,7 @@ public class SettingsController {
 	private CommitService commitService;
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String settings(final GitRepository repo, final Model model) throws GitServerException {
+	public String settings(final GitRepository repo, final Model model) throws GitSharkException {
 		if (repo.hasCommits()) {
 			model.addAttribute("size", readableFileSize(repoService.repoSize(repo)));
 			model.addAttribute("commitCount", commitService.commitCount(repo));
@@ -59,14 +59,14 @@ public class SettingsController {
 
 	@EvictRepoCache
 	@RequestMapping(value = "/gc", method = RequestMethod.POST)
-	public String gc(final GitRepository repo, final RedirectAttributes redirectAttributes) throws GitServerException {
+	public String gc(final GitRepository repo, final RedirectAttributes redirectAttributes) throws GitSharkException {
 		repo.execute(db -> {
 			try {
 				Git.wrap(db).gc().call();
 				redirectAttributes.addFlashAttribute(Constants.SUCCESS_STATUS, "Garbage Collection Successful!");
 			} catch (final GitAPIException e) {
 				redirectAttributes.addFlashAttribute(Constants.FAILURE_STATUS, "Garbage Collection Failed!");
-				throw new GitServerErrorException(e);
+				throw new GitSharkErrorException(e);
 			}
 		});
 		return "redirect:/repo/" + repo.getInterfaceBaseUrl() + "/settings";

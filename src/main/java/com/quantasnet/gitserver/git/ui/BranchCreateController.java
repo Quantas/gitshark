@@ -17,7 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.cache.EvictAllCaches;
 import com.quantasnet.gitserver.git.cache.EvictRepoCache;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
 
@@ -31,7 +31,7 @@ public class BranchCreateController {
 	private FilesystemRepositoryService repoService;
 	
 	@RequestMapping(value = "/branch/create", method = RequestMethod.GET)
-	public String create(final GitRepository repo, final Model model) throws GitServerException {
+	public String create(final GitRepository repo, final Model model) throws GitSharkException {
 		model.addAttribute("branches", repoService.branches(repo).keySet());
 		return "git/branchcreate";
 	}
@@ -39,7 +39,7 @@ public class BranchCreateController {
 	@EvictAllCaches
 	@EvictRepoCache
 	@RequestMapping(value = "/branch/create", method = RequestMethod.POST)
-	public String saveNewBranch(final GitRepository repo, @RequestParam final String sourceBranch, @RequestParam final String newBranch, final RedirectAttributes redirectAttributes) throws GitServerException {
+	public String saveNewBranch(final GitRepository repo, @RequestParam final String sourceBranch, @RequestParam final String newBranch, final RedirectAttributes redirectAttributes) throws GitSharkException {
 		
 		repo.execute(db -> {
 			final Set<String> branches = repoService.branches(repo).keySet();

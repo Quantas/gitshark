@@ -1,4 +1,4 @@
-package com.quantasnet.gitserver.backend.mongo;
+package com.quantasnet.gitserver.git.dfs.mongo;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;

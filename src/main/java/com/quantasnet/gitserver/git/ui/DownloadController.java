@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}/download")
@@ -31,7 +31,7 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 public class DownloadController {
 	
 	@RequestMapping(value = "/{branch}", method = RequestMethod.GET)
-	public ResponseEntity<byte[]> downloadBranch(final GitRepository repo, @PathVariable final String branch, @RequestParam(required = false, defaultValue = "zip") final String format) throws GitServerException {
+	public ResponseEntity<byte[]> downloadBranch(final GitRepository repo, @PathVariable final String branch, @RequestParam(required = false, defaultValue = "zip") final String format) throws GitSharkException {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		
 		final Formats formats = Formats.getForExtension(format);
@@ -56,7 +56,7 @@ public class DownloadController {
 				
 				ArchiveCommand.unregisterFormat(formats.extension);
 			} catch (final GitAPIException | ReflectiveOperationException e) {
-				throw new GitServerErrorException(e);
+				throw new GitSharkErrorException(e);
 			}
 		});
 		

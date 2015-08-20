@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.git.service.SpecialMarkupService;
 
@@ -17,7 +17,7 @@ public class SummaryController {
 	private SpecialMarkupService specialMarkupService;
 	
 	@RequestMapping({ "", "/" })
-	public String summary(final GitRepository repo, final Model model) throws GitServerException {
+	public String summary(final GitRepository repo, final Model model) throws GitSharkException {
 		repo.execute(db -> {
 			if (repo.hasCommits()) {
 				model.addAttribute("specialmarkup", specialMarkupService.resolveReadMeFile(repo, db, db.getBranch()));

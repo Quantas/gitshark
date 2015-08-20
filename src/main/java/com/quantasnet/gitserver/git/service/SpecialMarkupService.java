@@ -23,8 +23,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.quantasnet.gitserver.git.cache.RepoCacheConstants;
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.model.ReadmeFile;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
@@ -58,7 +58,7 @@ public class SpecialMarkupService {
 		return ASCIIDOC_NAMES.contains(fileNameLower) || MARKDOWN_NAMES.contains(fileNameLower);
 	}
 
-	public String retrieveMarkup(final GitRepository repo, final Repository db, final RepoFile file, final String branch) throws GitServerErrorException {
+	public String retrieveMarkup(final GitRepository repo, final Repository db, final RepoFile file, final String branch) throws GitSharkErrorException {
 		try {
 			final String postfix = getFilePostfix(file.getName());
 			final String content = file.getFileContents() == null ? new String(repoUtils.getFileContents(db, ObjectId.fromString(file.getObjectId()))) : file.getFileContents();
@@ -68,19 +68,19 @@ public class SpecialMarkupService {
 				return renderMarkdown(content);
 			}
 		} catch (final IOException e) {
-			throw new GitServerErrorException(e);
+			throw new GitSharkErrorException(e);
 		}
 
 		return null;
 	}
 
 	@Cacheable(cacheNames = RepoCacheConstants.ALL_READMES, key = "{ #repo.fullDisplayName, #branch }")
-	public ReadmeFile resolveReadMeFile(final GitRepository repo, final Repository db, final String branch) throws GitServerException {
+	public ReadmeFile resolveReadMeFile(final GitRepository repo, final Repository db, final String branch) throws GitSharkException {
 		return resolveReadMeFile(repo, db, branch, repoUtils.getFiles(repo, db, branch, ""));
 	}
 	
 	@Cacheable(cacheNames = RepoCacheConstants.ALL_READMES, key = "{ #repo.fullDisplayName, #branch }")
-	public ReadmeFile resolveReadMeFile(final GitRepository repo, final Repository db, final String branch, final List<RepoFile> files) throws GitServerException {
+	public ReadmeFile resolveReadMeFile(final GitRepository repo, final Repository db, final String branch, final List<RepoFile> files) throws GitSharkException {
 		LOG.info("Cache Miss - Readme File - {} - {}", repo.getFullDisplayName(), branch);
 		try {
 			if (!files.isEmpty()) {
@@ -97,7 +97,7 @@ public class SpecialMarkupService {
 			}
 			return null;
 		} catch (final IOException e) {
-			throw new GitServerErrorException(e);
+			throw new GitSharkErrorException(e);
 		}
 	}
 

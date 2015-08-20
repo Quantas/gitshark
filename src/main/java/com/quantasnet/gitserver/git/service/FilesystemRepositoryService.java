@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.quantasnet.gitserver.Constants;
 import com.quantasnet.gitserver.git.cache.RepoCacheConstants;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
 @Service
@@ -21,12 +21,12 @@ public class FilesystemRepositoryService {
 	}
 
 	@Cacheable(cacheNames = RepoCacheConstants.BRANCHES, key = "#repo.fullDisplayName")
-	public Map<String, Ref> branches(final GitRepository repo) throws GitServerException {
+	public Map<String, Ref> branches(final GitRepository repo) throws GitSharkException {
 		return repo.executeWithReturn(db -> db.getRefDatabase().getRefs(Constants.REFS_HEADS));
 	}
 
 	@Cacheable(cacheNames = RepoCacheConstants.TAGS, key = "#repo.fullDisplayName")
-	public Map<String, Ref> tags(final GitRepository repo) throws GitServerException {
+	public Map<String, Ref> tags(final GitRepository repo) throws GitSharkException {
 		return repo.executeWithReturn(db -> db.getRefDatabase().getRefs(Constants.REFS_TAGS));
 	}
 }

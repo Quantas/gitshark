@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.git.service.CommitService;
@@ -32,7 +32,7 @@ public class CommitsController {
 	private CommitService commitService;
 
 	@RequestMapping("/commits")
-	public String showLog(final GitRepository repo, @RequestParam(required = false) final String selected, final Model model) throws GitServerException {
+	public String showLog(final GitRepository repo, @RequestParam(required = false) final String selected, final Model model) throws GitSharkException {
 		repo.execute(db -> {
 			if (repo.hasCommits()) {
 				repoUtils.addRefsToModel(model, repo);
@@ -48,7 +48,7 @@ public class CommitsController {
 	}
 	
 	@RequestMapping(value = "/commit/{commitId}")
-	public String singleCommit(final GitRepository repo, @PathVariable final String commitId, final Model model) throws GitServerException {
+	public String singleCommit(final GitRepository repo, @PathVariable final String commitId, final Model model) throws GitSharkException {
 		if (repo.hasCommits()) {
 			repo.execute(db -> {
 				try (final RevWalk revWalk = new RevWalk(db)) {
@@ -64,9 +64,9 @@ public class CommitsController {
 		            model.addAttribute("diffs", commitService.getDiffsForCommmit(repo, db, parent, commit, revWalk));
 		            model.addAttribute("commit", new Commit(commit, repo));
 				} catch (final IllegalArgumentException e) {
-					throw new GitServerException(e);
+					throw new GitSharkException(e);
 	            } catch (final GitAPIException e) {
-            		throw new GitServerErrorException(e);
+            		throw new GitSharkErrorException(e);
             	}
 			});
 		}

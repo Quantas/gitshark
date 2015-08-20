@@ -30,8 +30,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.servlet.HandlerMapping;
 
 import com.quantasnet.gitserver.git.exception.CommitNotFoundException;
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
@@ -72,7 +72,7 @@ public class RepositoryUtilities {
 	}
 
 	@Cacheable(cacheNames = "hasCommits", key = "#repo.fullDisplayName")
-	public boolean hasCommits(final GitRepository repo) throws GitServerException {
+	public boolean hasCommits(final GitRepository repo) throws GitSharkException {
 		return repo.executeWithReturn(db -> {
 			try {
 				return Git.wrap(db).log().setMaxCount(1).call().iterator().hasNext();
@@ -82,7 +82,7 @@ public class RepositoryUtilities {
 		});
 	}
 	
-	public List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String branch, final String path) throws GitServerException {
+	public List<RepoFile> getFiles(final GitRepository repo, final Repository db, final String branch, final String path) throws GitSharkException {
 		final List<RepoFile> files = new ArrayList<>();
 		
 		try (final RevWalk revWalk = new RevWalk(db); final TreeWalk treeWalk = new TreeWalk(db)) {
@@ -130,7 +130,7 @@ public class RepositoryUtilities {
 				}
 			}
 		} catch (final IOException | GitAPIException e) {
-			throw new GitServerErrorException(e);
+			throw new GitSharkErrorException(e);
 		}
 		
 		collectFileContentsOrSortFiles(db, files);
@@ -139,7 +139,7 @@ public class RepositoryUtilities {
 	}
 
 	public RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final String ref, final boolean customPath, final String pathString,
-			final boolean directory, final ObjectId objectId) throws GitAPIException, GitServerException {
+			final boolean directory, final ObjectId objectId) throws GitAPIException, GitSharkException {
 		
 		final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
 		final String parent = pathString.substring(0, pathString.lastIndexOf("/") + 1);
@@ -169,7 +169,7 @@ public class RepositoryUtilities {
 		return db.newObjectReader().open(objectId).getBytes();
 	}
 	
-	public RevCommit getRefHeadCommit(final String refString, final GitRepository repo, final Repository db) throws IOException, GitServerException {
+	public RevCommit getRefHeadCommit(final String refString, final GitRepository repo, final Repository db) throws IOException, GitSharkException {
 		final Ref branchRef = repoService.branches(repo).get(refString);
 		final Ref tagRef = repoService.tags(repo).get(refString);
 		final Ref ref = branchRef != null ? branchRef : tagRef != null ? tagRef : null;
@@ -193,7 +193,7 @@ public class RepositoryUtilities {
 		return null;
 	}
 	
-	public void addRefsToModel(final Model model, final GitRepository repo) throws GitServerException {
+	public void addRefsToModel(final Model model, final GitRepository repo) throws GitSharkException {
 		model.addAttribute("tags", repoService.tags(repo).keySet());
 		model.addAttribute("branches", repoService.branches(repo).keySet());
 	}
@@ -211,13 +211,13 @@ public class RepositoryUtilities {
 		return new RepoFile(repo, "", ". .", parent, true, branch, null, null);
 	}
 
-	private void collectFileContentsOrSortFiles(final Repository db, final List<RepoFile> files) throws GitServerErrorException {
+	private void collectFileContentsOrSortFiles(final Repository db, final List<RepoFile> files) throws GitSharkErrorException {
 		if (files.size() == 1) {
 			// if we wanted just a single file, get it's contents for display and get out of here
 			try {
 				files.get(0).setFileContentsRaw(getFileContents(db, ObjectId.fromString(files.get(0).getObjectId())));
 			} catch (IOException e) {
-				throw new GitServerErrorException(e);
+				throw new GitSharkErrorException(e);
 			}
 		} else if (files.size() > 1) {
 			Collections.sort(files);

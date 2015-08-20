@@ -1,4 +1,4 @@
-package com.quantasnet.gitserver.backend.mongo;
+package com.quantasnet.gitserver.git.dfs.mongo;
 
 import java.util.List;
 
@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.gridfs.GridFS;
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.user.User;
 
 /**
@@ -34,7 +34,7 @@ public class MongoService {
 		return new GridFS(mongoDbFactory.getDb());
 	}
 	
-	public MongoRepo createRepo(final String name, final User user) throws GitServerException {
+	public MongoRepo createRepo(final String name, final User user) throws GitSharkException {
 		final MongoRepo repo = new MongoRepo();
 		repo.setName(name);
 		repo.setOwnerId(user.getId());
@@ -53,12 +53,12 @@ public class MongoService {
 		}
 	}
 	
-	public MongoRepo getRepo(final String name, final String owner, final String userName, final User user) throws GitServerErrorException {
+	public MongoRepo getRepo(final String name, final String owner, final String userName, final User user) throws GitSharkErrorException {
 		if (owner.equals(userName)) {
 			return mongoRepoRepository.findByOwnerIdAndName(user.getId(), name);
 		}
 		// TODO
-		throw new GitServerErrorException(new IllegalArgumentException("Not Yet Implemented."));
+		throw new GitSharkErrorException(new IllegalArgumentException("Not Yet Implemented."));
 	}
 	
 	public List<MongoRepo> getAllReposForUser(final User user) {

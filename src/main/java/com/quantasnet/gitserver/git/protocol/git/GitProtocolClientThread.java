@@ -17,9 +17,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.exception.RepositoryAccessDeniedException;
-import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePackFactory;
+import com.quantasnet.gitserver.git.protocol.packs.GitSharkReceivePackFactory;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
 @Scope("prototype")
@@ -29,7 +29,7 @@ public class GitProtocolClientThread extends Thread {
 	private static final Logger LOG = LoggerFactory.getLogger(GitProtocolClientThread.class);
 	
 	@Autowired
-	private GitServerReceivePackFactory receivePackFactory;
+	private GitSharkReceivePackFactory receivePackFactory;
 	
 	private Socket socket;
 	
@@ -89,7 +89,7 @@ public class GitProtocolClientThread extends Thread {
 					throw new RepositoryAccessDeniedException();
 				}
 			}
-		} catch (final RepositoryAccessDeniedException | GitServerException e) {
+		} catch (final RepositoryAccessDeniedException | GitSharkException e) {
 			LOG.error("Probably failed...", e);
 		} finally {
 			IOUtils.closeQuietly(input);

@@ -6,9 +6,9 @@ import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
 @EnableCaching
-public class GitServerApplication {
+public class GitSharkApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GitServerApplication.class, args);
+        SpringApplication.run(GitSharkApplication.class, args);
     }
 }

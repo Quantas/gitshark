@@ -10,8 +10,8 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
@@ -20,7 +20,7 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 class HistoryView implements DisplayView {
 
 	@Override
-	public Object display(final GitRepository repo, final String ref, final Model model, final String path, final Repository db, final List<RepoFile> files) throws GitServerException {
+	public Object display(final GitRepository repo, final String ref, final Model model, final String path, final Repository db, final List<RepoFile> files) throws GitSharkException {
 		try {
 			final List<Commit> history = new ArrayList<>();
 			final LogCommand logCommand = Git.wrap(db).log().setMaxCount(50);
@@ -36,7 +36,7 @@ class HistoryView implements DisplayView {
 			model.addAttribute("history", history);
 			return "git/history";
 		} catch (Exception e) {
-			throw new GitServerErrorException(e);
+			throw new GitSharkErrorException(e);
 		}
 	}
 

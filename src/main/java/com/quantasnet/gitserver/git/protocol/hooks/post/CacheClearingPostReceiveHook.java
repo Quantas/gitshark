@@ -17,7 +17,7 @@ import com.quantasnet.gitserver.user.User;
  * Created by andrewlandsverk on 7/11/15.
  */
 @Component
-public class CacheClearingPostReceiveHook implements GitServerPostReceiveHook {
+public class CacheClearingPostReceiveHook implements GitSharkPostReceiveHook {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CacheClearingPostReceiveHook.class);
 

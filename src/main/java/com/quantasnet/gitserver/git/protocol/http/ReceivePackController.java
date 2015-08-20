@@ -28,10 +28,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.protocol.http.vendor.SmartOutputStream;
-import com.quantasnet.gitserver.git.protocol.packs.GitServerReceivePackFactory;
+import com.quantasnet.gitserver.git.protocol.packs.GitSharkReceivePackFactory;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.user.User;
 
@@ -42,11 +42,11 @@ public class ReceivePackController {
 	private static final Logger LOG = LoggerFactory.getLogger(ReceivePackController.class);
 
 	@Autowired
-	private GitServerReceivePackFactory receivePackFactory;
+	private GitSharkReceivePackFactory receivePackFactory;
 
 	@RequestMapping(value = "/info/refs", params = "service=" + Constants.GIT_RECEIVE_PACK, method = RequestMethod.GET, 
 			produces = Constants.GIT_RECEIVE_PACK_ADV)
-	public ResponseEntity<byte[]> receivePackAdv(final GitRepository repo, @AuthenticationPrincipal final User user, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent) throws GitServerException {
+	public ResponseEntity<byte[]> receivePackAdv(final GitRepository repo, @AuthenticationPrincipal final User user, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent) throws GitSharkException {
 		final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		
 		repo.execute(db -> {
@@ -71,7 +71,7 @@ public class ReceivePackController {
 	@RequestMapping(value = "/" + Constants.GIT_RECEIVE_PACK, method = RequestMethod.POST, 
 			consumes = Constants.GIT_RECEIVE_PACK_REQUEST, 
 			produces = Constants.GIT_RECEIVE_PACK_RESULT)
-	public void receivePack(final GitRepository repo, @AuthenticationPrincipal final User user, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws GitServerException {
+	public void receivePack(final GitRepository repo, @AuthenticationPrincipal final User user, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws GitSharkException {
 		
 		final int[] version = ClientVersionUtil.parseVersion(userAgent);
 		
@@ -79,7 +79,7 @@ public class ReceivePackController {
 			try {
 				rsp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 			} catch (final IOException e) {
-				throw new GitServerErrorException(e);
+				throw new GitSharkErrorException(e);
 			}
 			return;
 		}

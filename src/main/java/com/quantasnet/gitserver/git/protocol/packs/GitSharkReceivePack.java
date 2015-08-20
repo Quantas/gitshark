@@ -9,21 +9,21 @@ import org.eclipse.jgit.transport.PreReceiveHook;
 import org.eclipse.jgit.transport.ReceiveCommand;
 import org.eclipse.jgit.transport.ReceivePack;
 
-import com.quantasnet.gitserver.git.protocol.hooks.post.GitServerPostReceiveHook;
-import com.quantasnet.gitserver.git.protocol.hooks.pre.GitServerPreReceiveHook;
+import com.quantasnet.gitserver.git.protocol.hooks.post.GitSharkPostReceiveHook;
+import com.quantasnet.gitserver.git.protocol.hooks.pre.GitSharkPreReceiveHook;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.user.User;
 
-public class GitServerReceivePack extends ReceivePack implements PreReceiveHook, PostReceiveHook {
+public class GitSharkReceivePack extends ReceivePack implements PreReceiveHook, PostReceiveHook {
 
 	private final GitRepository repo;
 	private final User user;
 
-	private final List<GitServerPreReceiveHook> preReceiveHooks;
-	private final List<GitServerPostReceiveHook> postReceiveHooks;
+	private final List<GitSharkPreReceiveHook> preReceiveHooks;
+	private final List<GitSharkPostReceiveHook> postReceiveHooks;
 	
-	public GitServerReceivePack(final Repository into, final GitRepository repo, final User user,
-			final List<GitServerPreReceiveHook> preReceiveHooks, final List<GitServerPostReceiveHook> postReceiveHooks) {
+	public GitSharkReceivePack(final Repository into, final GitRepository repo, final User user,
+			final List<GitSharkPreReceiveHook> preReceiveHooks, final List<GitSharkPostReceiveHook> postReceiveHooks) {
 		super(into);
 		this.repo = repo;
 		this.user = user;

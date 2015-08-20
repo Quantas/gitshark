@@ -15,7 +15,7 @@ import com.quantasnet.gitserver.user.User;
  * Created by andrewlandsverk on 7/11/15.
  */
 @Component
-public class LoggingPostReceiveHook implements GitServerPostReceiveHook {
+public class LoggingPostReceiveHook implements GitSharkPostReceiveHook {
 
     private static final Logger LOG = LoggerFactory.getLogger(LoggingPostReceiveHook.class);
 

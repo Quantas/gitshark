@@ -1,4 +1,4 @@
-package com.quantasnet.gitserver.git.backend.mongo;
+package com.quantasnet.gitserver.git.dfs;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,22 +22,22 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
-import com.quantasnet.gitserver.backend.mongo.MongoService;
+import com.quantasnet.gitserver.git.dfs.mongo.MongoService;
 
-public class MongoDfsObjDatabase extends DfsObjDatabase {
+public class GitSharkDfsObjDatabase extends DfsObjDatabase {
 	
-	private MongoDfsRepository mongoRepo;
+	private GitSharkDfsRepository repository;
 	private final MongoService mongoService;
 	
-	MongoDfsObjDatabase(final MongoDfsRepository repository, final MongoService mongoService) {
+	GitSharkDfsObjDatabase(final GitSharkDfsRepository repository, final MongoService mongoService) {
 		super(repository, new DfsReaderOptions());
-		this.mongoRepo = repository;
+		this.repository = repository;
 		this.mongoService = mongoService;
 	}
 
 	@Override
 	protected DfsPackDescription newPack(final PackSource source) throws IOException {
-		final DfsPackDescription desc = new DfsPackDescription(mongoRepo.getDescription(), UUID.randomUUID().toString());
+		final DfsPackDescription desc = new DfsPackDescription(repository.getDescription(), UUID.randomUUID().toString());
 		desc.setPackSource(source);
 		return desc;
 	}
@@ -54,7 +54,7 @@ public class MongoDfsObjDatabase extends DfsObjDatabase {
 
 	@Override
 	protected List<DfsPackDescription> listPacks() throws IOException {
-		final List<GridFSDBFile> dbFiles = mongoService.gridFS().find(new BasicDBObject("metadata.repoId", mongoRepo.getId()));
+		final List<GridFSDBFile> dbFiles = mongoService.gridFS().find(new BasicDBObject("metadata.repoId", repository.getId()));
 		final List<DfsPackDescription> packs = new ArrayList<>();
 		for (final GridFSDBFile file : dbFiles) {
 			final DBObject metadata = file.getMetaData();
@@ -68,7 +68,7 @@ public class MongoDfsObjDatabase extends DfsObjDatabase {
 
 	@Override
 	protected ReadableChannel openFile(DfsPackDescription desc, PackExt ext) throws FileNotFoundException, IOException {
-		final GridFSDBFile file = mongoService.gridFS().findOne(new BasicDBObject("metadata.fileName", desc.getFileName(ext)).append("metadata.repoId", mongoRepo.getId()));
+		final GridFSDBFile file = mongoService.gridFS().findOne(new BasicDBObject("metadata.fileName", desc.getFileName(ext)).append("metadata.repoId", repository.getId()));
 		if (null != file) {
 			final InputStream inputStream = file.getInputStream();
 			final byte[] data = IOUtils.toByteArray(inputStream);
@@ -155,19 +155,19 @@ public class MongoDfsObjDatabase extends DfsObjDatabase {
 	}
 	
 	private BasicDBObject createMetadata(final DfsPackDescription desc, final PackExt ext) {
-		final MongoObjMetadata metadata = new MongoObjMetadata();
+		final GitSharkObjMetadata metadata = new GitSharkObjMetadata();
 		metadata.setDeltaCount(desc.getDeltaCount());
 		metadata.setFileName(desc.getFileName(ext));
 		metadata.setIndexVersion(desc.getIndexVersion());
 		metadata.setLastModified(desc.getLastModified());
 		metadata.setObjectCount(desc.getObjectCount());
 		metadata.setPackSource(desc.getPackSource());
-		metadata.setRepoId(mongoRepo.getId());
+		metadata.setRepoId(repository.getId());
 		return metadata.build();
 	}
 	
 	private DfsPackDescription createDescriptionFromMetadata(final DBObject dbObject, final String fileName) {
-		final DfsPackDescription dfsPackDescription = new DfsPackDescription(mongoRepo.getDescription(), fileName);
+		final DfsPackDescription dfsPackDescription = new DfsPackDescription(repository.getDescription(), fileName);
 		dfsPackDescription.setLastModified((long) dbObject.get("lastModified"));
 		dfsPackDescription.setObjectCount((long) dbObject.get("objectCount"));
 		dfsPackDescription.setDeltaCount((long) dbObject.get("deltaCount"));

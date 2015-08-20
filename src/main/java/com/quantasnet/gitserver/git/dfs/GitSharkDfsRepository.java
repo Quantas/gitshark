@@ -1,4 +1,4 @@
-package com.quantasnet.gitserver.git.backend.mongo;
+package com.quantasnet.gitserver.git.dfs;
 
 import java.io.IOException;
 
@@ -8,42 +8,42 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRepository;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryBuilder;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 
-import com.quantasnet.gitserver.backend.mongo.MongoService;
+import com.quantasnet.gitserver.git.dfs.mongo.MongoService;
 
 /**
  * 
  * @author Andrew
  */
-public class MongoDfsRepository extends DfsRepository {
+public class GitSharkDfsRepository extends DfsRepository {
 
-	private static class MongoRepositoryBuilder extends DfsRepositoryBuilder<MongoRepositoryBuilder, MongoDfsRepository> {
+	private static class MongoRepositoryBuilder extends DfsRepositoryBuilder<MongoRepositoryBuilder, GitSharkDfsRepository> {
 		@Override
-		public MongoDfsRepository build() throws IOException {
-			return new MongoDfsRepository(this);
+		public GitSharkDfsRepository build() throws IOException {
+			return new GitSharkDfsRepository(this);
 		}
 	}
 
 	private String id;
 	private MongoService mongoService;
 	
-	public MongoDfsRepository(final String id, final String repoName, final MongoService mongoService) {
+	public GitSharkDfsRepository(final String id, final String repoName, final MongoService mongoService) {
 		this(new MongoRepositoryBuilder().setRepositoryDescription(new DfsRepositoryDescription(repoName)));
 		this.id = id;
 		this.mongoService = mongoService;
 	}
 	
-	private MongoDfsRepository(final MongoRepositoryBuilder builder) {
+	private GitSharkDfsRepository(final MongoRepositoryBuilder builder) {
 		super(builder);
 	}
 
 	@Override
 	public DfsObjDatabase getObjectDatabase() {
-		return new MongoDfsObjDatabase(this, mongoService);
+		return new GitSharkDfsObjDatabase(this, mongoService);
 	}
 
 	@Override
 	public DfsRefDatabase getRefDatabase() {
-		return new MongoDfsRefDatabase(this, mongoService);
+		return new GitSharkDfsRefDatabase(this, mongoService);
 	}
 
 	public String getId() {

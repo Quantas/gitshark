@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 
 import com.google.common.collect.ImmutableSet;
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.git.service.SpecialMarkupService;
@@ -37,7 +37,7 @@ class FileView implements DisplayView {
 	private SpecialMarkupService specialMarkupService;
 
 	@Override
-	public Object display(final GitRepository repo, final String ref, final Model model, final String path, final Repository db, final List<RepoFile> files) throws GitServerException {
+	public Object display(final GitRepository repo, final String ref, final Model model, final String path, final Repository db, final List<RepoFile> files) throws GitSharkException {
 		final RepoFile repoFile = files.get(0);
 
 		if (null != repoFile) {
@@ -58,13 +58,13 @@ class FileView implements DisplayView {
 					model.addAttribute(SPECIAL_MARKUP, specialMarkupService.retrieveMarkup(repo, db, repoFile, ref));
 				}
 			} catch (final IOException ioe) {
-				throw new GitServerErrorException(ioe);
+				throw new GitSharkErrorException(ioe);
 			}
 
 			return "git/file";
 		}
 
-		throw new GitServerErrorException("repoFile was null");
+		throw new GitSharkErrorException("repoFile was null");
 	}
 
 	@Override

@@ -6,7 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.git.service.RefLogService;
 
@@ -19,7 +19,7 @@ public class RefLogController {
 	private RefLogService refLogService;
 	
 	@RequestMapping(value = "", method = RequestMethod.GET)
-	public String branches(final GitRepository repo, final Model model) throws GitServerException {
+	public String branches(final GitRepository repo, final Model model) throws GitSharkException {
 		if (repo.hasCommits()) {
 			model.addAttribute("logs", refLogService.retrieveActivity(repo));
 		}

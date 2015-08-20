@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.backend.mongo.MongoRepo;
-import com.quantasnet.gitserver.backend.mongo.MongoService;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.dfs.mongo.MongoRepo;
+import com.quantasnet.gitserver.git.dfs.mongo.MongoService;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.user.User;
 
 @RequestMapping("/repo")
@@ -29,7 +29,7 @@ public class RepoManageController {
 	private MongoService mongoService;
 	
 	@RequestMapping
-	public String myRepos(@AuthenticationPrincipal final User user, final Model model) throws GitServerException {
+	public String myRepos(@AuthenticationPrincipal final User user, final Model model) throws GitSharkException {
 		model.addAttribute("repos", mongoService.getAllReposForUser(user));
 		return "git/repos";
 	}
@@ -43,7 +43,7 @@ public class RepoManageController {
 	}
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public String createRepo(@AuthenticationPrincipal final User user, @Valid final NewRepoForm repoForm, final BindingResult bindingResult, final RedirectAttributes redirectAttributes) throws GitServerException {
+	public String createRepo(@AuthenticationPrincipal final User user, @Valid final NewRepoForm repoForm, final BindingResult bindingResult, final RedirectAttributes redirectAttributes) throws GitSharkException {
 
 		if (!bindingResult.hasErrors()) {
 			for (final MongoRepo repo : mongoService.getAllReposForUser(user)) {

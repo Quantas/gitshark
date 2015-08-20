@@ -6,11 +6,11 @@ import org.eclipse.jgit.lib.Repository;
 
 import com.google.common.collect.ComparisonChain;
 import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.backend.mongo.MongoRepo;
-import com.quantasnet.gitserver.backend.mongo.MongoService;
-import com.quantasnet.gitserver.git.backend.mongo.MongoDfsRepository;
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.dfs.GitSharkDfsRepository;
+import com.quantasnet.gitserver.git.dfs.mongo.MongoRepo;
+import com.quantasnet.gitserver.git.dfs.mongo.MongoService;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 
 /**
  * Note: this class has a natural ordering that is inconsistent with equals.
@@ -20,7 +20,7 @@ import com.quantasnet.gitserver.git.exception.GitServerException;
 public class GitRepository implements Comparable<GitRepository> {
 
 	private final MongoService mongoService;
-	private final MongoRepo mongoRepo;
+	private final MongoRepo repository;
 	private final String owner;
 	private final String name;
 	
@@ -33,9 +33,9 @@ public class GitRepository implements Comparable<GitRepository> {
 	
 	private boolean commits;
 	
-	public GitRepository(final MongoService mongoService, final MongoRepo mongoRepo, final String owner, final String name, final boolean anonRead, final boolean anonWrite) {
+	public GitRepository(final MongoService mongoService, final MongoRepo repository, final String owner, final String name, final boolean anonRead, final boolean anonWrite) {
 		this.mongoService = mongoService;
-		this.mongoRepo = mongoRepo;
+		this.repository = repository;
 		this.owner = owner;
 		this.name = name;
 		this.anonRead = anonRead;
@@ -46,19 +46,19 @@ public class GitRepository implements Comparable<GitRepository> {
 		this.interfaceBaseUrl = getOwner() + '/' + getDisplayName();
 	}
 	
-	public void execute(final RepositoryAction repoAction) throws GitServerException {
-		try (final Repository db = new MongoDfsRepository(mongoRepo.getId(), mongoRepo.getName(), mongoService)) {
+	public void execute(final RepositoryAction repoAction) throws GitSharkException {
+		try (final Repository db = new GitSharkDfsRepository(repository.getId(), repository.getName(), mongoService)) {
 			repoAction.doAction(db);
 		} catch (final IOException e) {
-			throw new GitServerErrorException(e);
+			throw new GitSharkErrorException(e);
 		}
 	}
 
-	public <T> T executeWithReturn(final RepositoryActionWithReturn<T> repoAction) throws GitServerException {
-		try (final Repository db = new MongoDfsRepository(mongoRepo.getId(), mongoRepo.getName(), mongoService)) {
+	public <T> T executeWithReturn(final RepositoryActionWithReturn<T> repoAction) throws GitSharkException {
+		try (final Repository db = new GitSharkDfsRepository(repository.getId(), repository.getName(), mongoService)) {
 			return repoAction.doAction(db);
 		} catch (final IOException e) {
-			throw new GitServerErrorException(e);
+			throw new GitSharkErrorException(e);
 		}
 	}
 	

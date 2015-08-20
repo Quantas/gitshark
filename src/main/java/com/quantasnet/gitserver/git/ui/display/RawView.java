@@ -10,8 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
@@ -19,7 +19,7 @@ import com.quantasnet.gitserver.git.repo.GitRepository;
 class RawView implements DisplayView {
 
 	@Override
-	public Object display(final GitRepository repo, final String ref, final Model model, final String path, final Repository db, final List<RepoFile> files) throws GitServerException {
+	public Object display(final GitRepository repo, final String ref, final Model model, final String path, final Repository db, final List<RepoFile> files) throws GitSharkException {
 
 		final RepoFile repoFile = files.get(0);
 
@@ -29,7 +29,7 @@ class RawView implements DisplayView {
 			return new ResponseEntity<>(new String(repoFile.getFileContentsRaw()), headers, HttpStatus.OK);
 		}
 
-		throw new GitServerErrorException("repoFile was null");
+		throw new GitSharkErrorException("repoFile was null");
 	}
 
 	@Override

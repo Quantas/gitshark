@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.model.RefHolder;
 import com.quantasnet.gitserver.git.model.RefType;
 import com.quantasnet.gitserver.git.repo.GitRepository;
@@ -32,7 +32,7 @@ public class RefController {
 	private FilesystemRepositoryService repoService;
 	
 	@RequestMapping(value = "/{refType:(?:branch|tag)}", method = RequestMethod.GET)
-	public String refs(final GitRepository repo, @PathVariable final String refType, final Model model) throws GitServerException {
+	public String refs(final GitRepository repo, @PathVariable final String refType, final Model model) throws GitSharkException {
 		
 		final RefType type = RefType.getForName(refType);
 		

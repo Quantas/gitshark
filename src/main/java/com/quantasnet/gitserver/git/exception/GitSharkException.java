@@ -5,22 +5,22 @@ package com.quantasnet.gitserver.git.exception;
  * 
  * @author Andrew
  */
-public class GitServerException extends Exception {
+public class GitSharkException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
-	public GitServerException() {
+	public GitSharkException() {
 	}
 	
-	public GitServerException(final String message) {
+	public GitSharkException(final String message) {
 		super(message);
 	}
 	
-	public GitServerException(final String message, final Throwable cause) {
+	public GitSharkException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 	
-	public GitServerException(final Throwable cause) {
+	public GitSharkException(final Throwable cause) {
 		super(cause);
 	}
 	

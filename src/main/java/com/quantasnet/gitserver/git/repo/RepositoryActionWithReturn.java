@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.eclipse.jgit.lib.Repository;
 
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 
 /**
  * To be used in conjunction with {@link GitRepository#executeWithReturn(RepositoryActionWithReturn)}
@@ -18,8 +18,8 @@ public interface RepositoryActionWithReturn<T> {
 	 *
 	 * @param repo
 	 * @return T
-	 * @throws GitServerException
+	 * @throws GitSharkException
 	 * @throws IOException
 	 */
-	T doAction(Repository repo) throws GitServerException, IOException;
+	T doAction(Repository repo) throws GitSharkException, IOException;
 }

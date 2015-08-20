@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
-import com.quantasnet.gitserver.security.GitServerUserDetailsService;
+import com.quantasnet.gitserver.security.GitSharkUserDetailsService;
 
 @Configuration
 public class WebSecurityConfig {
@@ -68,13 +68,13 @@ public class WebSecurityConfig {
 	@Order(2)
 	public static class WebUISecurity extends WebSecurityConfigurerAdapter {
 		
-		private static final String KEY = "git-server-remember-me-68debb69-a234-4a4f-8508-ab9234hf8d2a";
+		private static final String KEY = "git-shark-remember-me-68debb69-a234-4a4f-8508-ab9234hf8d2a";
 		
 		@Autowired
 		private Environment env;
 		
 		@Autowired
-		private PersistentTokenRepository gitServerPersistentTokenRepository;
+		private PersistentTokenRepository gitSharkPersistentTokenRepository;
 		
 		@Autowired
 		private PasswordEncoder passwordEncoder;
@@ -116,13 +116,13 @@ public class WebSecurityConfig {
 		@Autowired
 		public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
 			auth
-				.userDetailsService(gitServerUserDetailsService())
+				.userDetailsService(gitSharkUserDetailsService())
 				.passwordEncoder(passwordEncoder);
 		}
 
 		@Bean
-		public UserDetailsService gitServerUserDetailsService() {
-			return new GitServerUserDetailsService();
+		public UserDetailsService gitSharkUserDetailsService() {
+			return new GitSharkUserDetailsService();
 		}
 		
 		@Bean
@@ -134,9 +134,9 @@ public class WebSecurityConfig {
 		@Bean
 		public RememberMeServices rememberMeServices() {
 			final PersistentTokenBasedRememberMeServices rememberMeServices =
-				new PersistentTokenBasedRememberMeServices(KEY, gitServerUserDetailsService(), gitServerPersistentTokenRepository);
-			rememberMeServices.setCookieName("GIT_SERVER_REMEMBER_ME");
-			rememberMeServices.setParameter("_git_server_remember_me");
+				new PersistentTokenBasedRememberMeServices(KEY, gitSharkUserDetailsService(), gitSharkPersistentTokenRepository);
+			rememberMeServices.setCookieName("GIT_SHARK_REMEMBER_ME");
+			rememberMeServices.setParameter("_git_shark_remember_me");
 			return rememberMeServices;
 		}
 	}

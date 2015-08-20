@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.quantasnet.gitserver.user.UserService;
 
-public class GitServerUserDetailsService implements UserDetailsService {
+public class GitSharkUserDetailsService implements UserDetailsService {
 
 	@Autowired
 	private UserService userService;

@@ -3,15 +3,15 @@ package com.quantasnet.gitserver.git.exception;
 /**
  * Created by andrewlandsverk on 7/13/15.
  */
-public class GitServerRuntimeException extends RuntimeException {
+public class GitSharkRuntimeException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	public GitServerRuntimeException(final Exception cause) {
+	public GitSharkRuntimeException(final Exception cause) {
 		super(cause);
 	}
 
-	public GitServerRuntimeException(final String message) {
+	public GitSharkRuntimeException(final String message) {
 		super(message);
 	}
 }

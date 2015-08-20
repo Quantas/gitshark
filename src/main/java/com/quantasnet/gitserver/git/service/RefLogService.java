@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.model.RefLog;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
@@ -32,7 +32,7 @@ public class RefLogService {
 	
 	// Causes StackOverflowError on enormous pushes
 	// @Cacheable(cacheNames = RepoCacheConstants.REFLOG, key = "#repo.fullDisplayName")
-	public List<RefLog> retrieveActivity(final GitRepository repo) throws GitServerException {
+	public List<RefLog> retrieveActivity(final GitRepository repo) throws GitSharkException {
 		final List<RefLog> logs = new ArrayList<>();
 		
 		repo.execute(db -> {

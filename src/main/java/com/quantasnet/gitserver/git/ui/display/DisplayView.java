@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.jgit.lib.Repository;
 import org.springframework.ui.Model;
 
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
@@ -24,9 +24,9 @@ public interface DisplayView {
 	 * @param db {@link Repository}
 	 * @param files Current list of files
 	 * @return View Name or other valid MVC method return type
-	 * @throws GitServerException
+	 * @throws GitSharkException
 	 */
-	Object display(GitRepository repo, String ref, Model model, String path, Repository db, List<RepoFile> files) throws GitServerException;
+	Object display(GitRepository repo, String ref, Model model, String path, Repository db, List<RepoFile> files) throws GitSharkException;
 
 	/**
 	 * @return the {@link DisplayType} this DisplayView is for

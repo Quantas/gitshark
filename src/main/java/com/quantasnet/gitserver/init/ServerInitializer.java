@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import com.quantasnet.gitserver.git.exception.GitServerRuntimeException;
+import com.quantasnet.gitserver.git.exception.GitSharkRuntimeException;
 import com.quantasnet.gitserver.git.exception.ServerInitializerException;
 
 @Component
@@ -27,7 +27,7 @@ public class ServerInitializer implements ApplicationListener<ContextRefreshedEv
 		if (alreadyInit) {
 			final String message = "SERVER ALREADY INITALIZED...";
 			LOG.error(message);
-			throw new GitServerRuntimeException(message);
+			throw new GitSharkRuntimeException(message);
 		} else {
 			try {
 				for (final Initializer init : initializers) {
@@ -36,7 +36,7 @@ public class ServerInitializer implements ApplicationListener<ContextRefreshedEv
 				}
 				alreadyInit = true;
 			} catch (final ServerInitializerException e) {
-				throw new GitServerRuntimeException(e);
+				throw new GitSharkRuntimeException(e);
 			}
 		}
 	}

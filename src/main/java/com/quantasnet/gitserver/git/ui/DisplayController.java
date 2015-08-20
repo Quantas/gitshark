@@ -12,8 +12,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.model.Breadcrumb;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.RepoFile;
@@ -36,7 +36,7 @@ public class DisplayController {
 	private ServletContext servletContext;
 	
 	@RequestMapping("/tree")
-	public Object displayRepoTreeNoBranch(final GitRepository repo, final Model model, final HttpServletRequest req) throws GitServerException {
+	public Object displayRepoTreeNoBranch(final GitRepository repo, final Model model, final HttpServletRequest req) throws GitSharkException {
 		final String ref = repo.executeWithReturn(db -> {
 			try {
 				return db.getBranch();
@@ -48,7 +48,7 @@ public class DisplayController {
 	}
 	
 	@RequestMapping("/{type:(?:tree|raw|history)}/{ref}/**")
-	public Object displayRepoTree(final GitRepository repo, @PathVariable final DisplayType type, @PathVariable final String ref, final Model model, final HttpServletRequest req) throws GitServerException {
+	public Object displayRepoTree(final GitRepository repo, @PathVariable final DisplayType type, @PathVariable final String ref, final Model model, final HttpServletRequest req) throws GitSharkException {
 		final String repoPath = "/repo/" + repo.getInterfaceBaseUrl() + "/tree/" + ref + '/';
 		final String path = repoUtils.resolvePath(req, repoPath, ref);
 		
@@ -75,7 +75,7 @@ public class DisplayController {
 				return displayViewService.getForType(actualType).display(repo, ref, model, path, db, files);
 			}
 
-			throw new GitServerErrorException("error in tree rendering");
+			throw new GitSharkErrorException("error in tree rendering");
 		});
 	}
 

@@ -13,9 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @Service
-public class GitServerPersistentTokenRepository implements PersistentTokenRepository {
+public class GitSharkPersistentTokenRepository implements PersistentTokenRepository {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GitServerPersistentTokenRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GitSharkPersistentTokenRepository.class);
 
     @Autowired
     private RememberMeTokenRepo rememberMeTokenRepository;

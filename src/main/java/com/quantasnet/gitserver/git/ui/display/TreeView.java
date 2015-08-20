@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.model.ReadmeFile;
 import com.quantasnet.gitserver.git.model.RepoFile;
 import com.quantasnet.gitserver.git.repo.GitRepository;
@@ -27,7 +27,7 @@ class TreeView implements DisplayView {
 	private RepositoryUtilities repoUtils;
 
 	@Override
-	public Object display(final GitRepository repo, final String ref, final Model model, final String path, final Repository db, final List<RepoFile> files) throws GitServerException {
+	public Object display(final GitRepository repo, final String ref, final Model model, final String path, final Repository db, final List<RepoFile> files) throws GitSharkException {
 		if (repoUtils.isPathRoot(path)) {
 			model.addAttribute(SPECIAL_MARKUP, specialMarkupService.resolveReadMeFile(repo, db, ref, files));
 		} else {
@@ -43,7 +43,7 @@ class TreeView implements DisplayView {
 		return DisplayType.TREE;
 	}
 
-	private void addReadmeIfExists(final GitRepository repo, final String ref, final Model model, final Repository db, final List<RepoFile> files) throws GitServerErrorException {
+	private void addReadmeIfExists(final GitRepository repo, final String ref, final Model model, final Repository db, final List<RepoFile> files) throws GitSharkErrorException {
 		for (final RepoFile aFile : files) {
 			if (!aFile.isDirectory() && specialMarkupService.isReadmeFile(aFile.getName())) {
 				model.addAttribute(SPECIAL_MARKUP,

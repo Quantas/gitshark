@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.git.service.FilesystemRepositoryService;
 
@@ -27,7 +27,7 @@ public class RepoController {
 	private FilesystemRepositoryService repoService;
 	
 	@RequestMapping(value = "/" + Constants.HEAD, method = RequestMethod.GET)
-	public ResponseEntity<byte[]> head(final GitRepository repo) throws GitServerException {
+	public ResponseEntity<byte[]> head(final GitRepository repo) throws GitSharkException {
 		final byte[] head = repo.executeWithReturn(db -> {
 			return ("ref: " + db.getFullBranch()).getBytes();
 		});		
@@ -35,7 +35,7 @@ public class RepoController {
 	}
 	
 	@RequestMapping(value = "/info/refs", method = RequestMethod.GET, produces = Constants.TEXT_PLAIN)
-	public ResponseEntity<String> infoRefs(final GitRepository repo) throws GitServerException {
+	public ResponseEntity<String> infoRefs(final GitRepository repo) throws GitSharkException {
 		final StringBuilder output = new StringBuilder();
 		
 		repo.execute(db -> {

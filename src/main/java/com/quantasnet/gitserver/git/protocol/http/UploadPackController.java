@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.quantasnet.gitserver.Constants;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.protocol.http.vendor.SmartOutputStream;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 
@@ -38,7 +38,7 @@ public class UploadPackController {
 	
 	@RequestMapping(value = "/info/refs", params = "service=" + Constants.GIT_UPLOAD_PACK, method = RequestMethod.GET, 
 			produces = Constants.GIT_UPLOAD_PACK_ADV)
-	public ResponseEntity<byte[]> uploadPackAdv(final GitRepository repo, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent) throws GitServerException {
+	public ResponseEntity<byte[]> uploadPackAdv(final GitRepository repo, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent) throws GitSharkException {
 		final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		
 		repo.execute(db -> {
@@ -63,7 +63,7 @@ public class UploadPackController {
 	@RequestMapping(value = "/" + Constants.GIT_UPLOAD_PACK, method = RequestMethod.POST, 
 			consumes = Constants.GIT_UPLOAD_PACK_REQUEST, 
 			produces = Constants.GIT_UPLOAD_PACK_RESULT)
-	public void uploadPack(final GitRepository repo, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws GitServerException, IOException {
+	public void uploadPack(final GitRepository repo, @RequestHeader(Constants.HEADER_USER_AGENT) String userAgent, final HttpServletRequest req, final HttpServletResponse rsp) throws GitSharkException, IOException {
 		
 		final int[] version = ClientVersionUtil.parseVersion(userAgent);
 		if (ClientVersionUtil.hasChunkedEncodingRequestBug(version, req)) {

@@ -1,4 +1,4 @@
-package com.quantasnet.gitserver.git.protocol.hooks.post;
+package com.quantasnet.gitserver.git.protocol.hooks.pre;
 
 import java.util.Collection;
 
@@ -11,6 +11,6 @@ import com.quantasnet.gitserver.user.User;
 /**
  * Created by andrewlandsverk on 7/11/15.
  */
-public interface GitServerPostReceiveHook {
-    void onPostReceive(ReceivePack rp, Collection<ReceiveCommand> commands, User user, GitRepository repo);
+public interface GitSharkPreReceiveHook {
+    void onPreReceive(ReceivePack rp, Collection<ReceiveCommand> commands, User user, GitRepository repo);
 }

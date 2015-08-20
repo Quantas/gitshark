@@ -32,8 +32,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.quantasnet.gitserver.git.cache.RepoCacheConstants;
-import com.quantasnet.gitserver.git.exception.GitServerErrorException;
-import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.GitSharkErrorException;
+import com.quantasnet.gitserver.git.exception.GitSharkException;
 import com.quantasnet.gitserver.git.model.Commit;
 import com.quantasnet.gitserver.git.model.Diff;
 import com.quantasnet.gitserver.git.repo.GitRepository;
@@ -53,18 +53,18 @@ public class CommitService {
 	private FilesystemRepositoryService repoService;
 
 	@Cacheable(cacheNames = RepoCacheConstants.COMMIT_COUNT, key = "{ #repo.fullDisplayName }")
-	public long commitCount(final GitRepository repo) throws GitServerException {
+	public long commitCount(final GitRepository repo) throws GitSharkException {
 		return repo.executeWithReturn(db -> {
 			try {
 				return StreamSupport.stream(Git.wrap(db).log().call().spliterator(), false).count();
 			} catch (final GitAPIException e) {
-				throw new GitServerErrorException(e);
+				throw new GitSharkErrorException(e);
 			}
 		});
 	}
 
 	@Cacheable(cacheNames = RepoCacheConstants.ALL_COMMITS, key = "{ #repo.fullDisplayName, #selected }")
-	public List<Commit> getCommits(final GitRepository repo, final String selected, final Repository db) throws IOException, GitServerException {
+	public List<Commit> getCommits(final GitRepository repo, final String selected, final Repository db) throws IOException, GitSharkException {
 		LOG.info("Cache Miss - {}, {}", repo.getFullDisplayName(), selected);
 
 		final Map<ObjectId, String> branchHeads = new HashMap<>();
