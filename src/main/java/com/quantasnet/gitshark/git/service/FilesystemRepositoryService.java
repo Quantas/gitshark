@@ -14,12 +14,6 @@ import com.quantasnet.gitshark.git.repo.GitRepository;
 @Service
 public class FilesystemRepositoryService {
 
-	@Cacheable(cacheNames = RepoCacheConstants.REPO_SIZE, key = "#repo.fullDisplayName")
-	public long repoSize(final GitRepository repo) {
-		// TODO
-		return 0;
-	}
-
 	@Cacheable(cacheNames = RepoCacheConstants.BRANCHES, key = "#repo.fullDisplayName")
 	public Map<String, Ref> branches(final GitRepository repo) throws GitSharkException {
 		return repo.executeWithReturn(db -> db.getRefDatabase().getRefs(Constants.REFS_HEADS));

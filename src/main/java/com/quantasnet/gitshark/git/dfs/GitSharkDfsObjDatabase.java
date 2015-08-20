@@ -59,9 +59,7 @@ public class GitSharkDfsObjDatabase extends DfsObjDatabase {
 		for (final GridFSDBFile file : dbFiles) {
 			final DBObject metadata = file.getMetaData();
 			final String fileName = (String) metadata.get("fileName");
-			//if (fileName.endsWith(".pack")) {
-				packs.add(createDescriptionFromMetadata(metadata, fileName));
-			//}
+			packs.add(createDescriptionFromMetadata(metadata, fileName));
 		}
 		return packs;
 	}

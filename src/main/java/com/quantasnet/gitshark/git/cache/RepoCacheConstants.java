@@ -14,8 +14,7 @@ public class RepoCacheConstants {
 	public static final String BRANCHES = "branches";
 	public static final String TAGS = "tags";
 	public static final String COMMIT_COUNT = "commitCount";
-	public static final String REPO_SIZE = "repoSize";
-
+	
 	private RepoCacheConstants() {
 		// no instances
 	}

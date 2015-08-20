@@ -1,7 +1,5 @@
 package com.quantasnet.gitshark.git.ui;
 
-import java.text.DecimalFormat;
-
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +36,6 @@ public class SettingsController {
 	@RequestMapping(method = RequestMethod.GET)
 	public String settings(final GitRepository repo, final Model model) throws GitSharkException {
 		if (repo.hasCommits()) {
-			model.addAttribute("size", readableFileSize(repoService.repoSize(repo)));
 			model.addAttribute("commitCount", commitService.commitCount(repo));
 			model.addAttribute("branchCount", repoService.branches(repo).size());
 			model.addAttribute("tagCount", repoService.tags(repo).size());
@@ -70,16 +67,5 @@ public class SettingsController {
 			}
 		});
 		return "redirect:/repo/" + repo.getInterfaceBaseUrl() + "/settings";
-	}
-
-	private static String readableFileSize(final long size) {
-		if (size <= 0) {
-			return "0";
-		}
-
-		final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
-		final int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
-
-		return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
 }
