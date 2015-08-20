@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.quantasnet.gitserver</groupId>
+	<groupId>com.quantasnet.gitshark</groupId>
 	<artifactId>gitshark</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -31,7 +31,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<start-class>com.quantasnet.gitserver.GitSharkApplication</start-class>
+		<start-class>com.quantasnet.gitshark.GitSharkApplication</start-class>
 		<java.version>1.8</java.version>
 
 		<commons-io.version>2.4</commons-io.version>
