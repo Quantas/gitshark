@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.gridfs.GridFS;
+import com.quantasnet.gitserver.git.exception.GitServerErrorException;
 import com.quantasnet.gitserver.git.exception.GitServerException;
 import com.quantasnet.gitserver.user.User;
 
@@ -42,7 +43,7 @@ public class MongoService {
 	
 	public boolean deleteRepo(final String name, final User user) {
 		try {
-			final MongoRepo repo = getRepo(name, user);
+			final MongoRepo repo = getRepo(name, user.getUserName(), user.getUserName(), user);
 			gridFS().remove(new BasicDBObject("metadata.repoId", repo.getId()));
 			mongoRepoRepository.delete(repo);
 			mongoRefRepository.delete(mongoRefRepository.findByRepoId(repo.getId()));
@@ -52,8 +53,12 @@ public class MongoService {
 		}
 	}
 	
-	public MongoRepo getRepo(final String name, final User user) {
-		return mongoRepoRepository.findByOwnerIdAndName(user.getId(), name);
+	public MongoRepo getRepo(final String name, final String owner, final String userName, final User user) throws GitServerErrorException {
+		if (owner.equals(userName)) {
+			return mongoRepoRepository.findByOwnerIdAndName(user.getId(), name);
+		}
+		// TODO
+		throw new GitServerErrorException(new IllegalArgumentException("Not Yet Implemented."));
 	}
 	
 	public List<MongoRepo> getAllReposForUser(final User user) {

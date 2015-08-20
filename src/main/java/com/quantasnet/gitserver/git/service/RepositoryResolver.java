@@ -16,6 +16,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import com.quantasnet.gitserver.backend.mongo.MongoRepo;
 import com.quantasnet.gitserver.backend.mongo.MongoService;
 import com.quantasnet.gitserver.git.exception.GitServerException;
+import com.quantasnet.gitserver.git.exception.RepositoryNotFoundException;
 import com.quantasnet.gitserver.git.repo.GitRepository;
 import com.quantasnet.gitserver.user.User;
 
@@ -49,20 +50,24 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 
 		final HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 		final String requestURI = request.getServletPath();
-		// final String owner = requestURI.split("/")[2];
+		final String owner = requestURI.split("/")[2];
 		final String repoName = removeDotGit(requestURI.split("/")[3]);
 		
-		final MongoRepo mongoRepo = mongoService.getRepo(repoName, user);
+		final MongoRepo mongoRepo = mongoService.getRepo(repoName, owner, userName, user);
 		
-		final GitRepository repo = buildRepo(mongoRepo, user);
+		if (null == mongoRepo) {
+			throw new RepositoryNotFoundException(repoName);
+		}
+		
+		final GitRepository repo = buildRepo(mongoRepo, owner);
 		mavContainer.addAttribute("repo", repo);
 		mavContainer.addAttribute("checkoutUrl", buildCheckoutUrl(request, userName, repo));
 
 		return repo;
 	}
 	
-	private GitRepository buildRepo(final MongoRepo mongoRepo, final User user) throws GitServerException {
-		final GitRepository repo = new GitRepository(mongoService, mongoRepo, user.getUserName(), mongoRepo.getName(), false, false);
+	private GitRepository buildRepo(final MongoRepo mongoRepo, final String owner) throws GitServerException {
+		final GitRepository repo = new GitRepository(mongoService, mongoRepo, owner, mongoRepo.getName(), false, false);
 		repo.setCommits(repoUtils.hasCommits(repo));
 		return repo;
 	}
