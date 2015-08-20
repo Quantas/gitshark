@@ -77,6 +77,7 @@ public class RepositoryUtilities {
 			try {
 				return Git.wrap(db).log().setMaxCount(1).call().iterator().hasNext();
 			} catch (final GitAPIException e) {
+				LOG.trace("HEAD not found, empty repository", e);
 				return false;
 			}
 		});

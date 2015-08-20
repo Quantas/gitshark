@@ -5,6 +5,8 @@ import java.util.List;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Ref.Storage;
 import org.eclipse.jgit.lib.SymbolicRef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ import com.quantasnet.gitshark.user.User;
 @Service
 public class MongoService {
 
+	private static final Logger LOG = LoggerFactory.getLogger(MongoService.class);
+	
 	@Autowired
 	private MongoRepoRepository mongoRepoRepository;
 	
@@ -49,6 +53,7 @@ public class MongoService {
 			mongoRefRepository.delete(mongoRefRepository.findByRepoId(repo.getId()));
 			return true;
 		} catch (final Exception e) {
+			LOG.error("Fatal error deleting repo", e);
 			return false;
 		}
 	}

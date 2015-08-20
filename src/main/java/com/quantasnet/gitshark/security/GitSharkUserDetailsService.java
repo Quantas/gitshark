@@ -3,7 +3,6 @@ package com.quantasnet.gitshark.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.quantasnet.gitshark.user.UserService;
 
@@ -13,7 +12,7 @@ public class GitSharkUserDetailsService implements UserDetailsService {
 	private UserService userService;
 	
 	@Override
-	public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(final String username) {
 		return userService.getUserByUsername(username);
 	}
 

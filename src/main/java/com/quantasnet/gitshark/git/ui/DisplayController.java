@@ -6,6 +6,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +28,8 @@ import com.quantasnet.gitshark.git.ui.display.DisplayViewService;
 @Controller
 public class DisplayController {
 
+	private static final Logger LOG = LoggerFactory.getLogger(DisplayController.class);
+	
 	@Autowired
 	private RepositoryUtilities repoUtils;
 
@@ -41,6 +45,7 @@ public class DisplayController {
 			try {
 				return db.getBranch();
 			} catch (final Exception e) {
+				LOG.trace("No HEAD found while trying to display tree", e);
 				return null;
 			}
 		});

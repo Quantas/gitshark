@@ -28,9 +28,7 @@ public class RepoController {
 	
 	@RequestMapping(value = "/" + Constants.HEAD, method = RequestMethod.GET)
 	public ResponseEntity<byte[]> head(final GitRepository repo) throws GitSharkException {
-		final byte[] head = repo.executeWithReturn(db -> {
-			return ("ref: " + db.getFullBranch()).getBytes();
-		});		
+		final byte[] head = repo.executeWithReturn(db -> ("ref: " + db.getFullBranch()).getBytes());		
 		return new ResponseEntity<>(head, HttpStatus.OK);
 	}
 	
