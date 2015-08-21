@@ -8,15 +8,13 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRefDatabase;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectIdRef;
 import org.eclipse.jgit.lib.ObjectIdRef.Unpeeled;
-import org.eclipse.jgit.lib.Ref.Storage;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Ref.Storage;
 import org.eclipse.jgit.lib.SymbolicRef;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.util.RefList;
 
-import com.quantasnet.gitshark.git.dfs.mongo.MongoRef;
-
-public class GitSharkDfsRefDatabase extends DfsRefDatabase {
+final class GitSharkDfsRefDatabase extends DfsRefDatabase {
 
 	private final GitSharkDfsService dfsService;
 	private final GitSharkDfsRepository repository;
@@ -29,11 +27,11 @@ public class GitSharkDfsRefDatabase extends DfsRefDatabase {
 
 	@Override
 	protected RefCache scanAllRefs() throws IOException {
-		final List<MongoRef> mongoRefs = dfsService.getAllRefsForRepo(repository.getId());
+		final List<? extends GitSharkDfsRef> refs = dfsService.getAllRefsForRepo(repository.getId());
 		final RefList.Builder<Ref> ids = new RefList.Builder<Ref>();
 		final RefList.Builder<Ref> sym = new RefList.Builder<Ref>();
 		
-		for (final GitSharkDfsRef ref : mongoRefs) {
+		for (final GitSharkDfsRef ref : refs) {
 			if (ref.isSymbolic()) {
 				final Ref newRef = new SymbolicRef(ref.getName(), new Unpeeled(ref.getStorage(), ref.getTargetName(), ObjectId.fromString(ref.getTargetObjectId())));
 				sym.add(newRef);

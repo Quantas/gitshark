@@ -146,12 +146,12 @@ public class MongoDfsService implements GitSharkDfsService {
 	}
 	
 	@Override
-	public List<MongoRepo> getAllReposForUser(final User user) {
+	public List<? extends GitSharkDfsRepo> getAllReposForUser(final User user) {
 		return mongoRepoRepository.findByOwnerId(user.getId());
 	}
 	
 	@Override
-	public List<MongoRef> getAllRefsForRepo(final String repoId) {
+	public List<? extends GitSharkDfsRef> getAllRefsForRepo(final String repoId) {
 		return mongoRefRepository.findByRepoId(repoId);
 	}
 	

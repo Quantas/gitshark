@@ -9,8 +9,6 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.pack.PackExt;
 import org.eclipse.jgit.lib.Ref;
 
-import com.quantasnet.gitshark.git.dfs.mongo.MongoRef;
-import com.quantasnet.gitshark.git.dfs.mongo.MongoRepo;
 import com.quantasnet.gitshark.git.exception.GitSharkErrorException;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
 import com.quantasnet.gitshark.user.User;
@@ -33,9 +31,9 @@ public interface GitSharkDfsService {
 
 	GitSharkDfsRepo getRepo(String name, String owner, String userName, User user) throws GitSharkErrorException;
 
-	List<MongoRepo> getAllReposForUser(User user);
+	List<? extends GitSharkDfsRepo> getAllReposForUser(User user);
 
-	List<MongoRef> getAllRefsForRepo(String repoId);
+	List<? extends GitSharkDfsRef> getAllRefsForRepo(String repoId);
 
 	GitSharkDfsRef getRefByNameForRepo(String name, String repoId);
 

@@ -16,7 +16,7 @@ import org.eclipse.jgit.internal.storage.dfs.DfsReaderOptions;
 import org.eclipse.jgit.internal.storage.dfs.ReadableChannel;
 import org.eclipse.jgit.internal.storage.pack.PackExt;
 
-public class GitSharkDfsObjDatabase extends DfsObjDatabase {
+final class GitSharkDfsObjDatabase extends DfsObjDatabase {
 	
 	private final GitSharkDfsRepository repository;
 	private final GitSharkDfsService dfsService;
