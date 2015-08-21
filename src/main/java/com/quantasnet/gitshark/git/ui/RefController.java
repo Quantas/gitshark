@@ -18,7 +18,7 @@ import com.quantasnet.gitshark.git.exception.GitSharkException;
 import com.quantasnet.gitshark.git.model.RefHolder;
 import com.quantasnet.gitshark.git.model.RefType;
 import com.quantasnet.gitshark.git.repo.GitRepository;
-import com.quantasnet.gitshark.git.service.FilesystemRepositoryService;
+import com.quantasnet.gitshark.git.service.RefService;
 import com.quantasnet.gitshark.git.service.RepositoryUtilities;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}")
@@ -29,7 +29,7 @@ public class RefController {
 	private RepositoryUtilities repoUtils;
 	
 	@Autowired
-	private FilesystemRepositoryService repoService;
+	private RefService refService;
 	
 	@RequestMapping(value = "/{refType:(?:branch|tag)}", method = RequestMethod.GET)
 	public String refs(final GitRepository repo, @PathVariable final String refType, final Model model) throws GitSharkException {
@@ -39,7 +39,7 @@ public class RefController {
 		repo.execute(db -> {
 			final List<RefHolder> refs = new ArrayList<>();
 			
-			final Map<String, Ref> branchRefs =  type == RefType.BRANCH ? repoService.branches(repo) : repoService.tags(repo);
+			final Map<String, Ref> branchRefs =  type == RefType.BRANCH ? refService.branches(repo) : refService.tags(repo);
 			for (final String entry : branchRefs.keySet()) {
 				refs.add(new RefHolder(repoUtils.getRefHeadCommit(entry, repo, db), repo, entry));
 			}

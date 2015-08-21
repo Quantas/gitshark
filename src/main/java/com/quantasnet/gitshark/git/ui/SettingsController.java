@@ -21,7 +21,7 @@ import com.quantasnet.gitshark.git.exception.GitSharkErrorException;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
 import com.quantasnet.gitshark.git.repo.GitRepository;
 import com.quantasnet.gitshark.git.service.CommitService;
-import com.quantasnet.gitshark.git.service.FilesystemRepositoryService;
+import com.quantasnet.gitshark.git.service.RefService;
 import com.quantasnet.gitshark.user.User;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}/settings")
@@ -31,7 +31,7 @@ public class SettingsController {
 	private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
 	
 	@Autowired
-	private FilesystemRepositoryService repoService;
+	private RefService refService;
 	
 	@Autowired
 	private GitSharkDfsService dfsService;
@@ -45,8 +45,8 @@ public class SettingsController {
 			model.addAttribute("repoSize", Utils.readableFileSize(dfsService.repositorySize(repo.getId())));
 			model.addAttribute("files", dfsService.getPacks(repo.getId(), new DfsRepositoryDescription(repo.getName())));
 			model.addAttribute("commitCount", commitService.commitCount(repo));
-			model.addAttribute("branchCount", repoService.branches(repo).size());
-			model.addAttribute("tagCount", repoService.tags(repo).size());
+			model.addAttribute("branchCount", refService.branches(repo).size());
+			model.addAttribute("tagCount", refService.tags(repo).size());
 		}
 		return "git/settings";
 	}

@@ -50,7 +50,7 @@ public class CommitService {
 	private RepositoryUtilities repoUtils;
 	
 	@Autowired
-	private FilesystemRepositoryService repoService;
+	private RefService refService;
 
 	@Cacheable(cacheNames = RepoCacheConstants.COMMIT_COUNT, key = "{ #repo.fullDisplayName }")
 	public long commitCount(final GitRepository repo) throws GitSharkException {
@@ -72,7 +72,7 @@ public class CommitService {
 		RevCommit selectedCommit = null;
 
 		if (null == selected) {
-			final Set<String> branches = repoService.branches(repo).keySet();
+			final Set<String> branches = refService.branches(repo).keySet();
 
 			for (final String branch : branches) {
 				try {
@@ -94,8 +94,8 @@ public class CommitService {
 			if (null == selectedCommit) {
 				final List<RevCommit> headCommits = new ArrayList<>();
 				final Map<String, Ref> refs = new HashMap<>();
-				refs.putAll(repoService.branches(repo));
-				refs.putAll(repoService.tags(repo));
+				refs.putAll(refService.branches(repo));
+				refs.putAll(refService.tags(repo));
 				for (Ref ref : refs.values()) {
 					if (!ref.isPeeled()) {
 						ref = db.peel(ref);

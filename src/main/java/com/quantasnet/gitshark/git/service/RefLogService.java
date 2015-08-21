@@ -26,7 +26,7 @@ public class RefLogService {
 	private static final Logger LOG = LoggerFactory.getLogger(RefLogService.class);
 	
 	@Autowired
-	private FilesystemRepositoryService repoService;
+	private RefService refService;
 	
 	// TODO completely broken when using DFS
 	
@@ -36,7 +36,7 @@ public class RefLogService {
 		final List<RefLog> logs = new ArrayList<>();
 		
 		repo.execute(db -> {
-			final Set<String> branches = repoService.branches(repo).keySet();
+			final Set<String> branches = refService.branches(repo).keySet();
 			
 			final Git git = Git.wrap(db);
 			

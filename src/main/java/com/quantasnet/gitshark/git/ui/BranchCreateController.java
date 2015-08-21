@@ -19,7 +19,7 @@ import com.quantasnet.gitshark.git.cache.EvictAllCaches;
 import com.quantasnet.gitshark.git.cache.EvictRepoCache;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
 import com.quantasnet.gitshark.git.repo.GitRepository;
-import com.quantasnet.gitshark.git.service.FilesystemRepositoryService;
+import com.quantasnet.gitshark.git.service.RefService;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}")
 @Controller
@@ -28,11 +28,11 @@ public class BranchCreateController {
 	private static final Logger LOG = LoggerFactory.getLogger(BranchCreateController.class);
 	
 	@Autowired
-	private FilesystemRepositoryService repoService;
+	private RefService refService;
 	
 	@RequestMapping(value = "/branch/create", method = RequestMethod.GET)
 	public String create(final GitRepository repo, final Model model) throws GitSharkException {
-		model.addAttribute("branches", repoService.branches(repo).keySet());
+		model.addAttribute("branches", refService.branches(repo).keySet());
 		return "git/branchcreate";
 	}
 	
@@ -42,7 +42,7 @@ public class BranchCreateController {
 	public String saveNewBranch(final GitRepository repo, @RequestParam final String sourceBranch, @RequestParam final String newBranch, final RedirectAttributes redirectAttributes) throws GitSharkException {
 		
 		repo.execute(db -> {
-			final Set<String> branches = repoService.branches(repo).keySet();
+			final Set<String> branches = refService.branches(repo).keySet();
 			if (branches.contains(sourceBranch) && !branches.contains(newBranch)) {
 				try {
 					Git.wrap(db)

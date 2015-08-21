@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.quantasnet.gitshark.Constants;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
 import com.quantasnet.gitshark.git.repo.GitRepository;
-import com.quantasnet.gitshark.git.service.FilesystemRepositoryService;
+import com.quantasnet.gitshark.git.service.RefService;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}.git")
 @Controller
 public class RepoController {
 
 	@Autowired
-	private FilesystemRepositoryService repoService;
+	private RefService refService;
 	
 	@RequestMapping(value = "/" + Constants.HEAD, method = RequestMethod.GET)
 	public ResponseEntity<byte[]> head(final GitRepository repo) throws GitSharkException {
@@ -53,8 +53,8 @@ public class RepoController {
 			adv.setDerefTags(true);
 
 			final Map<String, Ref> refs = new HashMap<>();
-			refs.putAll(repoService.branches(repo));
-			refs.putAll(repoService.tags(repo));
+			refs.putAll(refService.branches(repo));
+			refs.putAll(refService.tags(repo));
 			refs.remove(Constants.HEAD);
 			adv.send(refs);
 		});

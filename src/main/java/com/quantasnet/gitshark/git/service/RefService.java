@@ -12,7 +12,7 @@ import com.quantasnet.gitshark.git.exception.GitSharkException;
 import com.quantasnet.gitshark.git.repo.GitRepository;
 
 @Service
-public class FilesystemRepositoryService {
+public class RefService {
 
 	@Cacheable(cacheNames = RepoCacheConstants.BRANCHES, key = "#repo.fullDisplayName")
 	public Map<String, Ref> branches(final GitRepository repo) throws GitSharkException {

@@ -41,9 +41,9 @@ public class RepositoryUtilities {
 	private static final Logger LOG = LoggerFactory.getLogger(RepositoryUtilities.class);
 
 	@Autowired
-	private FilesystemRepositoryService repoService;
+	private RefService refService;
 	
-	public  String resolvePath(final HttpServletRequest req, final String repoPath, final String branch) {
+	public String resolvePath(final HttpServletRequest req, final String repoPath, final String branch) {
 		String path = ((String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).replaceFirst("\\/(raw|history)\\/", "/tree/");
 
 		if (path.endsWith("/tree")) {
@@ -171,8 +171,8 @@ public class RepositoryUtilities {
 	}
 	
 	public RevCommit getRefHeadCommit(final String refString, final GitRepository repo, final Repository db) throws IOException, GitSharkException {
-		final Ref branchRef = repoService.branches(repo).get(refString);
-		final Ref tagRef = repoService.tags(repo).get(refString);
+		final Ref branchRef = refService.branches(repo).get(refString);
+		final Ref tagRef = refService.tags(repo).get(refString);
 		final Ref ref = branchRef != null ? branchRef : tagRef != null ? tagRef : null;
 
 		// must be a commit id and not a ref
@@ -195,8 +195,8 @@ public class RepositoryUtilities {
 	}
 	
 	public void addRefsToModel(final Model model, final GitRepository repo) throws GitSharkException {
-		model.addAttribute("tags", repoService.tags(repo).keySet());
-		model.addAttribute("branches", repoService.branches(repo).keySet());
+		model.addAttribute("tags", refService.tags(repo).keySet());
+		model.addAttribute("branches", refService.branches(repo).keySet());
 	}
 	
 	private RepoFile buildBackwardsNavigationFile(final GitRepository repo, final String pathString, final String branch) {
