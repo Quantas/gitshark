@@ -89,12 +89,10 @@ public class MongoDfsService implements GitSharkDfsService {
 	
 	@Override
 	public void deletePacks(final Collection<DfsPackDescription> replaces, final String repoId) {
-		replaces.forEach(pack -> {
-			getAvailableExtensions(pack).forEach(ext -> {
-				LOG.info("Deleting Pack = {}", pack);
-				gridFS().remove(new BasicDBObject("metadata.fileName", pack.getFileName(ext)).append("metadata.repoId", repoId));
-			});
-		});
+		replaces.forEach(pack -> getAvailableExtensions(pack).forEach(ext -> {
+			LOG.info("Deleting Pack = {}", pack);
+			gridFS().remove(new BasicDBObject("metadata.fileName", pack.getFileName(ext)).append("metadata.repoId", repoId));
+		}));
 	}
 	
 	private List<PackExt> getAvailableExtensions(final DfsPackDescription desc) {
