@@ -9,8 +9,8 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.pack.PackExt;
 import org.eclipse.jgit.lib.Ref;
 
-import com.quantasnet.gitshark.git.exception.GitSharkErrorException;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
+import com.quantasnet.gitshark.git.exception.RepositoryNotFoundException;
 import com.quantasnet.gitshark.user.User;
 
 public interface GitSharkDfsService {
@@ -29,7 +29,7 @@ public interface GitSharkDfsService {
 
 	boolean deleteRepo(String name, User user);
 
-	GitSharkDfsRepo getRepo(String name, String owner, String userName, User user) throws GitSharkErrorException;
+	GitSharkDfsRepo getRepo(String name, String owner) throws RepositoryNotFoundException;
 
 	List<? extends GitSharkDfsRepo> getAllReposForUser(User user);
 

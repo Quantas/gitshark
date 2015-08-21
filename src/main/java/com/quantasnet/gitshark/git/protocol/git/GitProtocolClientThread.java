@@ -21,6 +21,7 @@ import com.quantasnet.gitshark.git.exception.GitSharkException;
 import com.quantasnet.gitshark.git.exception.RepositoryAccessDeniedException;
 import com.quantasnet.gitshark.git.protocol.packs.GitSharkReceivePackFactory;
 import com.quantasnet.gitshark.git.repo.GitRepository;
+import com.quantasnet.gitshark.git.service.RepositoryService;
 
 @Scope("prototype")
 @Component
@@ -30,6 +31,9 @@ public class GitProtocolClientThread extends Thread {
 	
 	@Autowired
 	private GitSharkReceivePackFactory receivePackFactory;
+	
+	@Autowired
+	private RepositoryService repoService;
 	
 	private Socket socket;
 	
@@ -74,7 +78,7 @@ public class GitProtocolClientThread extends Thread {
 
 	private void handleRequest(final InputStream input, final OutputStream output, final String requestedMethod, final String owner, final String repo) {
 		try {
-			final GitRepository gitRepo = null; // TODO
+			final GitRepository gitRepo = repoService.getRepository(repo, owner, null);
 			
 			if (Constants.GIT_UPLOAD_PACK.equals(requestedMethod)) {
 				if (gitRepo.isAnonRead()) {

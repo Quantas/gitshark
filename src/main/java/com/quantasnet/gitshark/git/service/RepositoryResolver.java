@@ -13,10 +13,6 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import com.quantasnet.gitshark.git.dfs.GitSharkDfsRepo;
-import com.quantasnet.gitshark.git.dfs.GitSharkDfsService;
-import com.quantasnet.gitshark.git.exception.GitSharkException;
-import com.quantasnet.gitshark.git.exception.RepositoryNotFoundException;
 import com.quantasnet.gitshark.git.repo.GitRepository;
 import com.quantasnet.gitshark.user.User;
 
@@ -24,10 +20,7 @@ import com.quantasnet.gitshark.user.User;
 public class RepositoryResolver implements HandlerMethodArgumentResolver {
 
 	@Autowired
-	private GitSharkDfsService dfsService;
-	
-	@Autowired
-	private RepositoryUtilities repoUtils;
+	private RepositoryService repoService;
 	
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
@@ -53,22 +46,10 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 		final String owner = requestURI.split("/")[2];
 		final String repoName = removeDotGit(requestURI.split("/")[3]);
 		
-		final GitSharkDfsRepo repository = dfsService.getRepo(repoName, owner, userName, user);
-		
-		if (null == repository) {
-			throw new RepositoryNotFoundException(repoName);
-		}
-		
-		final GitRepository repo = buildRepo(repository, owner);
+		final GitRepository repo = repoService.getRepository(repoName, owner, userName);
 		mavContainer.addAttribute("repo", repo);
 		mavContainer.addAttribute("checkoutUrl", buildCheckoutUrl(request, userName, repo));
 
-		return repo;
-	}
-	
-	private GitRepository buildRepo(final GitSharkDfsRepo repository, final String owner) throws GitSharkException {
-		final GitRepository repo = new GitRepository(dfsService, repository, owner, repository.getName(), false, false);
-		repo.setCommits(repoUtils.hasCommits(repo));
 		return repo;
 	}
 	

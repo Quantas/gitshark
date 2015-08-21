@@ -30,9 +30,10 @@ import com.mongodb.gridfs.GridFSInputFile;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsRef;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsRepo;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsService;
-import com.quantasnet.gitshark.git.exception.GitSharkErrorException;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
+import com.quantasnet.gitshark.git.exception.RepositoryNotFoundException;
 import com.quantasnet.gitshark.user.User;
+import com.quantasnet.gitshark.user.UserService;
 
 /**
  * Created by andrewlandsverk on 8/17/15.
@@ -50,6 +51,9 @@ public class MongoDfsService implements GitSharkDfsService {
 	
 	@Autowired
 	private MongoDbFactory mongoDbFactory;
+	
+	@Autowired
+	private UserService userService;
 	
 	private GridFS gridFS() {
 		return new GridFS(mongoDbFactory.getDb());
@@ -123,7 +127,7 @@ public class MongoDfsService implements GitSharkDfsService {
 	@Override
 	public boolean deleteRepo(final String name, final User user) {
 		try {
-			final MongoRepo repo = getRepo(name, user.getUserName(), user.getUserName(), user);
+			final MongoRepo repo = getRepo(name, user.getUserName());
 			gridFS().remove(new BasicDBObject("metadata.repoId", repo.getId()));
 			mongoRepoRepository.delete(repo);
 			mongoRefRepository.delete(mongoRefRepository.findByRepoId(repo.getId()));
@@ -135,12 +139,16 @@ public class MongoDfsService implements GitSharkDfsService {
 	}
 	
 	@Override
-	public MongoRepo getRepo(final String name, final String owner, final String userName, final User user) throws GitSharkErrorException {
-		if (owner.equals(userName)) {
-			return mongoRepoRepository.findByOwnerIdAndName(user.getId(), name);
+	public MongoRepo getRepo(final String name, final String owner) throws RepositoryNotFoundException {
+		final User repoOwner = userService.getUserByUsername(owner);
+		if (null != repoOwner) {
+			final MongoRepo repo = mongoRepoRepository.findByOwnerIdAndName(repoOwner.getId(), name);
+			if (null != repo) {
+				return repo;
+			}
 		}
-		// TODO
-		throw new GitSharkErrorException(new IllegalArgumentException("Not Yet Implemented."));
+		
+		throw new RepositoryNotFoundException(name);
 	}
 	
 	@Override
