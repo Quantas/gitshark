@@ -23,6 +23,14 @@
 			Branches: <span th:text="${branchCount}"></span><br />
 			Tags: <span th:text="${tagCount}"></span>
 			<hr />
+			<table class="table table-striped table-hover">
+				<tr th:each="file : ${files}">
+					<td th:text="${file}"></td>
+					<td th:text="${file.objectCount}"></td>
+					<td th:text="${file.indexVersion}"></td>
+				</tr>
+			</table>
+			
 			<form th:action="@{/repo/} + ${repo.interfaceBaseUrl} + '/settings/gc'" method="POST">
 				<button name="submit" type="submit" class="btn btn-warning btn-md">Garbage Collection</button>
 			</form>

@@ -2,6 +2,7 @@ package com.quantasnet.gitshark.git.ui;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ public class SettingsController {
 	public String settings(final GitRepository repo, final Model model) throws GitSharkException {
 		if (repo.hasCommits()) {
 			model.addAttribute("repoSize", Utils.readableFileSize(dfsService.repositorySize(repo.getId())));
+			model.addAttribute("files", dfsService.getPacks(repo.getId(), new DfsRepositoryDescription(repo.getName())));
 			model.addAttribute("commitCount", commitService.commitCount(repo));
 			model.addAttribute("branchCount", repoService.branches(repo).size());
 			model.addAttribute("tagCount", repoService.tags(repo).size());
