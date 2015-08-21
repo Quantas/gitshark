@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.quantasnet.gitshark.Constants;
-import com.quantasnet.gitshark.git.dfs.mongo.MongoRepo;
-import com.quantasnet.gitshark.git.dfs.mongo.MongoService;
+import com.quantasnet.gitshark.git.dfs.GitSharkDfsRepo;
+import com.quantasnet.gitshark.git.dfs.GitSharkDfsService;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
 import com.quantasnet.gitshark.user.User;
 
@@ -26,11 +26,11 @@ public class RepoManageController {
 	private static final String REPO_FORM = "repoForm";
 
 	@Autowired
-	private MongoService mongoService;
+	private GitSharkDfsService dfsService;
 	
 	@RequestMapping
 	public String myRepos(@AuthenticationPrincipal final User user, final Model model) throws GitSharkException {
-		model.addAttribute("repos", mongoService.getAllReposForUser(user));
+		model.addAttribute("repos", dfsService.getAllReposForUser(user));
 		return "git/repos";
 	}
 	
@@ -46,7 +46,7 @@ public class RepoManageController {
 	public String createRepo(@AuthenticationPrincipal final User user, @Valid final NewRepoForm repoForm, final BindingResult bindingResult, final RedirectAttributes redirectAttributes) throws GitSharkException {
 
 		if (!bindingResult.hasErrors()) {
-			for (final MongoRepo repo : mongoService.getAllReposForUser(user)) {
+			for (final GitSharkDfsRepo repo : dfsService.getAllReposForUser(user)) {
 				if (repo.getName().equals(repoForm.getRepoName())) {
 					bindingResult.rejectValue("repoName", "reponame.exists", "Repository already exists");
 					break;
@@ -60,7 +60,7 @@ public class RepoManageController {
 			return "redirect:/repo/create";
 		}
 
-		mongoService.createRepo(repoForm.getRepoName(), user);
+		dfsService.createRepo(repoForm.getRepoName(), user);
 		
 		redirectAttributes.addFlashAttribute(Constants.SUCCESS_STATUS, "Repository created successfully.");
 		return "redirect:/repo/" + user.getUserName() + '/' + repoForm.getRepoName();

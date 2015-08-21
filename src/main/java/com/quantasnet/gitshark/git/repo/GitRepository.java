@@ -6,9 +6,9 @@ import org.eclipse.jgit.lib.Repository;
 
 import com.google.common.collect.ComparisonChain;
 import com.quantasnet.gitshark.Constants;
+import com.quantasnet.gitshark.git.dfs.GitSharkDfsRepo;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsRepository;
-import com.quantasnet.gitshark.git.dfs.mongo.MongoRepo;
-import com.quantasnet.gitshark.git.dfs.mongo.MongoService;
+import com.quantasnet.gitshark.git.dfs.GitSharkDfsService;
 import com.quantasnet.gitshark.git.exception.GitSharkErrorException;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
 
@@ -19,8 +19,8 @@ import com.quantasnet.gitshark.git.exception.GitSharkException;
  */
 public class GitRepository implements Comparable<GitRepository> {
 
-	private final MongoService mongoService;
-	private final MongoRepo repository;
+	private final GitSharkDfsService dfsService;
+	private final GitSharkDfsRepo repository;
 	private final String owner;
 	private final String name;
 	
@@ -33,8 +33,8 @@ public class GitRepository implements Comparable<GitRepository> {
 	
 	private boolean commits;
 	
-	public GitRepository(final MongoService mongoService, final MongoRepo repository, final String owner, final String name, final boolean anonRead, final boolean anonWrite) {
-		this.mongoService = mongoService;
+	public GitRepository(final GitSharkDfsService dfsService, final GitSharkDfsRepo repository, final String owner, final String name, final boolean anonRead, final boolean anonWrite) {
+		this.dfsService = dfsService;
 		this.repository = repository;
 		this.owner = owner;
 		this.name = name;
@@ -47,7 +47,7 @@ public class GitRepository implements Comparable<GitRepository> {
 	}
 	
 	public void execute(final RepositoryAction repoAction) throws GitSharkException {
-		try (final Repository db = new GitSharkDfsRepository(repository.getId(), repository.getName(), mongoService)) {
+		try (final Repository db = new GitSharkDfsRepository(repository.getId(), repository.getName(), dfsService)) {
 			repoAction.doAction(db);
 		} catch (final IOException e) {
 			throw new GitSharkErrorException(e);
@@ -55,11 +55,15 @@ public class GitRepository implements Comparable<GitRepository> {
 	}
 
 	public <T> T executeWithReturn(final RepositoryActionWithReturn<T> repoAction) throws GitSharkException {
-		try (final Repository db = new GitSharkDfsRepository(repository.getId(), repository.getName(), mongoService)) {
+		try (final Repository db = new GitSharkDfsRepository(repository.getId(), repository.getName(), dfsService)) {
 			return repoAction.doAction(db);
 		} catch (final IOException e) {
 			throw new GitSharkErrorException(e);
 		}
+	}
+	
+	public String getId() {
+		return repository.getId();
 	}
 	
 	public String getOwner() {

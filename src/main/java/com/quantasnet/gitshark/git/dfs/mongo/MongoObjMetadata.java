@@ -1,10 +1,10 @@
-package com.quantasnet.gitshark.git.dfs;
+package com.quantasnet.gitshark.git.dfs.mongo;
 
 import org.eclipse.jgit.internal.storage.dfs.DfsObjDatabase.PackSource;
 
 import com.mongodb.BasicDBObject;
 
-class GitSharkObjMetadata {
+class MongoObjMetadata {
 
 	private String repoId;
 	private String fileName;

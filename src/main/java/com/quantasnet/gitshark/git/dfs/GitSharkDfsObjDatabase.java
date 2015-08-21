@@ -2,14 +2,12 @@ package com.quantasnet.gitshark.git.dfs;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.jgit.internal.storage.dfs.DfsObjDatabase;
 import org.eclipse.jgit.internal.storage.dfs.DfsOutputStream;
@@ -18,21 +16,15 @@ import org.eclipse.jgit.internal.storage.dfs.DfsReaderOptions;
 import org.eclipse.jgit.internal.storage.dfs.ReadableChannel;
 import org.eclipse.jgit.internal.storage.pack.PackExt;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.gridfs.GridFSDBFile;
-import com.mongodb.gridfs.GridFSInputFile;
-import com.quantasnet.gitshark.git.dfs.mongo.MongoService;
-
 public class GitSharkDfsObjDatabase extends DfsObjDatabase {
 	
-	private GitSharkDfsRepository repository;
-	private final MongoService mongoService;
+	private final GitSharkDfsRepository repository;
+	private final GitSharkDfsService dfsService;
 	
-	GitSharkDfsObjDatabase(final GitSharkDfsRepository repository, final MongoService mongoService) {
+	GitSharkDfsObjDatabase(final GitSharkDfsRepository repository, final GitSharkDfsService dfsService) {
 		super(repository, new DfsReaderOptions());
 		this.repository = repository;
-		this.mongoService = mongoService;
+		this.dfsService = dfsService;
 	}
 
 	@Override
@@ -43,37 +35,25 @@ public class GitSharkDfsObjDatabase extends DfsObjDatabase {
 	}
 
 	@Override
-	protected void commitPackImpl(Collection<DfsPackDescription> desc, Collection<DfsPackDescription> replaces) throws IOException {
-		// TODO Auto-generated method stub
+	protected void commitPackImpl(final Collection<DfsPackDescription> desc, final Collection<DfsPackDescription> replaces) throws IOException {
+		dfsService.deletePacks(replaces, repository.getId());
 	}
 
 	@Override
 	protected void rollbackPack(Collection<DfsPackDescription> desc) {
-		// TODO Auto-generated method stub
+		// NYI
 	}
 
 	@Override
 	protected List<DfsPackDescription> listPacks() throws IOException {
-		final List<GridFSDBFile> dbFiles = mongoService.gridFS().find(new BasicDBObject("metadata.repoId", repository.getId()));
-		final List<DfsPackDescription> packs = new ArrayList<>();
-		for (final GridFSDBFile file : dbFiles) {
-			final DBObject metadata = file.getMetaData();
-			final String fileName = (String) metadata.get("fileName");
-			packs.add(createDescriptionFromMetadata(metadata, fileName));
-		}
-		return packs;
+		return dfsService.getPacks(repository.getId(), repository.getDescription());
 	}
 
 	@Override
-	protected ReadableChannel openFile(DfsPackDescription desc, PackExt ext) throws FileNotFoundException, IOException {
-		final GridFSDBFile file = mongoService.gridFS().findOne(new BasicDBObject("metadata.fileName", desc.getFileName(ext)).append("metadata.repoId", repository.getId()));
-		if (null != file) {
-			final InputStream inputStream = file.getInputStream();
-			final byte[] data = IOUtils.toByteArray(inputStream);
-			IOUtils.closeQuietly(inputStream);
-			
+	protected ReadableChannel openFile(final DfsPackDescription desc, final PackExt ext) throws FileNotFoundException, IOException {
+		final byte[] data = dfsService.readFromPackFile(desc, ext, repository.getId());
+		if (null != data) {
 			return new ReadableChannel() {
-				
 				private boolean open = true;
 				private int position;
 				
@@ -124,20 +104,17 @@ public class GitSharkDfsObjDatabase extends DfsObjDatabase {
 				}
 			};
 		}
-		
-		
-		throw new IllegalArgumentException();
+		throw new FileNotFoundException(desc.getFileName(ext));
 	}
 
 	@Override
 	protected DfsOutputStream writeFile(final DfsPackDescription desc, final PackExt ext) throws IOException {
-		final GridFSInputFile newFile = mongoService.gridFS().createFile();
-		newFile.setMetaData(createMetadata(desc, ext));
+		final OutputStream outputStream = dfsService.getPackOutStream(desc, ext, repository.getId());
 		return new DfsOutputStream() {
 			
 			@Override
 			public void write(byte[] buf, int off, int len) throws IOException {
-				newFile.getOutputStream().write(buf, off, len);
+				outputStream.write(buf, off, len);
 			}
 			
 			@Override
@@ -147,30 +124,8 @@ public class GitSharkDfsObjDatabase extends DfsObjDatabase {
 			
 			@Override
 			public void close() throws IOException {
-				newFile.getOutputStream().close();
+				outputStream.close();
 			}
 		};
-	}
-	
-	private BasicDBObject createMetadata(final DfsPackDescription desc, final PackExt ext) {
-		final GitSharkObjMetadata metadata = new GitSharkObjMetadata();
-		metadata.setDeltaCount(desc.getDeltaCount());
-		metadata.setFileName(desc.getFileName(ext));
-		metadata.setIndexVersion(desc.getIndexVersion());
-		metadata.setLastModified(desc.getLastModified());
-		metadata.setObjectCount(desc.getObjectCount());
-		metadata.setPackSource(desc.getPackSource());
-		metadata.setRepoId(repository.getId());
-		return metadata.build();
-	}
-	
-	private DfsPackDescription createDescriptionFromMetadata(final DBObject dbObject, final String fileName) {
-		final DfsPackDescription dfsPackDescription = new DfsPackDescription(repository.getDescription(), fileName);
-		dfsPackDescription.setLastModified((long) dbObject.get("lastModified"));
-		dfsPackDescription.setObjectCount((long) dbObject.get("objectCount"));
-		dfsPackDescription.setDeltaCount((long) dbObject.get("deltaCount"));
-		dfsPackDescription.setIndexVersion((int) dbObject.get("indexVersion"));
-		dfsPackDescription.setPackSource(PackSource.valueOf((String) dbObject.get("packSource")));
-		return dfsPackDescription;
 	}
 }

@@ -15,26 +15,25 @@ import org.eclipse.jgit.lib.SymbolicRef;
 import org.eclipse.jgit.util.RefList;
 
 import com.quantasnet.gitshark.git.dfs.mongo.MongoRef;
-import com.quantasnet.gitshark.git.dfs.mongo.MongoService;
 
 public class GitSharkDfsRefDatabase extends DfsRefDatabase {
 
-	private MongoService mongoService;
-	private GitSharkDfsRepository repository;
+	private final GitSharkDfsService dfsService;
+	private final GitSharkDfsRepository repository;
 	
-	GitSharkDfsRefDatabase(final GitSharkDfsRepository repository, final MongoService mongoService) {
+	GitSharkDfsRefDatabase(final GitSharkDfsRepository repository, final GitSharkDfsService dfsService) {
 		super(repository);
 		this.repository = repository;
-		this.mongoService = mongoService;
+		this.dfsService = dfsService;
 	}
 
 	@Override
 	protected RefCache scanAllRefs() throws IOException {
-		final List<MongoRef> mongoRefs = mongoService.getAllRefsForRepo(repository.getId());
+		final List<MongoRef> mongoRefs = dfsService.getAllRefsForRepo(repository.getId());
 		final RefList.Builder<Ref> ids = new RefList.Builder<Ref>();
 		final RefList.Builder<Ref> sym = new RefList.Builder<Ref>();
 		
-		for (final MongoRef ref : mongoRefs) {
+		for (final GitSharkDfsRef ref : mongoRefs) {
 			if (ref.isSymbolic()) {
 				final Ref newRef = new SymbolicRef(ref.getName(), new Unpeeled(ref.getStorage(), ref.getTargetName(), ObjectId.fromString(ref.getTargetObjectId())));
 				sym.add(newRef);
@@ -51,7 +50,7 @@ public class GitSharkDfsRefDatabase extends DfsRefDatabase {
 					final Ref head = new SymbolicRef("HEAD", new Unpeeled(ref.getStorage(), ref.getName(), ref.getObjectId()));
 					sym.add(head);
 					ids.add(head);
-					mongoService.storeRefByNameForRepo("HEAD", repository.getId(), head);
+					dfsService.storeRefByNameForRepo("HEAD", repository.getId(), head);
 					break;
 				}
 			}
@@ -76,10 +75,10 @@ public class GitSharkDfsRefDatabase extends DfsRefDatabase {
 		
 		String name = newRef.getName();
 		if (oldRef == null) {
-			return mongoService.storeRefByNameForRepo(name, repository.getId(), newRef);
+			return dfsService.storeRefByNameForRepo(name, repository.getId(), newRef);
 		}
 
-		final MongoRef cur = mongoService.getRefByNameForRepo(name, repository.getId());
+		final GitSharkDfsRef cur = dfsService.getRefByNameForRepo(name, repository.getId());
 		if (cur != null) {
 			Ref toCompare = new Unpeeled(cur.getStorage(), cur.getName(), ObjectId.fromString(cur.getObjectId()));
 			
@@ -90,12 +89,12 @@ public class GitSharkDfsRefDatabase extends DfsRefDatabase {
 			}
 			
 			if (eq(toCompare, oldRef)) {
-				return mongoService.updateRefByNameForRepo(name, repository.getId(), newRef);
+				return dfsService.updateRefByNameForRepo(name, repository.getId(), newRef);
 			}
 		}
 
 		if (oldRef.getStorage() == Storage.NEW) {
-			final boolean created = mongoService.storeRefByNameForRepo(name, repository.getId(), newRef);
+			final boolean created = dfsService.storeRefByNameForRepo(name, repository.getId(), newRef);
 			if (created) {
 				// Make sure HEAD exists
 				scanAllRefs();
@@ -110,12 +109,12 @@ public class GitSharkDfsRefDatabase extends DfsRefDatabase {
 	protected boolean compareAndRemove(final Ref oldRef) throws IOException {
 		final String name = oldRef.getName();
 		
-		final MongoRef cur = mongoService.getRefByNameForRepo(name, repository.getId());
+		final GitSharkDfsRef cur = dfsService.getRefByNameForRepo(name, repository.getId());
 		if (cur != null) {
 			final Ref toCompare = new Unpeeled(cur.getStorage(), cur.getName(), ObjectId.fromString(cur.getObjectId()));
 			
 			if (eq(toCompare, oldRef)) {
-				return mongoService.deleteRefByNameForRepo(name, repository.getId());
+				return dfsService.deleteRefByNameForRepo(name, repository.getId());
 			}
 		}
 		

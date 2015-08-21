@@ -8,8 +8,6 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRepository;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryBuilder;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 
-import com.quantasnet.gitshark.git.dfs.mongo.MongoService;
-
 /**
  * 
  * @author Andrew
@@ -24,12 +22,12 @@ public class GitSharkDfsRepository extends DfsRepository {
 	}
 
 	private String id;
-	private MongoService mongoService;
+	private GitSharkDfsService dfsService;
 	
-	public GitSharkDfsRepository(final String id, final String repoName, final MongoService mongoService) {
+	public GitSharkDfsRepository(final String id, final String repoName, final GitSharkDfsService dfsService) {
 		this(new MongoRepositoryBuilder().setRepositoryDescription(new DfsRepositoryDescription(repoName)));
 		this.id = id;
-		this.mongoService = mongoService;
+		this.dfsService = dfsService;
 	}
 	
 	private GitSharkDfsRepository(final MongoRepositoryBuilder builder) {
@@ -38,12 +36,12 @@ public class GitSharkDfsRepository extends DfsRepository {
 
 	@Override
 	public DfsObjDatabase getObjectDatabase() {
-		return new GitSharkDfsObjDatabase(this, mongoService);
+		return new GitSharkDfsObjDatabase(this, dfsService);
 	}
 
 	@Override
 	public DfsRefDatabase getRefDatabase() {
-		return new GitSharkDfsRefDatabase(this, mongoService);
+		return new GitSharkDfsRefDatabase(this, dfsService);
 	}
 
 	public String getId() {

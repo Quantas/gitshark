@@ -13,8 +13,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import com.quantasnet.gitshark.git.dfs.mongo.MongoRepo;
-import com.quantasnet.gitshark.git.dfs.mongo.MongoService;
+import com.quantasnet.gitshark.git.dfs.GitSharkDfsRepo;
+import com.quantasnet.gitshark.git.dfs.GitSharkDfsService;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
 import com.quantasnet.gitshark.git.exception.RepositoryNotFoundException;
 import com.quantasnet.gitshark.git.repo.GitRepository;
@@ -24,7 +24,7 @@ import com.quantasnet.gitshark.user.User;
 public class RepositoryResolver implements HandlerMethodArgumentResolver {
 
 	@Autowired
-	private MongoService mongoService;
+	private GitSharkDfsService dfsService;
 	
 	@Autowired
 	private RepositoryUtilities repoUtils;
@@ -53,7 +53,7 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 		final String owner = requestURI.split("/")[2];
 		final String repoName = removeDotGit(requestURI.split("/")[3]);
 		
-		final MongoRepo repository = mongoService.getRepo(repoName, owner, userName, user);
+		final GitSharkDfsRepo repository = dfsService.getRepo(repoName, owner, userName, user);
 		
 		if (null == repository) {
 			throw new RepositoryNotFoundException(repoName);
@@ -66,8 +66,8 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 		return repo;
 	}
 	
-	private GitRepository buildRepo(final MongoRepo repository, final String owner) throws GitSharkException {
-		final GitRepository repo = new GitRepository(mongoService, repository, owner, repository.getName(), false, false);
+	private GitRepository buildRepo(final GitSharkDfsRepo repository, final String owner) throws GitSharkException {
+		final GitRepository repo = new GitRepository(dfsService, repository, owner, repository.getName(), false, false);
 		repo.setCommits(repoUtils.hasCommits(repo));
 		return repo;
 	}
