@@ -36,7 +36,9 @@ public class GitSharkDfsObjDatabase extends DfsObjDatabase {
 
 	@Override
 	protected void commitPackImpl(final Collection<DfsPackDescription> desc, final Collection<DfsPackDescription> replaces) throws IOException {
-		dfsService.deletePacks(replaces, repository.getId());
+		if (null != replaces) {
+			dfsService.deletePacks(replaces, repository.getId());
+		}
 	}
 
 	@Override
