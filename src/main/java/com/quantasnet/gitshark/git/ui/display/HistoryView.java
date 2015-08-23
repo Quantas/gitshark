@@ -1,12 +1,12 @@
 package com.quantasnet.gitshark.git.ui.display;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 
@@ -22,16 +22,16 @@ class HistoryView implements DisplayView {
 	@Override
 	public Object display(final GitRepository repo, final String ref, final Model model, final String path, final Repository db, final List<RepoFile> files) throws GitSharkException {
 		try {
-			final List<Commit> history = new ArrayList<>();
 			final LogCommand logCommand = Git.wrap(db).log().setMaxCount(50);
 
 			if (path.length() > 1) {
 				logCommand.addPath(path);
 			}
 
-			for (final RevCommit historyCommit : logCommand.call()) {
-				history.add(new Commit(historyCommit, repo));
-			}
+			final List<Commit> history = StreamSupport.stream(logCommand.call().spliterator(), false)
+					.map(historyCommit -> new Commit(historyCommit, repo))
+					.collect(Collectors.toList());
+
 			model.addAttribute("historyPos", ref);
 			model.addAttribute("history", history);
 			return "git/history";
