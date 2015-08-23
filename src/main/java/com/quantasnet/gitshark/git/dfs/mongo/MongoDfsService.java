@@ -28,6 +28,7 @@ import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsRef;
+import com.quantasnet.gitshark.git.dfs.GitSharkDfsRefLog;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsRepo;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsService;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
@@ -48,6 +49,9 @@ public class MongoDfsService implements GitSharkDfsService {
 	
 	@Autowired
 	private MongoRefRepository mongoRefRepository;
+	
+	@Autowired
+	private MongoRefLogRepository mongoRefLogRepository;
 	
 	@Autowired
 	private MongoDbFactory mongoDbFactory;
@@ -203,6 +207,23 @@ public class MongoDfsService implements GitSharkDfsService {
 		
 		mongoRefRepository.delete(existing);
 		return true;
+	}
+	
+	@Override
+	public GitSharkDfsRefLog createEmptyRefLog() {
+		return new MongoRefLog();
+	}
+	
+	@Override
+	public void saveRefLog(final GitSharkDfsRefLog refLog) {
+		if (refLog instanceof MongoRefLog) {
+			mongoRefLogRepository.save((MongoRefLog) refLog);
+		}
+	}
+	
+	@Override
+	public List<? extends GitSharkDfsRefLog> getRefLogForRepo(final String repoId) {
+		return mongoRefLogRepository.findByRepoId(repoId);
 	}
 	
 	private MongoRef buildFromRef(final String name, final String repoId, final Ref ref) {

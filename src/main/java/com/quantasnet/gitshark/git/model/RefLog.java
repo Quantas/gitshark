@@ -6,12 +6,12 @@ import java.util.List;
 
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.PersonIdent;
-import org.eclipse.jgit.lib.ReflogEntry;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 
 import com.google.common.collect.ComparisonChain;
+import com.quantasnet.gitshark.git.dfs.GitSharkDfsRefLog;
 import com.quantasnet.gitshark.git.repo.GitRepository;
 
 /**
@@ -29,19 +29,19 @@ public class RefLog extends BaseCommit implements Comparable<RefLog> {
 	private final PersonIdent committer;
 	private final String comment;
 	
-	public RefLog(final ReflogEntry reflogEntry, final GitRepository repo, final Repository db, final String branch) throws IOException {
+	public RefLog(final GitSharkDfsRefLog refLog, final GitRepository repo, final Repository db) throws IOException {
 		super(null, repo);
-		this.totalCommitCount = generateCommits(reflogEntry, db, repo);
-		this.branch = branch;
-		this.committer = reflogEntry.getWho();
-		this.comment = parseCommentString(reflogEntry.getComment());
+		this.totalCommitCount = generateCommits(refLog, db, repo);
+		this.branch = refLog.getBranch();
+		this.comment = "Pushed " + totalCommitCount + " commit" + (totalCommitCount > 1 ? "s" : "") + " to " + branch;
+		this.committer = new PersonIdent(refLog.getUserDisplayName(), refLog.getUserEmail(), refLog.getTime().toDate(), refLog.getTime().getZone().toTimeZone());
 	}
 
-	private long generateCommits(final ReflogEntry reflogEntry, final Repository db, final GitRepository repo) throws IOException {
+	private long generateCommits(final GitSharkDfsRefLog refLog, final Repository db, final GitRepository repo) throws IOException {
 		try (final RevWalk revWalk = new RevWalk(db)) {
 			
-			final ObjectId newId = reflogEntry.getNewId();
-			final ObjectId oldId = reflogEntry.getOldId();
+			final ObjectId newId = ObjectId.fromString(refLog.getNewId());
+			final ObjectId oldId = ObjectId.fromString(refLog.getOldId());
 			
 			revWalk.markStart(revWalk.parseCommit(newId));
 			
@@ -61,21 +61,6 @@ public class RefLog extends BaseCommit implements Comparable<RefLog> {
 			
 			return commitCount;
 		}
-	}
-	
-	private String parseCommentString(final String comment) {
-		final String branchFromOldBranch = "branch: Created from branch";
-		
-		if ("push: created".equals(comment)) {
-			return "Pushed New Branch " + branch;
-		} else if ("push: forced-update".equals(comment)) {
-			return "Pushed " + totalCommitCount + " commit" + (totalCommitCount > 1 ? "s" : "") + " to " + branch;
-		} else if (comment.startsWith(branchFromOldBranch)) {
-			final String oldBranch = comment.substring(branchFromOldBranch.length());
-			return "Created New Branch " + branch + " from " + oldBranch;
-		}
-		
-		return comment;
 	}
 	
 	@Override

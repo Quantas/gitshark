@@ -16,30 +16,23 @@ import com.quantasnet.gitshark.user.User;
 public interface GitSharkDfsService {
 
 	OutputStream getPackOutStream(DfsPackDescription desc, PackExt ext, String repoId);
-	
 	byte[] readFromPackFile(DfsPackDescription desc, PackExt ext, String repoId);
-	
 	List<DfsPackDescription> getPacks(String repoId, DfsRepositoryDescription desc);
-
 	void deletePacks(Collection<DfsPackDescription> replaces, String repoId);
 	
 	long repositorySize(String repoId);
 	
 	GitSharkDfsRepo createRepo(String name, User user) throws GitSharkException;
-
 	boolean deleteRepo(String name, User user);
-
 	GitSharkDfsRepo getRepo(String name, String owner) throws RepositoryNotFoundException;
-
 	List<? extends GitSharkDfsRepo> getAllReposForUser(User user);
-
 	List<? extends GitSharkDfsRef> getAllRefsForRepo(String repoId);
-
 	GitSharkDfsRef getRefByNameForRepo(String name, String repoId);
-
 	boolean updateRefByNameForRepo(String name, String repoId, Ref ref);
-
 	boolean storeRefByNameForRepo(String name, String repoId, Ref ref);
-
 	boolean deleteRefByNameForRepo(String name, String repoId);
+	
+	GitSharkDfsRefLog createEmptyRefLog();
+	void saveRefLog(GitSharkDfsRefLog refLog);
+	List<? extends GitSharkDfsRefLog> getRefLogForRepo(String repoId);
 }
