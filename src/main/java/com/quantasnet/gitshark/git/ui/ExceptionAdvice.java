@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.quantasnet.gitshark.git.exception.GitSharkErrorException;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
 import com.quantasnet.gitshark.git.exception.RepositoryAccessDeniedException;
+import com.quantasnet.gitshark.git.exception.RepositoryNotFoundException;
 
 @ControllerAdvice("com.quantasnet.gitshark.git.ui")
 public class ExceptionAdvice {
@@ -22,7 +23,7 @@ public class ExceptionAdvice {
 		return "forward:/401";
 	}
 
-	@ExceptionHandler(GitSharkException.class)
+	@ExceptionHandler({ RepositoryNotFoundException.class, GitSharkException.class })
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public String notFound() {
 		return "forward:/404";
