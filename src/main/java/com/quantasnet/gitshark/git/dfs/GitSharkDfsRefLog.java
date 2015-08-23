@@ -27,4 +27,7 @@ public interface GitSharkDfsRefLog {
 	
 	String getUserDisplayName();
 	void setUserDisplayName(String userDisplayName);
+
+	String getType();
+	void setType(String type);
 }

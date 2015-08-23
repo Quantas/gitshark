@@ -9,6 +9,7 @@ import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.transport.ReceiveCommand;
 
 import com.google.common.collect.ComparisonChain;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsRefLog;
@@ -27,40 +28,43 @@ public class RefLog extends BaseCommit implements Comparable<RefLog> {
 	private final long totalCommitCount;
 	private final String branch;
 	private final PersonIdent committer;
+	private final ReceiveCommand.Type type;
 	private final String comment;
 	
 	public RefLog(final GitSharkDfsRefLog refLog, final GitRepository repo, final Repository db) throws IOException {
 		super(null, repo);
+		this.type = ReceiveCommand.Type.valueOf(refLog.getType());
 		this.totalCommitCount = generateCommits(refLog, db, repo);
 		this.branch = refLog.getBranch();
-		this.comment = "Pushed " + totalCommitCount + " commit" + (totalCommitCount > 1 ? "s" : "") + " to " + branch;
+		this.comment = parseCommentString();
 		this.committer = new PersonIdent(refLog.getUserDisplayName(), refLog.getUserEmail(), refLog.getTime().toDate(), refLog.getTime().getZone().toTimeZone());
 	}
 
 	private long generateCommits(final GitSharkDfsRefLog refLog, final Repository db, final GitRepository repo) throws IOException {
-		try (final RevWalk revWalk = new RevWalk(db)) {
-			
-			final ObjectId newId = ObjectId.fromString(refLog.getNewId());
-			final ObjectId oldId = ObjectId.fromString(refLog.getOldId());
-			
-			revWalk.markStart(revWalk.parseCommit(newId));
-			
-			long commitCount = 0;
-			
-			for (final RevCommit commit : revWalk) {
-				if (commit.getId().equals(oldId)) {
-					break;
+		long commitCount = 0;
+
+		if (type != ReceiveCommand.Type.DELETE) {
+			try (final RevWalk revWalk = new RevWalk(db)) {
+
+				final ObjectId newId = ObjectId.fromString(refLog.getNewId());
+				final ObjectId oldId = ObjectId.fromString(refLog.getOldId());
+
+				revWalk.markStart(revWalk.parseCommit(newId));
+
+				for (final RevCommit commit : revWalk) {
+					if (commit.getId().equals(oldId)) {
+						break;
+					}
+
+					if (commitCount < 4) {
+						commits.add(new Commit(commit, repo));
+					}
+
+					commitCount++;
 				}
-				
-				if (commitCount < 4) {
-					commits.add(new Commit(commit, repo));
-				}
-				
-				commitCount++;
 			}
-			
-			return commitCount;
 		}
+		return commitCount;
 	}
 	
 	@Override
@@ -88,7 +92,21 @@ public class RefLog extends BaseCommit implements Comparable<RefLog> {
 	public long getTotalCommitCount() {
 		return totalCommitCount;
 	}
-	
+
+	private String parseCommentString() {
+		switch (type) {
+			case CREATE:
+				return "Pushed New Branch " + branch;
+			case DELETE:
+				return "Deleted branch " + branch;
+			case UPDATE:
+			case UPDATE_NONFASTFORWARD:
+			default:
+				return "Pushed " + totalCommitCount + " commit" + (totalCommitCount > 1 ? "s" : "") + " to " + branch;
+		}
+	}
+
+
 	@Override
 	public int compareTo(final RefLog right) {
 		return ComparisonChain.start()

@@ -34,7 +34,9 @@ public class RefLogWritingPostReceiveHook implements GitSharkPostReceiveHook {
 				refLog.setUserEmail(user.getEmail());
 				refLog.setUserDisplayName(user.getFirstName() + ' ' + user.getLastName());
 				refLog.setTime(DateTime.now());
-				
+
+				refLog.setType(command.getType().name());
+
 				refLog.setOldId(command.getOldId().name());
 				refLog.setNewId(command.getNewId().name());
 				

@@ -21,7 +21,9 @@ public class MongoRefLog implements GitSharkDfsRefLog {
 	
 	private String oldId;
 	private String newId;
-	
+
+	private String type;
+
 	private DateTime time;
 	private String userName;
 	private String userEmail;
@@ -113,5 +115,15 @@ public class MongoRefLog implements GitSharkDfsRefLog {
 	@Override
 	public void setUserDisplayName(String userDisplayName) {
 		this.userDisplayName = userDisplayName;
+	}
+
+	@Override
+	public String getType() {
+		return type;
+	}
+
+	@Override
+	public void setType(String type) {
+		this.type = type;
 	}
 }
