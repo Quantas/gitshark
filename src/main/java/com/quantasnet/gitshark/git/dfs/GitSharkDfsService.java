@@ -27,6 +27,7 @@ public interface GitSharkDfsService {
 	GitSharkDfsRepo getRepo(String name, String owner) throws RepositoryNotFoundException;
 	List<? extends GitSharkDfsRepo> getAllReposForUser(User user);
 	List<? extends GitSharkDfsRef> getAllRefsForRepo(String repoId);
+
 	GitSharkDfsRef getRefByNameForRepo(String name, String repoId);
 	boolean updateRefByNameForRepo(String name, String repoId, Ref ref);
 	boolean storeRefByNameForRepo(String name, String repoId, Ref ref);
