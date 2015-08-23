@@ -12,6 +12,7 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.ReceiveCommand;
 
 import com.google.common.collect.ComparisonChain;
+import com.quantasnet.gitshark.Constants;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsRefLog;
 import com.quantasnet.gitshark.git.repo.GitRepository;
 
@@ -34,8 +35,8 @@ public class RefLog extends BaseCommit implements Comparable<RefLog> {
 	public RefLog(final GitSharkDfsRefLog refLog, final GitRepository repo, final Repository db) throws IOException {
 		super(null, repo);
 		this.type = ReceiveCommand.Type.valueOf(refLog.getType());
-		this.totalCommitCount = generateCommits(refLog, db, repo);
 		this.branch = refLog.getBranch();
+		this.totalCommitCount = generateCommits(refLog, db, repo);
 		this.comment = parseCommentString();
 		this.committer = new PersonIdent(refLog.getUserDisplayName(), refLog.getUserEmail(), refLog.getTime().toDate(), refLog.getTime().getZone().toTimeZone());
 	}
@@ -43,7 +44,7 @@ public class RefLog extends BaseCommit implements Comparable<RefLog> {
 	private long generateCommits(final GitSharkDfsRefLog refLog, final Repository db, final GitRepository repo) throws IOException {
 		long commitCount = 0;
 
-		if (type != ReceiveCommand.Type.DELETE) {
+		if (type != ReceiveCommand.Type.DELETE && ! branch.startsWith(Constants.REFS_TAGS)) {
 			try (final RevWalk revWalk = new RevWalk(db)) {
 
 				final ObjectId newId = ObjectId.fromString(refLog.getNewId());
@@ -94,15 +95,16 @@ public class RefLog extends BaseCommit implements Comparable<RefLog> {
 	}
 
 	private String parseCommentString() {
+		final String theRef = branch.replaceFirst(Constants.REFS_HEADS, "").replaceFirst(Constants.REFS_TAGS, "");
 		switch (type) {
 			case CREATE:
-				return "Pushed New Branch " + branch;
+				return branch.startsWith(Constants.REFS_HEADS) ? "Pushed New Branch " + theRef : "Pushed New Tag " + theRef;
 			case DELETE:
-				return "Deleted branch " + branch;
+				return "Deleted " + theRef;
 			case UPDATE:
 			case UPDATE_NONFASTFORWARD:
 			default:
-				return "Pushed " + totalCommitCount + " commit" + (totalCommitCount > 1 ? "s" : "") + " to " + branch;
+				return "Pushed " + totalCommitCount + " commit" + (totalCommitCount > 1 ? "s" : "") + " to " + theRef;
 		}
 	}
 
