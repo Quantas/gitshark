@@ -100,7 +100,7 @@ public class RefLog extends BaseCommit implements Comparable<RefLog> {
 			case CREATE:
 				return branch.startsWith(Constants.REFS_HEADS) ? "Pushed New Branch " + theRef : "Pushed New Tag " + theRef;
 			case DELETE:
-				return "Deleted " + theRef;
+				return "Deleted " + branch;
 			case UPDATE:
 			case UPDATE_NONFASTFORWARD:
 			default:
