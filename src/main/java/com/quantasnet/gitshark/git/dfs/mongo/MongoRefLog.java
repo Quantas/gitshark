@@ -5,6 +5,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import org.joda.time.DateTime;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsRefLog;
@@ -15,8 +16,10 @@ public class MongoRefLog implements GitSharkDfsRefLog {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private String id;
-	
+
+	@Indexed
 	private String repoId;
+
 	private String branch;
 	
 	private String oldId;
