@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.quantasnet.gitshark.Constants;
 import com.quantasnet.gitshark.Utils;
+import com.quantasnet.gitshark.git.cache.EvictAllCaches;
 import com.quantasnet.gitshark.git.cache.EvictRepoCache;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsService;
 import com.quantasnet.gitshark.git.exception.GitSharkErrorException;
@@ -50,7 +51,9 @@ public class SettingsController {
 		}
 		return "git/settings";
 	}
-	
+
+	@EvictAllCaches
+	@EvictRepoCache
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
 	public String deleteRepository(final GitRepository repo, @AuthenticationPrincipal final User user, final RedirectAttributes redirectAttributes) {
 		if (dfsService.deleteRepo(repo.getName(), user)) {
