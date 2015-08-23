@@ -16,6 +16,6 @@ import org.springframework.cache.annotation.CacheEvict;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-@CacheEvict(cacheNames = { RepoCacheConstants.HAS_COMMITS, RepoCacheConstants.COMMIT_COUNT, RepoCacheConstants.BRANCHES, RepoCacheConstants.TAGS }, key = "#repo.fullDisplayName")
+@CacheEvict(cacheNames = { RepoCacheConstants.HAS_COMMITS, RepoCacheConstants.COMMIT_COUNT, RepoCacheConstants.BRANCHES, RepoCacheConstants.TAGS, RepoCacheConstants.REFLOG }, key = "#repo.fullDisplayName")
 public @interface EvictRepoCache {
 }
