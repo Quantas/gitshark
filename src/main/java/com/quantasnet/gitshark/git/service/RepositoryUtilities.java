@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.HandlerMapping;
 
+import com.quantasnet.gitshark.git.cache.RepoCacheConstants;
 import com.quantasnet.gitshark.git.exception.CommitNotFoundException;
 import com.quantasnet.gitshark.git.exception.GitSharkErrorException;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
@@ -71,7 +72,7 @@ public class RepositoryUtilities {
 		return "".equals(path);
 	}
 
-	@Cacheable(cacheNames = "hasCommits", key = "#repo.fullDisplayName")
+	@Cacheable(cacheNames = RepoCacheConstants.HAS_COMMITS, key = "#repo.fullDisplayName")
 	public boolean hasCommits(final GitRepository repo) throws GitSharkException {
 		return repo.executeWithReturn(db -> {
 			try {

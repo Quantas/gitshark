@@ -58,8 +58,8 @@ public class CommitService {
 	@Autowired
 	private RefService refService;
 
-	@Cacheable(cacheNames = RepoCacheConstants.CONTRIB_COUNT, key = "{ #repo.fullDisplayName }")
-	public int contributorCount(final GitRepository repo) throws GitSharkException {
+	@Cacheable(cacheNames = RepoCacheConstants.CONTRIB_COUNT, key = "#repo.fullDisplayName")
+	public Integer contributorCount(final GitRepository repo) throws GitSharkException {
 		return repo.executeWithReturn(db -> {
 			try {
 				// To trick the equals method of PersonIdent when inserting into the Set
@@ -76,8 +76,8 @@ public class CommitService {
 		});
 	}
 
-	@Cacheable(cacheNames = RepoCacheConstants.COMMIT_COUNT, key = "{ #repo.fullDisplayName }")
-	public long commitCount(final GitRepository repo) throws GitSharkException {
+	@Cacheable(cacheNames = RepoCacheConstants.COMMIT_COUNT, key = "#repo.fullDisplayName")
+	public Long commitCount(final GitRepository repo) throws GitSharkException {
 		return repo.executeWithReturn(db -> {
 			try {
 				return StreamSupport.stream(Git.wrap(db).log().call().spliterator(), false).count();
