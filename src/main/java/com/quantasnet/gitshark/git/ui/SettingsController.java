@@ -49,6 +49,7 @@ public class SettingsController {
 			model.addAttribute("contributorCount", commitService.contributorCount(repo));
 			model.addAttribute("branchCount", refService.branches(repo).size());
 			model.addAttribute("tagCount", refService.tags(repo).size());
+			model.addAttribute("security", dfsService.getSecurityForRepo(repo.getId()));
 		}
 		return "git/settings";
 	}

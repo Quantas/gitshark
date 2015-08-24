@@ -93,7 +93,7 @@ public class GitProtocolClientThread extends Thread {
 					throw new RepositoryAccessDeniedException();
 				}
 			}
-		} catch (final RepositoryAccessDeniedException | GitSharkException e) {
+		} catch (final GitSharkException e) {
 			LOG.error("Probably failed...", e);
 		} finally {
 			IOUtils.closeQuietly(input);

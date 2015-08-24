@@ -31,6 +31,7 @@ import com.quantasnet.gitshark.git.dfs.GitSharkDfsRef;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsRefLog;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsRepo;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsService;
+import com.quantasnet.gitshark.git.dfs.GitSharkRepoSecurity;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
 import com.quantasnet.gitshark.git.exception.RepositoryNotFoundException;
 import com.quantasnet.gitshark.user.User;
@@ -55,6 +56,9 @@ public class MongoDfsService implements GitSharkDfsService {
 	
 	@Autowired
 	private MongoDbFactory mongoDbFactory;
+
+	@Autowired
+	private MongoRepoSecurityRepository mongoSecurityRepository;
 	
 	@Autowired
 	private UserService userService;
@@ -164,7 +168,20 @@ public class MongoDfsService implements GitSharkDfsService {
 	public List<? extends GitSharkDfsRef> getAllRefsForRepo(final String repoId) {
 		return mongoRefRepository.findByRepoId(repoId);
 	}
-	
+
+	@Override
+	public GitSharkRepoSecurity getSecurityForRepo(final String repoId) {
+		final GitSharkRepoSecurity security = mongoSecurityRepository.findByRepoId(repoId);
+		return null != security ? security : new MongoRepoSecurity();
+	}
+
+	@Override
+	public void saveSecurityForRepo(final GitSharkRepoSecurity security) {
+		if (security instanceof MongoRepoSecurity) {
+			mongoSecurityRepository.save((MongoRepoSecurity) security);
+		}
+	}
+
 	@Override
 	public GitSharkDfsRef getRefByNameForRepo(final String name, final String repoId) {
 		return mongoRefRepository.findByRepoIdAndName(repoId, name);

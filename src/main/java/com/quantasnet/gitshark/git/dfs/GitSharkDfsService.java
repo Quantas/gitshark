@@ -28,6 +28,9 @@ public interface GitSharkDfsService {
 	List<? extends GitSharkDfsRepo> getAllReposForUser(User user);
 	List<? extends GitSharkDfsRef> getAllRefsForRepo(String repoId);
 
+	GitSharkRepoSecurity getSecurityForRepo(String repoId);
+	void saveSecurityForRepo(GitSharkRepoSecurity security);
+
 	GitSharkDfsRef getRefByNameForRepo(String name, String repoId);
 	boolean updateRefByNameForRepo(String name, String repoId, Ref ref);
 	boolean storeRefByNameForRepo(String name, String repoId, Ref ref);
