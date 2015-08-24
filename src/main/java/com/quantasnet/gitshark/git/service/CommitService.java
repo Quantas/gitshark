@@ -3,10 +3,14 @@ package com.quantasnet.gitshark.git.service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.eclipse.jgit.api.Git;
@@ -17,6 +21,7 @@ import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
+import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -25,6 +30,7 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.EmptyTreeIterator;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +57,24 @@ public class CommitService {
 	
 	@Autowired
 	private RefService refService;
+
+	@Cacheable(cacheNames = RepoCacheConstants.CONTRIB_COUNT, key = "{ #repo.fullDisplayName }")
+	public int contributorCount(final GitRepository repo) throws GitSharkException {
+		return repo.executeWithReturn(db -> {
+			try {
+				// To trick the equals method of PersonIdent when inserting into the Set
+				final DateTime now = DateTime.now();
+				final Date date = now.toDate();
+				final TimeZone zone = now.getZone().toTimeZone();
+
+				return StreamSupport.stream(Git.wrap(db).log().call().spliterator(), false)
+						.map(commit -> new PersonIdent(commit.getAuthorIdent().getName(), commit.getAuthorIdent().getEmailAddress(), date, zone))
+						.collect(Collectors.toSet()).size();
+			} catch (final GitAPIException e) {
+				throw new GitSharkErrorException(e);
+			}
+		});
+	}
 
 	@Cacheable(cacheNames = RepoCacheConstants.COMMIT_COUNT, key = "{ #repo.fullDisplayName }")
 	public long commitCount(final GitRepository repo) throws GitSharkException {

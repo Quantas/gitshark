@@ -46,6 +46,7 @@ public class SettingsController {
 			model.addAttribute("repoSize", Utils.readableFileSize(dfsService.repositorySize(repo.getId())));
 			model.addAttribute("files", dfsService.getPacks(repo.getId(), new DfsRepositoryDescription(repo.getName())));
 			model.addAttribute("commitCount", commitService.commitCount(repo));
+			model.addAttribute("contributorCount", commitService.contributorCount(repo));
 			model.addAttribute("branchCount", refService.branches(repo).size());
 			model.addAttribute("tagCount", refService.tags(repo).size());
 		}
