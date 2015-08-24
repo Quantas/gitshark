@@ -37,9 +37,6 @@ import com.quantasnet.gitshark.git.exception.RepositoryNotFoundException;
 import com.quantasnet.gitshark.user.User;
 import com.quantasnet.gitshark.user.UserService;
 
-/**
- * Created by andrewlandsverk on 8/17/15.
- */
 @Service
 public class MongoDfsService implements GitSharkDfsService {
 
