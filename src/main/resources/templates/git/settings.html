@@ -13,43 +13,6 @@
     </div>
 
 	<div th:if="${repo.commits}">
-		<div class="row" style="text-align: center;">
-			<div class="col-sm-2 col-sm-offset-1">
-				<h1>
-					<span th:text="${repoSize}"></span>
-					<br />
-					<small>Total Size</small>
-				</h1>
-			</div>
-			<div class="col-sm-2">
-				<h1>
-					<span th:text="${commitCount}"></span>
-					<br />
-					<small>Commits</small>
-				</h1>
-			</div>
-			<div class="col-sm-2">
-				<h1>
-					<span th:text="${branchCount}"></span>
-					<br />
-					<small>Branches</small>
-				</h1>
-			</div>
-			<div class="col-sm-2">
-				<h1>
-					<span th:text="${tagCount}"></span>
-					<br />
-					<small>Tags</small>
-				</h1>
-			</div>
-			<div class="col-sm-2">
-				<h1>
-					<span th:text="${contributorCount}"></span>
-					<br />
-					<small>People</small>
-				</h1>
-			</div>
-		</div>
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title">

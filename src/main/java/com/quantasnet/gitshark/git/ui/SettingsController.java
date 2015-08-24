@@ -14,15 +14,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.quantasnet.gitshark.Constants;
-import com.quantasnet.gitshark.Utils;
 import com.quantasnet.gitshark.git.cache.EvictAllCaches;
 import com.quantasnet.gitshark.git.cache.EvictRepoCache;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsService;
 import com.quantasnet.gitshark.git.exception.GitSharkErrorException;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
 import com.quantasnet.gitshark.git.repo.GitRepository;
-import com.quantasnet.gitshark.git.service.CommitService;
-import com.quantasnet.gitshark.git.service.RefService;
 import com.quantasnet.gitshark.user.User;
 
 @RequestMapping("/repo/{repoOwner}/{repoName}/settings")
@@ -32,23 +29,12 @@ public class SettingsController {
 	private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
 	
 	@Autowired
-	private RefService refService;
-	
-	@Autowired
 	private GitSharkDfsService dfsService;
-
-	@Autowired
-	private CommitService commitService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String settings(final GitRepository repo, final Model model) throws GitSharkException {
 		if (repo.hasCommits()) {
-			model.addAttribute("repoSize", Utils.readableFileSize(dfsService.repositorySize(repo.getId())));
 			model.addAttribute("files", dfsService.getPacks(repo.getId(), new DfsRepositoryDescription(repo.getName())));
-			model.addAttribute("commitCount", commitService.commitCount(repo));
-			model.addAttribute("contributorCount", commitService.contributorCount(repo));
-			model.addAttribute("branchCount", refService.branches(repo).size());
-			model.addAttribute("tagCount", refService.tags(repo).size());
 			model.addAttribute("security", dfsService.getSecurityForRepo(repo.getId()));
 		}
 		return "git/settings";
