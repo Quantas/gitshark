@@ -35,7 +35,7 @@
 	                </li>
 	                <li class="dropdown" sec:authorize="isAuthenticated()">
 	                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-	                        <img th:src="${#authentication.principal.imageUrl}" width="20" th:alt="${#authentication.principal.firstName + ' ' + #authentication.principal.lastName} + ' Avatar'" />
+	                        <img th:src="${#authentication.principal.imageUrl} + '&amp;s=25'" width="20" height="20" th:alt="${#authentication.principal.firstName + ' ' + #authentication.principal.lastName} + ' Avatar'" />
 	                        &nbsp;&nbsp;<span th:text="${#authentication.principal.firstName + ' ' + #authentication.principal.lastName}">User</span>
 	                        <b class="caret"></b>
 	                    </a>

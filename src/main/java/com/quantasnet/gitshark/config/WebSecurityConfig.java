@@ -83,9 +83,9 @@ public class WebSecurityConfig {
 		public void configure(final WebSecurity web) throws Exception {
 			web
 				.ignoring()
-				.antMatchers("/webjars/**", "/js/**", "/css/**");
+				.antMatchers("/webjars/**", "/js/**", "/css/**", "/fonts/**");
 		}
-		
+
 		@Override
 		protected void configure(final HttpSecurity http) throws Exception {
 			http
