@@ -9,6 +9,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+        <link rel="stylesheet" th:href="@{/css/bootstrap-yeti-3.3.5.min.css}" />
+        <link rel="stylesheet" th:href="@{/webjars/font-awesome/4.4.0/css/font-awesome.min.css}" />
+        <link rel="stylesheet" th:href="@{/css/gitserver.css}" />
+
         <!--[if !IE]><!-->
             <script type="text/javascript" th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
         <!--<![endif]-->
@@ -25,30 +29,14 @@
         <script type="text/javascript" th:src="@{/js/timeago.min.js}"></script>
         <script type="text/javascript" th:src="@{/webjars/zeroclipboard/2.2.0/ZeroClipboard.min.js}"></script>
 
-        <link rel="stylesheet" th:href="@{/css/bootstrap-yeti-3.3.5.min.css}" />
-        <link rel="stylesheet" th:href="@{/webjars/font-awesome/4.4.0/css/font-awesome.min.css}" />
-        <link rel="stylesheet" th:href="@{/css/gitserver.css}" />
-
         <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
         <!--[if lte IE 8]>
           <script src="//cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv.min.js"></script>
           <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
         <![endif]-->
 
-        <script>
-            $(document).ready(function() {
-                $("time.timeago").timeago();
-                
-                $('[data-toggle="tooltip"]').tooltip();
-                
-                $('#logoutLink').on("click", function(e) {
-                    e.preventDefault();
-                    $('#logoutForm').submit();
-                });
+        <script th:src="@{/js/clipboard.js}"></script>
 
-                new ZeroClipboard($(".copy-button"));
-            });
-        </script>
     </head>
     <body>
         <div class="wrapper">
