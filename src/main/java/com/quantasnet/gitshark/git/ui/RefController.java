@@ -1,12 +1,14 @@
 package com.quantasnet.gitshark.git.ui;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.lib.Ref;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +27,8 @@ import com.quantasnet.gitshark.git.service.RepositoryUtilities;
 @Controller
 public class RefController {
 
+	private static final Logger LOG = LoggerFactory.getLogger(RefController.class);
+
 	@Autowired
 	private RepositoryUtilities repoUtils;
 	
@@ -40,12 +44,20 @@ public class RefController {
 			final List<RefHolder> refs = new ArrayList<>();
 			
 			final Map<String, Ref> branchRefs =  type == RefType.BRANCH ? refService.branches(repo) : refService.tags(repo);
-			for (final String entry : branchRefs.keySet()) {
-				refs.add(new RefHolder(repoUtils.getRefHeadCommit(entry, repo, db), repo, entry));
-			}
-			
-			Collections.sort(refs);
-			
+
+			branchRefs.keySet()
+					.stream()
+					.map(entry -> {
+						try {
+							return new RefHolder(repoUtils.getRefHeadCommit(entry, repo, db), repo, entry);
+						} catch (GitSharkException e) {
+							LOG.error("Error building list of refs for {}, type={}", repo.getFullDisplayName(), type);
+						}
+						return null;
+					})
+					.sorted()
+					.collect(Collectors.toList());
+
 			model.addAttribute("refType", type.getName());
 			model.addAttribute("refTitle", StringUtils.capitalize(type.getName()));
 			model.addAttribute("sectionTitle", type.getTitle());

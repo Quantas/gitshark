@@ -1,7 +1,6 @@
 package com.quantasnet.gitshark.git.service;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,15 +28,13 @@ public class RefLogService {
 	
 	@Cacheable(cacheNames = RepoCacheConstants.REFLOG, key = "#repo.fullDisplayName")
 	public List<RefLog> retrieveActivity(final GitRepository repo) throws GitSharkException {
-		return repo.executeWithReturn(db -> {
-			final List<RefLog> logs = dfsService.getRefLogForRepo(repo.getId())
-					.stream()
-					.map(refLog -> buildRefLog(repo, db, refLog))
-					.collect(Collectors.toList());
-			
-			Collections.sort(logs);
-			return logs;
-		});
+		return repo.executeWithReturn(db ->
+			dfsService.getRefLogForRepo(repo.getId())
+				.stream()
+				.map(refLog -> buildRefLog(repo, db, refLog))
+				.sorted()
+				.collect(Collectors.toList())
+		);
 	}
 
 	private RefLog buildRefLog(final GitRepository repo, final Repository db, final GitSharkDfsRefLog refLog) {

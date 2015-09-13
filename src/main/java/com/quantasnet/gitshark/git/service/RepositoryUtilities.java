@@ -171,7 +171,7 @@ public class RepositoryUtilities {
 		return db.newObjectReader().open(objectId).getBytes();
 	}
 	
-	public RevCommit getRefHeadCommit(final String refString, final GitRepository repo, final Repository db) throws IOException, GitSharkException {
+	public RevCommit getRefHeadCommit(final String refString, final GitRepository repo, final Repository db) throws GitSharkException {
 		final Ref branchRef = refService.branches(repo).get(refString);
 		final Ref tagRef = refService.tags(repo).get(refString);
 		final Ref ref = branchRef != null ? branchRef : tagRef != null ? tagRef : null;

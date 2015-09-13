@@ -20,7 +20,7 @@
     	<table class="table table-hover">
 	   		<tr th:each="log : ${logs}">
 	   			<td>
-	   				<img th:src="${log.gravatarUrl} + '&amp;s=25'" data-toggle="tooltip" data-placement="right" th:alt="${log.authorName}" th:title="${log.authorName}" />
+	   				<img width="25" height="25" th:src="${log.gravatarUrl} + '&amp;s=25'" data-toggle="tooltip" data-placement="right" th:alt="${log.authorName}" th:title="${log.authorName}" />
 	   			</td>
 	   			<td>
 	   				<time class="timeago" th:attr="datetime=${log.dateTimeString}" data-toggle="tooltip" data-placement="right" th:title="${log.committer.when}"></time>
