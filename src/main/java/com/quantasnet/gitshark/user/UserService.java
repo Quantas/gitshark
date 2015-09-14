@@ -1,7 +1,5 @@
 package com.quantasnet.gitshark.user;
 
-import java.util.List;
-
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,10 +35,6 @@ public class UserService {
 
 	public User getUserById(String id) {
 		return userRepository.findOne(id);
-	}
-
-	public List<User> getAll() {
-		return userRepository.findAll();
 	}
 
 	public User registerNewUser(final RegistrationForm form) {

@@ -40,6 +40,7 @@
                     <th>E-Mail</th>
                     <th>Active</th>
                     <th>Admin</th>
+                    <th>&nbsp;</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -60,6 +61,20 @@
                     <td>
                         <span class="fa fa-fw fa-check" th:if="${user.admin}"></span>
                         <span class="fa fa-fw fa-ban" th:if="${!user.admin}"></span>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a class="btn btn-primary btn-sm" href="#"><i class="fa fa-user fa-fw"></i>&nbsp;Edit</a>
+                            <a class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
+                                <span class="fa fa-caret-down"></span></a>
+                            <ul class="dropdown-menu">
+                                <li th:if="${user.active}"><a th:href="@{/admin/users/deactivate/} + ${user.id}"><i class="fa fa-ban fa-fw"></i> Deactivate</a></li>
+                                <li th:if="${!user.active}"><a th:href="@{/admin/users/activate/} + ${user.id}"><i class="fa fa-check fa-fw"></i> Activate</a></li>
+                                <li><a th:href="@{/admin/users/delete/} + ${user.id}"><i class="fa fa-trash-o fa-fw"></i> Delete</a></li>
+                                <li th:if="${user.admin}"><a th:href="@{/admin/users/revokeadmin/} + ${user.id}">Revoke Admin</a></li>
+                                <li th:if="${!user.admin}"><a th:href="@{/admin/users/makeadmin/} + ${user.id}">Make Admin</a></li>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
                 </tbody>

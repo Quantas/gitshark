@@ -19,6 +19,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.quantasnet.gitshark.admin.user.command.UserAdminCommandConverter;
 import com.quantasnet.gitshark.git.service.RepositoryResolver;
 import com.quantasnet.gitshark.git.ui.display.DisplayTypeConverter;
 
@@ -30,6 +31,9 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
 	@Autowired
 	private DisplayTypeConverter displayTypeConverter;
+
+	@Autowired
+	private UserAdminCommandConverter userAdminCommandConverter;
 	
 	@Override
 	public void addViewControllers(final ViewControllerRegistry registry) {
@@ -79,5 +83,6 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 	public void addFormatters(final FormatterRegistry registry) {
 		super.addFormatters(registry);
 		registry.addConverter(displayTypeConverter);
+		registry.addConverter(userAdminCommandConverter);
 	}
 }
