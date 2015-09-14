@@ -41,11 +41,9 @@ public class RefController {
 		final RefType type = RefType.getForName(refType);
 		
 		repo.execute(db -> {
-			final List<RefHolder> refs = new ArrayList<>();
-			
 			final Map<String, Ref> branchRefs =  type == RefType.BRANCH ? refService.branches(repo) : refService.tags(repo);
 
-			branchRefs.keySet()
+			final List<RefHolder> refs = branchRefs.keySet()
 					.stream()
 					.map(entry -> {
 						try {
