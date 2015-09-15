@@ -51,14 +51,14 @@ public class WebSecurityConfig {
 				.authorizeRequests()
 					.anyRequest().authenticated()
 				.and()
-					.httpBasic()
+					.httpBasic().realmName("GitShark")
 				.and()
 					.csrf().disable()
 				.headers()
 					.defaultsDisabled()
-					.cacheControl().and()
-				.and()
-				.requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env));
+					.cacheControl();//.and()
+				//.and()
+				//.requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env));
 		}
 	}
 	
