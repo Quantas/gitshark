@@ -13,6 +13,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import com.quantasnet.gitshark.Constants;
 import com.quantasnet.gitshark.git.repo.GitRepository;
 import com.quantasnet.gitshark.user.User;
 
@@ -55,7 +56,7 @@ public class RepositoryResolver implements HandlerMethodArgumentResolver {
 	
 	private String buildCheckoutUrl(final HttpServletRequest request, final String userName, final GitRepository repo) {
 		return request.getScheme() + "://" + userName + '@' + request.getServerName() + ':' + request.getServerPort() + "/repo/"
-				+ repo.getOwner() + '/' + repo.getName();
+				+ repo.getOwner() + '/' + repo.getName() + Constants.DOT_GIT_SUFFIX;
 	}
 	
 	private String removeDotGit(final String name) {
