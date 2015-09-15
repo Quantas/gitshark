@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 </head>
 <body>
 <div layout:fragment="footer">
       <hr />
-      &copy;2015 Quantasnet
+      &copy;2015 Quantasnet - <span style="font-size: 10px" th:text="${application.serverName}">server name</span>
       <br />
       <br />
-	  <span class="alert alert-danger">
+	  <div class="alert alert-danger">
 		  This system is in ALPHA, expect that there may be data loss due to updates, etc.
-	  </span>
+	  </div>
 </div>
 </body>
 </html>
