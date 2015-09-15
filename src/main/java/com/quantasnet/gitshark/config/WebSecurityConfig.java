@@ -32,7 +32,7 @@ public class WebSecurityConfig {
 	}
 	
 	private static String channel(final Environment env) {
-		return env.acceptsProfiles("openshift", "heroku", "cloud") ? "REQUIRES_SECURE_CHANNEL" : "REQUIRES_INSECURE_CHANNEL";
+		return env.acceptsProfiles("cloud", "prod") ? "REQUIRES_SECURE_CHANNEL" : "REQUIRES_INSECURE_CHANNEL";
 	}
 
 	@EnableWebSecurity
