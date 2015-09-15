@@ -40,13 +40,21 @@ public class SpecialMarkupService {
 	private static final List<String> MD_POSTFIXES = Arrays.asList("md", "markdown");
 	private static final List<String> MARKDOWN_NAMES = Arrays.asList("readme.md", "readme.markdown");
 
-	private final Asciidoctor asciidoctor = Factory.create();
+	private Asciidoctor asciidoctor;
 
 	@Autowired
 	private RepositoryUtilities repoUtils;
 
 	@Autowired
 	private ServletContext servletContext;
+
+	public SpecialMarkupService() {
+		try {
+			asciidoctor = Factory.create();
+		} catch (final Throwable t) {
+			LOG.error("Error loading AsciiDoctor!");
+		}
+	}
 
 	public boolean isSpecialMarkup(final String fileName) {
 		final String postfix = getFilePostfix(fileName);
@@ -106,6 +114,10 @@ public class SpecialMarkupService {
 	}
 
 	private String renderAsciiDoc(final String originalText, final GitRepository repo, final String branch, final String parent) {
+		if (null == asciidoctor) {
+			return "Error loading AsciiDoctor";
+		}
+
 		final Options options = OptionsBuilder
 			.options()
 			.safe(SafeMode.SERVER)
