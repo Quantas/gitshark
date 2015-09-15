@@ -66,7 +66,6 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	public EmbeddedServletContainerCustomizer containerCustomizer() {
 		return container -> container.addErrorPages(
-				// new ErrorPage(HttpStatus.UNAUTHORIZED, "/401"),
 				new ErrorPage(HttpStatus.FORBIDDEN, "/403"),
 				new ErrorPage(HttpStatus.NOT_FOUND, "/404"),
 				new ErrorPage(HttpStatus.METHOD_NOT_ALLOWED, "/405"),
