@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -Dspring.profiles.active=heroku -jar target/*.jar -javaagent:target/dependency/newrelic-agent.jar
+web: java -Dserver.port=$PORT -Dspring.profiles.active=heroku -jar target/*.jar
