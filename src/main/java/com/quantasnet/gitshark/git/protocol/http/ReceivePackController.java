@@ -6,6 +6,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.errors.CorruptObjectException;
 import org.eclipse.jgit.errors.UnpackException;
 import org.eclipse.jgit.http.server.ClientVersionUtil;
@@ -94,6 +95,8 @@ public class ReceivePackController {
 				rsp.setContentType(Constants.GIT_RECEIVE_PACK_RESULT);
 				rp.receive(ServletUtils.getInputStream(req), out, null);
 				out.close();
+				// interesting
+				Git.wrap(db).gc().setExpire(null).call();
 			} catch (final CorruptObjectException | UnpackException e) {
 				LOG.error("Error receiving push", e);
 				ServletUtils.consumeRequestBody(req);

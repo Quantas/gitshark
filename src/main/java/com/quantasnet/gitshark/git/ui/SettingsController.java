@@ -59,7 +59,7 @@ public class SettingsController {
 		repo.execute(db -> {
 			try {
 				LOG.info("Starting GC for {}", repo.getFullDisplayName());
-				Git.wrap(db).gc().setAggressive(true).setExpire(null).call();
+				Git.wrap(db).gc().setExpire(null).call();
 				redirectAttributes.addFlashAttribute(Constants.SUCCESS_STATUS, "Garbage Collection Successful!");
 			} catch (final GitAPIException e) {
 				redirectAttributes.addFlashAttribute(Constants.FAILURE_STATUS, "Garbage Collection Failed!");
