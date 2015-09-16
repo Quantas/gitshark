@@ -18,12 +18,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 
 import com.quantasnet.gitshark.security.GitSharkUserDetailsService;
 
 @Configuration
 public class WebSecurityConfig {
-	
+
+	private static final String CSP = "default-src 'self'; script-src 'self' https://ssl.google-analytics.com; img-src 'self' http://www.google-analytics.com https://ssl.google-analytics.com;";
+
 	static final String GIT_HTTP_REGEX = "(\\/repo\\/)(.*)(?=.*\\.git(?!ignore))(.*)";
 
 	@Bean
@@ -107,6 +110,8 @@ public class WebSecurityConfig {
 					.csrf()
 				.and()
 					.headers()
+					.addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", CSP))
+					.addHeaderWriter(new StaticHeadersWriter("X-WebKit-CSP", CSP))
 				.and()
 					.requiresChannel().anyRequest().requires(WebSecurityConfig.channel(env))
 				.and()
