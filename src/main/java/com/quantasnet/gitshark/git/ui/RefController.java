@@ -1,6 +1,5 @@
 package com.quantasnet.gitshark.git.ui;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -49,7 +48,7 @@ public class RefController {
 						try {
 							return new RefHolder(repoUtils.getRefHeadCommit(entry, repo, db), repo, entry);
 						} catch (GitSharkException e) {
-							LOG.error("Error building list of refs for {}, type={}", repo.getFullDisplayName(), type);
+							LOG.error("Error building list of refs for {}, type={}", repo.getFullDisplayName(), type, e);
 						}
 						return null;
 					})

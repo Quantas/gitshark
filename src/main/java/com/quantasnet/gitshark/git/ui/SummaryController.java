@@ -38,9 +38,7 @@ public class SummaryController {
 			model.addAttribute("branchCount", refService.branches(repo).size());
 			model.addAttribute("tagCount", refService.tags(repo).size());
 
-			repo.execute(db -> {
-				model.addAttribute("specialmarkup", specialMarkupService.resolveReadMeFile(repo, db, db.getBranch()));
-			});
+			repo.execute(db -> model.addAttribute("specialmarkup", specialMarkupService.resolveReadMeFile(repo, db, db.getBranch())));
 		}
 		
 		return "git/summary";

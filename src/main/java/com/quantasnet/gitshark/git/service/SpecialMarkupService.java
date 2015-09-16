@@ -51,8 +51,8 @@ public class SpecialMarkupService {
 	public SpecialMarkupService() {
 		try {
 			asciidoctor = Factory.create();
-		} catch (final Throwable t) {
-			LOG.error("Error loading AsciiDoctor!", t);
+		} catch (final RuntimeException e) {
+			LOG.error("Error loading AsciiDoctor!", e);
 		}
 	}
 

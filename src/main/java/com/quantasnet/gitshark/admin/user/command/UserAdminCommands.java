@@ -11,7 +11,7 @@ enum UserAdminCommands {
 
 	public static UserAdminCommands convertFromText(final String text) {
 		for (final UserAdminCommands command : values) {
-			if (command.name().toLowerCase().equals(text)) {
+			if (command.name().equalsIgnoreCase(text)) {
 				return command;
 			}
 		}

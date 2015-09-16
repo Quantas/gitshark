@@ -8,5 +8,5 @@ $(document).ready(function() {
         $('#logoutForm').submit();
     });
 
-    new ZeroClipboard($(".copy-button"));
+    var clipboard = new ZeroClipboard($(".copy-button"));
 });
