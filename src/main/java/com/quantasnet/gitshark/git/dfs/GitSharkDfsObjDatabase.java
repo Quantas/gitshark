@@ -15,9 +15,13 @@ import org.eclipse.jgit.internal.storage.dfs.DfsPackDescription;
 import org.eclipse.jgit.internal.storage.dfs.DfsReaderOptions;
 import org.eclipse.jgit.internal.storage.dfs.ReadableChannel;
 import org.eclipse.jgit.internal.storage.pack.PackExt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 final class GitSharkDfsObjDatabase extends DfsObjDatabase {
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger(GitSharkDfsObjDatabase.class);
+
 	private final GitSharkDfsRepository repository;
 	private final GitSharkDfsService dfsService;
 	
@@ -43,7 +47,13 @@ final class GitSharkDfsObjDatabase extends DfsObjDatabase {
 
 	@Override
 	protected void rollbackPack(Collection<DfsPackDescription> desc) {
-		// NYI
+		if (null != desc) {
+			try {
+				dfsService.deletePacks(desc, repository.getId());
+			} catch (final Throwable t) {
+				LOG.error("Error rolling back DFS packet!!", t);
+			}
+		}
 	}
 
 	@Override
