@@ -1,7 +1,5 @@
 package com.quantasnet.gitshark.git.ui;
 
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +15,6 @@ import com.quantasnet.gitshark.Constants;
 import com.quantasnet.gitshark.git.cache.EvictAllCaches;
 import com.quantasnet.gitshark.git.cache.EvictRepoCache;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsService;
-import com.quantasnet.gitshark.git.exception.GitSharkErrorException;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
 import com.quantasnet.gitshark.git.repo.GitRepository;
 import com.quantasnet.gitshark.user.User;
@@ -50,21 +47,5 @@ public class SettingsController {
 		}
 		
 		return "redirect:/repo";
-	}
-
-	@EvictRepoCache
-	@RequestMapping(value = "/gc", method = RequestMethod.POST)
-	public String gc(final GitRepository repo, final RedirectAttributes redirectAttributes) throws GitSharkException {
-		repo.execute(db -> {
-			try {
-				LOG.info("Starting GC for {}", repo.getFullDisplayName());
-				Git.wrap(db).gc().setExpire(null).call();
-				redirectAttributes.addFlashAttribute(Constants.SUCCESS_STATUS, "Garbage Collection Successful!");
-			} catch (final GitAPIException e) {
-				redirectAttributes.addFlashAttribute(Constants.FAILURE_STATUS, "Garbage Collection Failed!");
-				throw new GitSharkErrorException(e);
-			}
-		});
-		return "redirect:/repo/" + repo.getInterfaceBaseUrl() + "/settings";
 	}
 }
