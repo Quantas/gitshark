@@ -37,7 +37,7 @@ public class RepositoryService {
 	}
 
 	private GitRepository buildRepo(final GitSharkDfsRepo repository, final GitSharkRepoSecurity security, final String owner) throws GitSharkException {
-		final GitRepository repo = new GitRepository(dfsService, repository, owner, repository.getName(), security.isAnonRead(), security.isAnonWrite());
+		final GitRepository repo = new GitRepository(dfsService, repository, owner, repository.getName(), security);
 		repo.setCommits(repoUtils.hasCommits(repo));
 		return repo;
 	}

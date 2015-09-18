@@ -39,11 +39,11 @@
 				</h3>
 			</div>
 			<div class="panel-body">
-				Anon Read:<span th:text="${security.anonRead}"></span><br />
-				Anon Write:<span th:text="${security.anonWrite}"></span><br />
+				Anon Read:<span th:text="${repo.security.anonRead}"></span><br />
+				Anon Write:<span th:text="${repo.security.anonWrite}"></span><br />
 				Users
 				<br />
-				<span th:each="user : ${users}">
+				<span th:each="user : ${repo.security.users}">
 					<span th:text="${user}"></span><br />
 				</span>
 			</div>

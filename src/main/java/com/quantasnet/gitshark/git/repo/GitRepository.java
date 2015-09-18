@@ -9,6 +9,7 @@ import com.quantasnet.gitshark.Constants;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsRepo;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsRepository;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsService;
+import com.quantasnet.gitshark.git.dfs.GitSharkRepoSecurity;
 import com.quantasnet.gitshark.git.exception.GitSharkErrorException;
 import com.quantasnet.gitshark.git.exception.GitSharkException;
 
@@ -21,6 +22,7 @@ public class GitRepository implements Comparable<GitRepository> {
 
 	private final GitSharkDfsService dfsService;
 	private final GitSharkDfsRepo repository;
+	private final GitSharkRepoSecurity security;
 	private final String owner;
 	private final String name;
 	
@@ -28,18 +30,14 @@ public class GitRepository implements Comparable<GitRepository> {
 	private final String fullDisplayName;
 	private final String interfaceBaseUrl;
 	
-	private final boolean anonRead;
-	private final boolean anonWrite;
-	
 	private boolean commits;
 	
-	public GitRepository(final GitSharkDfsService dfsService, final GitSharkDfsRepo repository, final String owner, final String name, final boolean anonRead, final boolean anonWrite) {
+	public GitRepository(final GitSharkDfsService dfsService, final GitSharkDfsRepo repository, final String owner, final String name, final GitSharkRepoSecurity security) {
 		this.dfsService = dfsService;
 		this.repository = repository;
 		this.owner = owner;
 		this.name = name;
-		this.anonRead = anonRead;
-		this.anonWrite = anonWrite;
+		this.security = security;
 		
 		this.displayName = name.replaceAll("\\" + Constants.DOT_GIT_SUFFIX, "");
 		this.fullDisplayName = getOwner() + '/' + getDisplayName();
@@ -73,19 +71,15 @@ public class GitRepository implements Comparable<GitRepository> {
 	public String getName() {
 		return name;
 	}
-	
-	public boolean isAnonRead() {
-		return anonRead;
+
+	public GitSharkRepoSecurity getSecurity() {
+		return security;
 	}
-	
-	public boolean isAnonWrite() {
-		return anonWrite;
-	}
-	
+
 	public void setCommits(boolean commits) {
 		this.commits = commits;
 	}
-	
+
 	/**
 	 * alias for isCommits
 	 */
@@ -112,7 +106,7 @@ public class GitRepository implements Comparable<GitRepository> {
 	@Override
 	public String toString() {
 		return "GitRepository [owner=" + owner + ", name=" + name + ", displayName=" + displayName
-				+ ", fullDisplayName=" + fullDisplayName + ", anonRead=" + anonRead + ", anonWrite=" + anonWrite
+				+ ", fullDisplayName=" + fullDisplayName + ", security=" + security
 				+ ", commits=" + commits + "]";
 	}
 

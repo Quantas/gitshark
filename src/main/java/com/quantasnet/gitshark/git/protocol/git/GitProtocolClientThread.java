@@ -81,13 +81,13 @@ public class GitProtocolClientThread extends Thread {
 			final GitRepository gitRepo = repoService.getRepository(repo, owner, null);
 			
 			if (Constants.GIT_UPLOAD_PACK.equals(requestedMethod)) {
-				if (gitRepo.isAnonRead()) {
+				if (gitRepo.getSecurity().isAnonRead()) {
 					gitRepo.execute(db -> new UploadPack(db).upload(input, output, null));
 				} else {
 					throw new RepositoryAccessDeniedException();
 				}
 			} else if (Constants.GIT_RECEIVE_PACK.equals(requestedMethod)) {
-				if (gitRepo.isAnonWrite()) {
+				if (gitRepo.getSecurity().isAnonWrite()) {
 					gitRepo.execute(db -> receivePackFactory.createReceivePack(db, gitRepo, null).receive(input, output, null));
 				} else {
 					throw new RepositoryAccessDeniedException();

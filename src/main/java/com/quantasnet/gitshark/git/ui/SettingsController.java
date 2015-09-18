@@ -35,7 +35,6 @@ public class SettingsController {
 	public String settings(final GitRepository repo, final Model model) throws GitSharkException {
 		if (repo.hasCommits()) {
 			model.addAttribute("files", dfsService.getPacks(repo.getId(), new DfsRepositoryDescription(repo.getName())));
-			model.addAttribute("security", dfsService.getSecurityForRepo(repo.getId()));
 		}
 		return "git/settings";
 	}
