@@ -23,7 +23,7 @@
 		</div>
   		<div class="panel-body">
 			<span class="pull-left">
-				<img th:src="${commit.gravatarUrl} + '&amp;s=25'" th:alt="${commit.authorName} + ' Avatar'" />
+				<img height="25" width="25" th:src="${commit.gravatarUrl} + '&amp;s=25'" th:alt="${commit.authorName} + ' Avatar'" />
 				&nbsp;
 				<span th:text="${commit.authorName} + ' - ' + ${commit.commit.authorIdent.when}"></span>
 			</span>

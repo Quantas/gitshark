@@ -24,7 +24,7 @@
 		</div>
 		<div class="panel-body">
 			<span class="pull-left">
-				<img th:src="${file.gravatarUrl} + '&amp;s=25'" th:alt="${file.authorName} + ' Avatar'" />
+				<img height="25" width="25" th:src="${file.gravatarUrl} + '&amp;s=25'" th:alt="${file.authorName} + ' Avatar'" />
 				&nbsp;
 				<span th:text="${file.authorName} + ' - ' + ${file.commit.authorIdent.when}"></span>
 			</span>
