@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.internal.storage.dfs.DfsObjDatabase.PackSource;
@@ -67,6 +68,7 @@ public class MongoDfsService implements GitSharkDfsService {
 	
 	@Override
 	public OutputStream getPackOutStream(final DfsPackDescription desc, final PackExt ext, final String repoId) {
+		LOG.info("Creating new pack file = {}, {}", desc, ext.getExtension());
 		final GridFSInputFile newFile = gridFS().createFile();
 		newFile.setMetaData(createMetadata(desc, ext, repoId));
 		return newFile.getOutputStream();
@@ -74,18 +76,21 @@ public class MongoDfsService implements GitSharkDfsService {
 	
 	@Override
 	public List<DfsPackDescription> getPacks(final String repoId, final DfsRepositoryDescription desc) {
+		LOG.info("Reading all packs for {}", desc.getRepositoryName());
 		final List<GridFSDBFile> dbFiles = gridFS().find(new BasicDBObject("metadata.repoId", repoId));
-		final List<DfsPackDescription> packs = new ArrayList<>();
-		for (final GridFSDBFile file : dbFiles) {
-			final DBObject metadata = file.getMetaData();
-			final String fileName = (String) metadata.get("fileName");
-			packs.add(createDescriptionFromMetadata(metadata, fileName, desc));
-		}
-		return packs;
+		return dbFiles
+			.stream()
+			.map(file -> {
+				final DBObject metadata = file.getMetaData();
+				final String fileName = (String) metadata.get("fileName");
+				return createDescriptionFromMetadata(metadata, fileName, desc);
+			})
+			.collect(Collectors.toList());
 	}
 	
 	@Override
 	public byte[] readFromPackFile(final DfsPackDescription desc, final PackExt ext, final String repoId) {
+		LOG.info("Reading from pack = {}, {}", desc, ext.getExtension());
 		final GridFSDBFile file = gridFS().findOne(new BasicDBObject("metadata.fileName", desc.getFileName(ext)).append("metadata.repoId", repoId));
 		if (null != file) {
 			try (final InputStream inputStream = file.getInputStream()) {
@@ -100,7 +105,7 @@ public class MongoDfsService implements GitSharkDfsService {
 	@Override
 	public void deletePacks(final Collection<DfsPackDescription> replaces, final String repoId) {
 		replaces.forEach(pack -> getAvailableExtensions(pack).forEach(ext -> {
-			LOG.info("Deleting Pack = {}", pack);
+			LOG.info("Deleting Pack = {}, {}", pack, ext.getExtension());
 			gridFS().remove(new BasicDBObject("metadata.fileName", pack.getFileName(ext)).append("metadata.repoId", repoId));
 		}));
 	}
