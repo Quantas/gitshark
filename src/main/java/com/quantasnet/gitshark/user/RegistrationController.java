@@ -38,7 +38,7 @@ public class RegistrationController {
 		final User userNameCheck = userService.getUserByUsername(form.getUserName());
 
 		if (null != userNameCheck) {
-			result.addError(new FieldError(REGISTRATION_FORM, "userName", "already taken"));
+			result.addError(new FieldError(REGISTRATION_FORM, "userName", "Username already taken"));
 		}
 		
 		final User emailCheck = userService.getUserByEmail(form.getEmail());
