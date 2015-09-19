@@ -118,7 +118,7 @@ public class MongoDfsService implements GitSharkDfsService {
 	
 	@Override
 	public long repositorySize(final String repoId) {
-		return gridFS().find(new BasicDBObject("metadata.repoId", repoId)).stream().mapToLong(file -> file.getLength()).sum();
+		return gridFS().find(new BasicDBObject("metadata.repoId", repoId)).stream().mapToLong(GridFSFile::getLength).sum();
 	}
 	
 	@Override
