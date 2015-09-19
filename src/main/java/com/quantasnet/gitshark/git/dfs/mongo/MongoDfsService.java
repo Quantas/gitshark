@@ -76,7 +76,7 @@ public class MongoDfsService implements GitSharkDfsService {
 	
 	@Override
 	public List<DfsPackDescription> getPacks(final String repoId, final DfsRepositoryDescription desc) {
-		LOG.info("Reading all packs for {}", desc.getRepositoryName());
+		LOG.debug("Reading all packs for {}", desc.getRepositoryName());
 		final List<GridFSDBFile> dbFiles = gridFS().find(new BasicDBObject("metadata.repoId", repoId));
 		return dbFiles
 			.stream()
