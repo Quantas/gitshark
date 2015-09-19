@@ -5,8 +5,6 @@ import java.util.regex.Pattern;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.quantasnet.gitshark.config.WebSecurityConfig;
-
 public class WebSecurityConfigTest {
 
 	final Pattern pattern = Pattern.compile(WebSecurityConfig.GIT_HTTP_REGEX);
