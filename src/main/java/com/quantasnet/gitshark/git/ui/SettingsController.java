@@ -1,8 +1,11 @@
 package com.quantasnet.gitshark.git.ui;
 
+import java.util.stream.Collectors;
+
+import org.eclipse.jgit.internal.storage.dfs.DfsObjDatabase;
+import org.eclipse.jgit.internal.storage.dfs.DfsPackDescription;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.jgit.internal.storage.pack.PackExt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -23,15 +26,16 @@ import com.quantasnet.gitshark.user.User;
 @Controller
 public class SettingsController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
-	
 	@Autowired
 	private GitSharkDfsService dfsService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String settings(final GitRepository repo, final Model model) throws GitSharkException {
 		if (repo.hasCommits()) {
-			model.addAttribute("files", dfsService.getPacks(repo.getId(), new DfsRepositoryDescription(repo.getName())));
+			model.addAttribute("files", dfsService.getPacks(repo.getId(), new DfsRepositoryDescription(repo.getName()))
+					.stream()
+					.map(this::buildModel)
+					.collect(Collectors.toList()));
 		}
 		return "git/settings";
 	}
@@ -47,5 +51,42 @@ public class SettingsController {
 		}
 		
 		return "redirect:/repo";
+	}
+
+	private PackModel buildModel(final DfsPackDescription pack) {
+		final PackExt ext;
+		if (pack.hasFileExt(PackExt.INDEX)) {
+			ext = PackExt.INDEX;
+		} else if (pack.hasFileExt(PackExt.PACK)) {
+			ext = PackExt.PACK;
+		} else {
+			ext = PackExt.BITMAP_INDEX;
+		}
+
+		return new PackModel(pack.getFileName(ext), ext, pack.getPackSource());
+	}
+
+	private class PackModel {
+		private final String fileName;
+		private final PackExt extension;
+		private final DfsObjDatabase.PackSource packSource;
+
+		public PackModel(String fileName, PackExt extension, DfsObjDatabase.PackSource packSource) {
+			this.fileName = fileName;
+			this.extension = extension;
+			this.packSource = packSource;
+		}
+
+		public String getFileName() {
+			return fileName;
+		}
+
+		public PackExt getExtension() {
+			return extension;
+		}
+
+		public DfsObjDatabase.PackSource getPackSource() {
+			return packSource;
+		}
 	}
 }

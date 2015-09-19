@@ -26,6 +26,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.gridfs.GridFSFile;
 import com.mongodb.gridfs.GridFSInputFile;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsRef;
 import com.quantasnet.gitshark.git.dfs.GitSharkDfsRefLog;
@@ -262,6 +263,7 @@ public class MongoDfsService implements GitSharkDfsService {
 		final MongoObjMetadata metadata = new MongoObjMetadata();
 		metadata.setDeltaCount(desc.getDeltaCount());
 		metadata.setFileName(desc.getFileName(ext));
+		metadata.setExtension(ext.getExtension());
 		metadata.setIndexVersion(desc.getIndexVersion());
 		metadata.setLastModified(desc.getLastModified());
 		metadata.setObjectCount(desc.getObjectCount());
@@ -272,11 +274,26 @@ public class MongoDfsService implements GitSharkDfsService {
 	
 	private DfsPackDescription createDescriptionFromMetadata(final DBObject dbObject, final String fileName, final DfsRepositoryDescription description) {
 		final DfsPackDescription dfsPackDescription = new DfsPackDescription(description, fileName);
+		final PackExt ext = buildExt(dbObject.get("extension"));
+		if (null != ext) {
+			dfsPackDescription.addFileExt(ext);
+		}
 		dfsPackDescription.setLastModified((long) dbObject.get("lastModified"));
 		dfsPackDescription.setObjectCount((long) dbObject.get("objectCount"));
 		dfsPackDescription.setDeltaCount((long) dbObject.get("deltaCount"));
 		dfsPackDescription.setIndexVersion((int) dbObject.get("indexVersion"));
 		dfsPackDescription.setPackSource(PackSource.valueOf((String) dbObject.get("packSource")));
 		return dfsPackDescription;
+	}
+
+	private PackExt buildExt(final Object extension) {
+		if (PackExt.INDEX.getExtension().equals(extension)) {
+			return PackExt.INDEX;
+		} else if (PackExt.PACK.getExtension().equals(extension)) {
+			return PackExt.PACK;
+		} else if (PackExt.BITMAP_INDEX.getExtension().equals(extension)) {
+			return PackExt.BITMAP_INDEX;
+		}
+		return null;
 	}
 }

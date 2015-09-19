@@ -22,9 +22,8 @@
 			<div class="panel-body">
 				<table class="table table-striped table-hover">
 					<tr th:each="file : ${files}">
-						<td th:text="${file}"></td>
-						<td th:text="${file.objectCount}"></td>
-						<td th:text="${file.indexVersion}"></td>
+						<td th:text="${file.fileName}"></td>
+						<td th:text="${file.extension.extension}"></td>
 						<td th:text="${file.packSource}"></td>
 					</tr>
 				</table>

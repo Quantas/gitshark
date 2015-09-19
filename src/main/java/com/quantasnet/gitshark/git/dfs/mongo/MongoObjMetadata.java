@@ -8,6 +8,7 @@ class MongoObjMetadata {
 
 	private String repoId;
 	private String fileName;
+	private String extension;
 	private String packSource;
 	private Long lastModified;
 	private Long objectCount;
@@ -18,6 +19,7 @@ class MongoObjMetadata {
 		final BasicDBObject returnObj = new BasicDBObject();
 		returnObj.put("repoId", repoId);
 		addIfExists(returnObj, "fileName", fileName);
+		addIfExists(returnObj, "extension", extension);
 		addIfExists(returnObj, "packSource", packSource);
 		addIfExists(returnObj, "lastModified", lastModified);
 		addIfExists(returnObj, "objectCount", objectCount);
@@ -47,7 +49,15 @@ class MongoObjMetadata {
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-	
+
+	public String getExtension() {
+		return extension;
+	}
+
+	public void setExtension(String extension) {
+		this.extension = extension;
+	}
+
 	public PackSource getPackSource() {
 		return PackSource.valueOf(packSource);
 	}
