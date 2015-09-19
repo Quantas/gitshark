@@ -269,8 +269,10 @@
 		<profile>
 			<id>disable-devtools</id>
 			<activation>
+				<!-- Epic Hack: Just for Heroku -->
 				<property>
-					<name>DISABLE_DEVTOOLS</name>
+					<name>skipTests</name>
+					<value>true</value>
 				</property>
 			</activation>
 			<dependencies>
