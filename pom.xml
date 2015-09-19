@@ -241,6 +241,14 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.springframework.boot</groupId>
+							<artifactId>spring-boot-devtools</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 
 			<plugin>
@@ -263,27 +271,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-
-	<profiles>
-		<profile>
-			<id>disable-devtools</id>
-			<activation>
-				<!-- Epic Hack: Just for Heroku -->
-				<property>
-					<name>skipTests</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-devtools</artifactId>
-					<scope>provided</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
-
-
 </project>
