@@ -1,6 +1,7 @@
 package com.quantasnet.gitshark.user;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,11 +23,11 @@ public class UserService {
 	private PasswordEncoder passwordEncoder;
 	
 	public User getUserByUsername(final String username) {
-		return userRepository.getUserByUserName(username);
+		return userRepository.getUserByUserName(StringUtils.lowerCase(username));
 	}
 
 	public User getUserByEmail(final String email) {
-		return userRepository.getUserByEmail(email);
+		return userRepository.getUserByEmail(StringUtils.lowerCase(email));
 	}
 	
 	public long count() {
