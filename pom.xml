@@ -46,7 +46,7 @@
 		<org.apache.commons.commons-lang3.version>3.4</org.apache.commons.commons-lang3.version>
 		<org.apache.tika.version>1.10</org.apache.tika.version>
 		<org.asciidoctor.version>1.5.2</org.asciidoctor.version>
-		<org.eclipse.jgit.version>4.1.0.201509280440-r</org.eclipse.jgit.version>
+		<org.eclipse.jgit.version>4.1.1.201511131810-r</org.eclipse.jgit.version>
 		<org.pegdown.version>1.6.0</org.pegdown.version>
 		<org.webjars.bootstrap.version>3.3.5</org.webjars.bootstrap.version>
 		<org.webjars.fontawesome.version>4.4.0</org.webjars.fontawesome.version>
