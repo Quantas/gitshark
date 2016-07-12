@@ -8,3 +8,5 @@ hs_err_pid*.log
 *.iml
 gitserver.log
 .springBeans
+*.ipr
+*.iws
