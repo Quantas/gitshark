@@ -46,7 +46,7 @@ final class GitSharkDfsObjDatabase extends DfsObjDatabase {
 	}
 
 	@Override
-	protected void rollbackPack(Collection<DfsPackDescription> desc) {
+	protected void rollbackPack(final Collection<DfsPackDescription> desc) {
 		if (null != desc) {
 			try {
 				dfsService.deletePacks(desc, repository.getId());
