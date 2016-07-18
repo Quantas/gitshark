@@ -256,7 +256,7 @@ public class MongoDfsService implements GitSharkDfsService {
 		newRef.setSymbolic(ref.isSymbolic());
 		
 		if (ref.isSymbolic()) {
-			final Ref target = ((SymbolicRef)ref).getTarget();
+			final Ref target = ref.getTarget();
 			newRef.setTargetName(target.getName());
 			newRef.setTargetObjectId(target.getObjectId().name());
 		}
