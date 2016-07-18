@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
@@ -142,8 +143,20 @@ public class RepositoryUtilities {
 
 	public RepoFile buildRepoFileObject(final GitRepository repo, final Repository db, final String path, final String ref, final boolean customPath, final String pathString,
 			final boolean directory, final ObjectId objectId) throws GitAPIException, GitSharkException {
-		
-		final String name = customPath ? pathString.replaceFirst(path + "/", "") : pathString;
+
+		final String name;
+
+		if (customPath) {
+			int pathLen = path.length();
+			if (pathLen == pathString.length()) {
+				name = pathString;
+			} else {
+				name = pathString.substring(pathLen + 1);
+			}
+		} else {
+			name = pathString;
+		}
+
 		final String parent = pathString.substring(0, pathString.lastIndexOf("/") + 1);
 
 		RevCommit commit = null;
