@@ -3,9 +3,11 @@ package com.quantasnet.gitshark.git.dfs.mongo;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -15,14 +17,12 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.pack.PackExt;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Ref.Storage;
-import org.eclipse.jgit.lib.SymbolicRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.stereotype.Service;
 
-import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFS;
@@ -104,22 +104,21 @@ public class MongoDfsService implements GitSharkDfsService {
 	
 	@Override
 	public void deletePacks(final Collection<DfsPackDescription> replaces, final String repoId) {
-		replaces.forEach(pack -> getAvailableExtensions(pack).forEach(ext -> {
-			LOG.info("Deleting Pack = {}, {}", pack, ext.getExtension());
-			gridFS().remove(new BasicDBObject("metadata.fileName", pack.getFileName(ext)).append("metadata.repoId", repoId));
-		}));
-	}
-	
-	private List<PackExt> getAvailableExtensions(final DfsPackDescription desc) {
-		final List<PackExt> extensions = new ArrayList<>();
-		
-		ImmutableList.of(PackExt.PACK, PackExt.INDEX, PackExt.BITMAP_INDEX).forEach(ext -> {
-			if (desc.hasFileExt(ext)) {
-				extensions.add(ext);
-			}
-		});
-		
-		return extensions;
+		replaces
+				.stream()
+				.map(pack -> pack.getFileName(PackExt.PACK))
+				.collect(Collectors.toSet())
+
+				.forEach(pack -> {
+					final String packNameNoExt = pack.substring(0, pack.lastIndexOf('.'));
+					LOG.info("Deleting Pack = {}", packNameNoExt);
+
+					final BasicDBObject query = new BasicDBObject();
+					query.put("metadata.fileName", Pattern.compile(packNameNoExt + "\\.(idx|pack|bitmap)"));
+					query.put("metadata.repoId", repoId);
+
+					gridFS().remove(query);
+				});
 	}
 	
 	@Override
